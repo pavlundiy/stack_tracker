@@ -325,6 +325,43 @@ canvas{display:block;width:100%!important}
 .empty-s{font-size:14px;line-height:1.5}
 .gap{height:16px}
 .divider{height:1px;background:var(--line);margin:0 16px}
+
+/* ── INSIGHT CARD ── */
+.insight-card{background:var(--bg2);border-radius:12px;padding:14px 16px;margin:4px 12px;display:flex;gap:12px;align-items:flex-start}
+.insight-ico{font-size:28px;flex-shrink:0;line-height:1.1}
+.insight-body{flex:1;min-width:0}
+.insight-title{font-size:15px;font-weight:600;color:var(--t1);margin-bottom:3px}
+.insight-sub{font-size:13px;color:var(--t2);line-height:1.5}
+.insight-pill{display:inline-block;background:var(--blue)22;color:var(--blue);border-radius:99px;padding:2px 10px;font-size:12px;font-weight:600;margin-top:4px}
+.insight-pill.green{background:#4CAF5022;color:var(--green)}
+.insight-pill.amber{background:#FF980022;color:var(--orange)}
+.insight-pill.red{background:#F4433622;color:var(--red)}
+
+/* ── CYCLE BADGE ── */
+.cycle-bar{height:6px;background:var(--bg3);border-radius:99px;margin-top:6px;overflow:hidden}
+.cycle-fill{height:6px;border-radius:99px;background:var(--green);transition:width .4s}
+.cycle-fill.warn{background:var(--orange)}
+.cycle-fill.break{background:#666}
+
+/* ── CONFETTI ── */
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden}
+.confetti-piece{position:absolute;width:8px;height:8px;border-radius:2px;animation:confetti-fall 1.2s ease-in forwards}
+@keyframes confetti-fall{0%{opacity:1;transform:translateY(-20px) rotate(0deg)}100%{opacity:0;transform:translateY(110vh) rotate(720deg)}}
+
+/* ── DAILY QUESTION ── */
+.dq-card{background:linear-gradient(135deg,#1a3a5c,#2b5278);border-radius:12px;padding:16px;margin:4px 12px}
+.dq-title{font-size:14px;font-weight:600;color:#90caf9;margin-bottom:10px}
+.dq-btns{display:flex;gap:8px}
+.dq-btn{flex:1;padding:10px 6px;background:rgba(255,255,255,0.1);border:none;border-radius:10px;font-size:20px;cursor:pointer;transition:all .15s;font-family:inherit}
+.dq-btn:active,.dq-btn.picked{background:rgba(255,255,255,0.25);transform:scale(1.08)}
+
+/* ── WEEKLY REPORT ── */
+.wr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.wr-box{background:rgba(255,255,255,0.08);border-radius:10px;padding:10px;text-align:center}
+.wr-val{font-size:20px;font-weight:700;color:#fff}
+.wr-lbl{font-size:10px;color:rgba(255,255,255,0.6);margin-top:2px}
+.day-dots{display:flex;gap:4px;margin-top:8px}
+.day-dot{width:10px;height:10px;border-radius:50%;flex:1}
 </style>
 </head>
 <body>
@@ -378,17 +415,34 @@ canvas{display:block;width:100%!important}
           <div style="flex:1">
             <div style="font-size:21px;font-weight:700" id="greet">Привет!</div>
             <div style="font-size:13px;color:var(--t2);margin-top:3px" id="tdate"></div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px" id="today-pills"></div>
-          <div style="margin-top:6px" id="age-badge"></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px" id="today-pills"></div>
+            <div style="margin-top:4px" id="age-badge"></div>
           </div>
         </div>
 
-        <!-- Alerts -->
+        <!-- Morning context line -->
+        <div id="morning-ctx"></div>
+
+        <!-- Daily question -->
+        <div id="daily-question"></div>
+
+        <!-- Synergy alerts -->
         <div id="alerts"></div>
+
+        <!-- Insights from diary -->
+        <div id="diary-insights"></div>
+
+        <!-- Cycle alerts -->
+        <div id="cycle-alerts"></div>
+
+        <!-- Weekly report (Sundays) -->
+        <div id="weekly-report"></div>
 
         <!-- Schedule -->
         <div id="sched"></div>
         <div class="gap"></div>
+        <!-- Confetti container -->
+        <div class="confetti-wrap" id="confetti-wrap"></div>
 
       </div>
     </div>
@@ -714,22 +768,22 @@ const S = {
 // ─────────────────────────────────────────────────
 function defaultBad() {
   return [
-    {id:'d3',     name:'Витамин D3',       cat:'vitamins', e:'☀️', dose:'1000–4000 МЕ', time:'утро с едой',    syn:['omega3','k2'],     con:['mg_same'], note:'Жирорастворимый. При >2000 МЕ нужен K2.'},
-    {id:'k2',     name:'Витамин K2-MK7',   cat:'vitamins', e:'🦴', dose:'90–200 мкг',   time:'с едой',         syn:['d3'],              con:[], note:'Направляет кальций в кости. Обязателен при D3 >2000 МЕ.'},
-    {id:'vitc',   name:'Витамин C',         cat:'vitamins', e:'🍋', dose:'500–2000 мг',  time:'с едой',         syn:['collagen'],        con:[], note:'Катализирует синтез коллагена.'},
-    {id:'vitb',   name:'Витамин B-комплекс',cat:'vitamins', e:'🅱️', dose:'по составу',   time:'утром с едой',   syn:[],                  con:[], note:'Натощак вызывает тошноту.'},
-    {id:'optimen',name:'Opti Men',           cat:'vitamins', e:'💪', dose:'1 таб/день',   time:'с завтраком',   syn:['omega3','collagen'],con:[], note:'Содержит D3 ~1000 МЕ, Mg ~40 мг, Zn ~15 мг, C ~300 мг.'},
-    {id:'mg',     name:'Магний цитрат',     cat:'minerals', e:'🔮', dose:'310–420 мг Mg', time:'вечером',       syn:['ltean'],           con:[], note:'Вечером — улучшает сон и расслабляет мышцы.'},
-    {id:'zinc',   name:'Цинк',              cat:'minerals', e:'⚡', dose:'8–11 мг',       time:'с едой',        syn:[],                  con:['iron'], note:'Opti Men даёт 100% нормы. Не добавлять отдельно.'},
-    {id:'iron',   name:'Железо',            cat:'minerals', e:'🔩', dose:'по анализам',   time:'натощак',       syn:['vitc'],            con:['zinc','calcium'], note:'Только при подтверждённом дефиците.'},
-    {id:'omega3', name:'Омега-3 (EPA/DHA)', cat:'sport',    e:'🐟', dose:'1–3 г EPA+DHA', time:'с жирной едой', syn:['d3'],              con:[], note:'Без жирной еды усвоение −50%.'},
-    {id:'creatine',name:'Креатин',          cat:'sport',    e:'⚡', dose:'3–5 г/день',    time:'после трен.',   syn:['leuzea'],          con:[], note:'Ежедневно. Время приёма не критично.'},
-    {id:'collagen',name:'Коллаген',         cat:'sport',    e:'💎', dose:'5–15 г/день',   time:'натощак/после трен.',syn:['vitc','hond'],con:[], note:'После тренировки — максимальная эффективность.'},
-    {id:'hond',   name:'Хондроитин+Глюкозамин+MSM',cat:'sport',e:'🦴',dose:'1500 мг глюкозамина',time:'с едой',syn:['collagen'],con:[], note:'Полная цепочка для суставов. Эффект через 4–8 нед.'},
-    {id:'ashwa',  name:'Ашваганда KSM-66',  cat:'adapto',   e:'🌿', dose:'300–600 мг',    time:'вечером',       syn:['mg','ltean'],      con:[], note:'Снижает кортизол. Эффект через 3–4 недели.'},
-    {id:'ltean',  name:'L-теанин',          cat:'adapto',   e:'🍵', dose:'100–400 мг',    time:'по потребности', syn:['mg'],             con:[], note:'Альфа-волны + медитация = синергия.'},
-    {id:'leuzea', name:'Левзея',            cat:'adapto',   e:'🌱', dose:'500–1000 мг',   time:'утром до 16:00',syn:['creatine'],        con:[], note:'После 16:00 нарушает сон.'},
-    {id:'tribulus',name:'Трибулус',         cat:'adapto',   e:'🪴', dose:'250–750 мг',    time:'утром',         syn:[],                  con:[], note:'Только циклами: 6 нед — 3 нед перерыв.'},
+    {id:'d3',     name:'Витамин D3',       cat:'vitamins', e:'☀️', dose:'1000–4000 МЕ', time:'утро с едой',    syn:['omega3','k2'],     con:['mg_same'], note:'Жирорастворимый. При >2000 МЕ нужен K2.',          cycleWeeks:null, breakWeeks:null},
+    {id:'k2',     name:'Витамин K2-MK7',   cat:'vitamins', e:'🦴', dose:'90–200 мкг',   time:'с едой',         syn:['d3'],              con:[], note:'Направляет кальций в кости. Обязателен при D3 >2000 МЕ.', cycleWeeks:null, breakWeeks:null},
+    {id:'vitc',   name:'Витамин C',         cat:'vitamins', e:'🍋', dose:'500–2000 мг',  time:'с едой',         syn:['collagen'],        con:[], note:'Катализирует синтез коллагена.',                          cycleWeeks:null, breakWeeks:null},
+    {id:'vitb',   name:'Витамин B-комплекс',cat:'vitamins', e:'🅱️', dose:'по составу',   time:'утром с едой',   syn:[],                  con:[], note:'Натощак вызывает тошноту.',                               cycleWeeks:null, breakWeeks:null},
+    {id:'optimen',name:'Opti Men',           cat:'vitamins', e:'💪', dose:'1 таб/день',   time:'с завтраком',   syn:['omega3','collagen'],con:[], note:'Содержит D3 ~1000 МЕ, Mg ~40 мг, Zn ~15 мг, C ~300 мг.',  cycleWeeks:null, breakWeeks:null},
+    {id:'mg',     name:'Магний цитрат',     cat:'minerals', e:'🔮', dose:'310–420 мг Mg', time:'вечером',       syn:['ltean'],           con:[], note:'Вечером — улучшает сон и расслабляет мышцы.',              cycleWeeks:null, breakWeeks:null},
+    {id:'zinc',   name:'Цинк',              cat:'minerals', e:'⚡', dose:'8–11 мг',       time:'с едой',        syn:[],                  con:['iron'], note:'Opti Men даёт 100% нормы. Не добавлять отдельно.',    cycleWeeks:null, breakWeeks:null},
+    {id:'iron',   name:'Железо',            cat:'minerals', e:'🔩', dose:'по анализам',   time:'натощак',       syn:['vitc'],            con:['zinc','calcium'], note:'Только при подтверждённом дефиците.',         cycleWeeks:null, breakWeeks:null},
+    {id:'omega3', name:'Омега-3 (EPA/DHA)', cat:'sport',    e:'🐟', dose:'1–3 г EPA+DHA', time:'с жирной едой', syn:['d3'],              con:[], note:'Без жирной еды усвоение −50%.',                            cycleWeeks:null, breakWeeks:null},
+    {id:'creatine',name:'Креатин',          cat:'sport',    e:'⚡', dose:'3–5 г/день',    time:'после трен.',   syn:['leuzea'],          con:[], note:'Ежедневно. Время приёма не критично.',                     cycleWeeks:null, breakWeeks:null},
+    {id:'collagen',name:'Коллаген',         cat:'sport',    e:'💎', dose:'5–15 г/день',   time:'натощак/после трен.',syn:['vitc','hond'],con:[], note:'После тренировки — максимальная эффективность.',            cycleWeeks:null, breakWeeks:null},
+    {id:'hond',   name:'Хондроитин+Глюкозамин+MSM',cat:'sport',e:'🦴',dose:'1500 мг глюкозамина',time:'с едой',syn:['collagen'],con:[], note:'Полная цепочка для суставов. Эффект через 4–8 нед.',             cycleWeeks:12,   breakWeeks:4},
+    {id:'ashwa',  name:'Ашваганда KSM-66',  cat:'adapto',   e:'🌿', dose:'300–600 мг',    time:'вечером',       syn:['mg','ltean'],      con:[], note:'Снижает кортизол. Эффект через 3–4 недели.',               cycleWeeks:8,    breakWeeks:4},
+    {id:'ltean',  name:'L-теанин',          cat:'adapto',   e:'🍵', dose:'100–400 мг',    time:'по потребности', syn:['mg'],             con:[], note:'Альфа-волны + медитация = синергия.',                      cycleWeeks:null, breakWeeks:null},
+    {id:'leuzea', name:'Левзея',            cat:'adapto',   e:'🌱', dose:'500–1000 мг',   time:'утром до 16:00',syn:['creatine'],        con:[], note:'После 16:00 нарушает сон.',                                cycleWeeks:8,    breakWeeks:4},
+    {id:'tribulus',name:'Трибулус',         cat:'adapto',   e:'🪴', dose:'250–750 мг',    time:'утром',         syn:[],                  con:[], note:'Только циклами: 6 нед — 3 нед перерыв.',                   cycleWeeks:6,    breakWeeks:3},
   ];
 }
 
@@ -939,6 +993,9 @@ function renderToday() {
     '<span class="tag tg">🔥 '+str+' дн.</span> '+
     '<span class="tag '+(pct===1?'tg':'ta')+'">'+Math.round(pct*100)+'% принято</span>';
   updateRing();
+  renderInsights();
+  renderCycleAlerts();
+  renderWeeklyReport();
   // Synergy alerts
   const myIds = STACK.map(function(s){return s.id;});
   const syns = getSyn(myIds);
@@ -1083,6 +1140,24 @@ function showBad(id) {
         '<div style="font-size:14px;color:var(--t1)">'+ob.name+'</div>'+
       '</div>';
     });
+    html += '</div>';
+  }
+
+  // Cycle info
+  if (b.cycleWeeks) {
+    var cs = getCycleStatus(b);
+    html += '<div style="background:var(--bg3);border-radius:10px;padding:12px 14px;margin-bottom:12px">';
+    html += '<div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;margin-bottom:8px">🔄 Цикл приёма</div>';
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">';
+    html += '<span class="tag tg">▶ Приём: '+b.cycleWeeks+' нед</span>';
+    html += '<span class="tag ta">⏸ Перерыв: '+b.breakWeeks+' нед</span>';
+    html += '</div>';
+    if (cs.cycleStart) {
+      html += '<div style="font-size:13px;color:var(--t1);margin-bottom:6px">'+cs.statusText+'</div>';
+      html += '<div class="cycle-bar"><div class="cycle-fill '+(cs.isBreak?'break':cs.daysLeft<=7?'warn':'')+'" style="width:'+cs.pct+'%"></div></div>';
+    }
+    html += '<button class="btn btn-ghost" style="margin-top:10px" onclick="setCycleStart(\''+b.id+'\');closeSheet()">'+
+      (cs.cycleStart ? '🔄 Перезапустить цикл' : '▶ Начать цикл сейчас')+'</button>';
     html += '</div>';
   }
 
@@ -1874,6 +1949,14 @@ function openAddBad() {
       '<div id="con-add-list" style="display:flex;gap:6px;flex-wrap:wrap;min-height:28px"></div>'+
       '<div id="con-add-hidden"></div>'+
     '</div>'+
+    '<div style="border-top:1px solid var(--line);padding-top:10px">'+
+    '<div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:8px">🔄 Цикл приёма (необязательно)</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">'+
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Приём (недель)</div>'+
+        '<input id="acw" class="inp" type="number" placeholder="напр. 6"></div>'+
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Перерыв (недель)</div>'+
+        '<input id="abw" class="inp" type="number" placeholder="напр. 3"></div>'+
+    '</div></div>'+
     '<button class="btn btn-blue" onclick="saveNewBad()">Добавить в базу</button></div>'
   );
   setTimeout(function() {
@@ -1906,7 +1989,7 @@ function saveNewBad() {
   var synIds=[].map.call(synEls,function(el){return el.value;});
   var conEls=($('con-add-hidden')||{}).querySelectorAll?$('con-add-hidden').querySelectorAll('[data-id]'):[];
   var conIds=[].map.call(conEls,function(el){return el.value;});
-  var b={id:newId,name:name,e:($('ae')||{}).value||""||'💊',cat:($('ac')||{}).value||'vitamins',dose:($('ad')||{}).value||""||'—',time:($('at')||{}).value||""||'—',syn:synIds,con:conIds,note:($('ano')||{}).value||""||'',custom:true};
+  var b={id:newId,name:name,e:($('ae')||{}).value||""||'💊',cat:($('ac')||{}).value||'vitamins',dose:($('ad')||{}).value||""||'—',time:($('at')||{}).value||""||'—',syn:synIds,con:conIds,note:($('ano')||{}).value||""||'',custom:true,cycleWeeks:parseInt(($('acw')||{}).value||'')||null,breakWeeks:parseInt(($('abw')||{}).value||'')||null};
   S.bad.push(b);sv('bad_v2',S.bad);
   var customRules=ld('syn_db_v1',[]);
   synIds.forEach(function(sid){
@@ -1922,6 +2005,223 @@ function saveNewBad() {
   sv('syn_db_v1',customRules);
   closeSheet();renderBase();toast('Добавлен: '+name);
 }
+
+
+// ─── CYCLE TRACKING ───────────────────────────────
+function setCycleStart(id) {
+  var cycles = ld('cycles_v1', {});
+  cycles[id] = { start: Date.now() };
+  sv('cycles_v1', cycles);
+  renderCycleAlerts();
+  toast('Цикл начат!');
+}
+
+function getCycleStatus(b) {
+  if (!b.cycleWeeks) return null;
+  var cycles = ld('cycles_v1', {});
+  var cycle = cycles[b.id];
+  if (!cycle) return { cycleStart: null, isBreak: false, daysLeft: 0, pct: 0, statusText: 'Цикл не начат' };
+  var daysPassed = Math.floor((Date.now() - cycle.start) / 86400000);
+  var totalDays = (b.cycleWeeks * 7) + (b.breakWeeks ? b.breakWeeks * 7 : 0);
+  var cycleDays = b.cycleWeeks * 7;
+  var breakDays = b.breakWeeks ? b.breakWeeks * 7 : 0;
+  var posInCycle = daysPassed % totalDays;
+  var isBreak = posInCycle >= cycleDays;
+  var daysLeft, statusText, pct;
+  if (isBreak) {
+    daysLeft = totalDays - posInCycle;
+    statusText = '⏸ Перерыв — ещё ' + daysLeft + ' дн. до возобновления';
+    pct = ((posInCycle - cycleDays) / breakDays) * 100;
+  } else {
+    daysLeft = cycleDays - posInCycle;
+    statusText = '▶ Приём — ещё ' + daysLeft + ' дн.';
+    pct = (posInCycle / cycleDays) * 100;
+    if (daysLeft <= 3) statusText = '⚠️ Скоро перерыв — ' + daysLeft + ' дн.';
+  }
+  return { cycleStart: cycle.start, isBreak: isBreak, daysLeft: daysLeft, pct: Math.min(100, pct), statusText: statusText, daysPassed: daysPassed };
+}
+
+function renderCycleAlerts() {
+  var el = $('cycle-alerts'); if (!el) return;
+  var cycleItems = STACK.filter(function(s) {
+    var b = S.bad.find(function(x){ return x.id === s.id; });
+    return b && b.cycleWeeks;
+  });
+  if (!cycleItems.length) { el.innerHTML = ''; return; }
+  var html = '';
+  cycleItems.forEach(function(s) {
+    var b = S.bad.find(function(x){ return x.id === s.id; });
+    var cs = getCycleStatus(b);
+    if (!cs) return;
+    if (!cs.cycleStart) {
+      html += '<div class="alert alert-o" style="margin:4px 12px">' +
+        '<span class="alert-ico">🔄</span>' +
+        '<span class="alert-txt"><b>' + b.name + '</b> — цикловый приём. ' +
+        '<span style="color:var(--blue);cursor:pointer" onclick="setCycleStart(\'' + b.id + '\')">Начать цикл</span></span></div>';
+    } else if (cs.isBreak && cs.daysLeft <= 3) {
+      html += '<div class="alert alert-g" style="margin:4px 12px">' +
+        '<span class="alert-ico">✅</span>' +
+        '<span class="alert-txt"><b>' + b.name + '</b> — перерыв заканчивается через ' + cs.daysLeft + ' дн. Готовьтесь возобновить.</span></div>';
+    } else if (!cs.isBreak && cs.daysLeft <= 5) {
+      html += '<div class="alert alert-o" style="margin:4px 12px">' +
+        '<span class="alert-ico">⏸</span>' +
+        '<span class="alert-txt"><b>' + b.name + '</b> — через ' + cs.daysLeft + ' дн. начинается перерыв.</span></div>';
+    } else if (cs.isBreak) {
+      html += '<div class="alert alert-r" style="margin:4px 12px">' +
+        '<span class="alert-ico">⛔</span>' +
+        '<span class="alert-txt"><b>' + b.name + '</b> — сейчас перерыв. ' + cs.statusText + '</span></div>';
+    }
+  });
+  el.innerHTML = html;
+}
+
+// ─── DIARY INSIGHTS ───────────────────────────────
+function renderInsights() {
+  var el = $('diary-insights'); if (!el) return;
+  if (S.diary.length < 5) { el.innerHTML = ''; return; }
+
+  var insights = [];
+
+  // Magnesium -> sleep correlation
+  var mgId = 'mg';
+  var mgDays = S.diary.filter(function(e){ return e.taken > 0 && e.sleep > 0; });
+  if (mgDays.length >= 4) {
+    var withMg = mgDays.filter(function(e){ return e.taken >= 8; });
+    var withoutMg = mgDays.filter(function(e){ return e.taken < 5; });
+    if (withMg.length >= 2 && withoutMg.length >= 2) {
+      var avgWith = withMg.reduce(function(a,e){ return a+e.sleep; },0) / withMg.length;
+      var avgWithout = withoutMg.reduce(function(a,e){ return a+e.sleep; },0) / withoutMg.length;
+      if (avgWith - avgWithout >= 0.5) {
+        insights.push({ ico:'😴', txt:'В дни полного приёма стека сон лучше на ' + ((avgWith-avgWithout)*33).toFixed(0) + '%', type:'good' });
+      }
+    }
+  }
+
+  // Energy trend
+  var last7 = S.diary.slice(0,7).filter(function(e){ return e.energy > 0; });
+  var prev7  = S.diary.slice(7,14).filter(function(e){ return e.energy > 0; });
+  if (last7.length >= 3 && prev7.length >= 3) {
+    var avgNow  = last7.reduce(function(a,e){ return a+e.energy; },0) / last7.length;
+    var avgPrev = prev7.reduce(function(a,e){ return a+e.energy; },0) / prev7.length;
+    if (avgNow - avgPrev >= 0.3) {
+      insights.push({ ico:'⚡', txt:'Энергия за последнюю неделю выше чем за предыдущую', type:'good' });
+    } else if (avgPrev - avgNow >= 0.3) {
+      insights.push({ ico:'😴', txt:'Энергия снизилась по сравнению с прошлой неделей — проверьте стек', type:'warn' });
+    }
+  }
+
+  // Streak
+  var str = streak();
+  if (str >= 7) insights.push({ ico:'🔥', txt:'Стрик ' + str + ' дней подряд — отличная дисциплина!', type:'good' });
+
+  // Best day of week
+  if (S.diary.length >= 7) {
+    var byDay = {0:[],1:[],2:[],3:[],4:[],5:[],6:[]};
+    S.diary.slice(0,21).forEach(function(e) {
+      if (!e.energy) return;
+      var d = new Date(e.ts).getDay();
+      byDay[d].push(e.energy);
+    });
+    var bestDay = -1, bestAvg = 0;
+    Object.keys(byDay).forEach(function(d) {
+      if (byDay[d].length < 2) return;
+      var avg = byDay[d].reduce(function(a,b){return a+b;},0)/byDay[d].length;
+      if (avg > bestAvg) { bestAvg = avg; bestDay = parseInt(d); }
+    });
+    if (bestDay >= 0) {
+      var DNAMES = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+      insights.push({ ico:'📅', txt:'Лучший день по энергии — ' + DNAMES[bestDay], type:'info' });
+    }
+  }
+
+  if (!insights.length) { el.innerHTML = ''; return; }
+
+  el.innerHTML = '<div style="padding:0 12px 4px">' + insights.map(function(ins) {
+    var cls = ins.type === 'good' ? 'alert-g' : ins.type === 'warn' ? 'alert-o' : 'alert-r';
+    if (ins.type === 'info') cls = '';
+    return '<div class="alert ' + cls + '" style="margin-bottom:6px;background:' + (ins.type==='info'?'var(--bg2)':'') + '">' +
+      '<span class="alert-ico">' + ins.ico + '</span>' +
+      '<span class="alert-txt">' + ins.txt + '</span>' +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+// ─── WEEKLY REPORT ────────────────────────────────
+function renderWeeklyReport() {
+  var el = $('weekly-report'); if (!el) return;
+  var now = new Date();
+  // Show on Sundays or if last 7 days have enough data
+  var isSunday = now.getDay() === 0;
+  if (!isSunday && S.diary.length < 7) { el.innerHTML = ''; return; }
+  var last7 = S.diary.slice(0, 7);
+  if (last7.length < 3) { el.innerHTML = ''; return; }
+
+  var avgEnergy = last7.filter(function(e){return e.energy>0;});
+  var avgSleep  = last7.filter(function(e){return e.sleep>0;});
+  var avgE = avgEnergy.length ? (avgEnergy.reduce(function(a,e){return a+e.energy;},0)/avgEnergy.length).toFixed(1) : '—';
+  var avgS = avgSleep.length  ? (avgSleep.reduce(function(a,e){return a+e.sleep;},0)/avgSleep.length).toFixed(1)   : '—';
+  var trainDays = last7.filter(function(e){return e.workout > 0;}).length;
+  var completeDays = last7.filter(function(e){return e.taken >= STACK.length-1;}).length;
+
+  // Best entry
+  var bestEntry = last7.filter(function(e){return e.energy===3&&e.sleep===3;});
+
+  el.innerHTML = '<div class="card" style="margin:0 0 8px;border-left:3px solid var(--blue)">' +
+    '<div class="card-t">📊 ' + (isSunday ? 'Итоги недели' : 'Последние 7 дней') + '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:10px">' +
+      '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:var(--t1)">' + avgE + '</div><div style="font-size:10px;color:var(--t2)">энергия</div></div>' +
+      '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:var(--t1)">' + avgS + '</div><div style="font-size:10px;color:var(--t2)">сон</div></div>' +
+      '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:var(--green)">' + trainDays + '</div><div style="font-size:10px;color:var(--t2)">трен.</div></div>' +
+      '<div style="text-align:center"><div style="font-size:20px;font-weight:700;color:var(--blue)">' + completeDays + '/7</div><div style="font-size:10px;color:var(--t2)">полных дней</div></div>' +
+    '</div>' +
+    (bestEntry.length ? '<div style="font-size:12px;color:var(--green)">🌟 ' + bestEntry.length + ' дн. с отличной энергией и сном</div>' : '') +
+  '</div>';
+}
+
+// ─── CONFETTI ─────────────────────────────────────
+function fireConfetti() {
+  var wrap = $('confetti-wrap'); if (!wrap) return;
+  wrap.innerHTML = '';
+  wrap.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;overflow:hidden';
+  var colors = ['#2AABEE','#4CAF50','#FF9800','#F44336','#9C27B0','#FFD700'];
+  for (var i = 0; i < 60; i++) {
+    (function(i) {
+      setTimeout(function() {
+        var p = document.createElement('div');
+        var color = colors[Math.floor(Math.random()*colors.length)];
+        var x = Math.random() * 100;
+        var size = 6 + Math.random() * 8;
+        p.style.cssText = 'position:absolute;width:'+size+'px;height:'+size+'px;background:'+color+
+          ';left:'+x+'%;top:-10px;border-radius:'+(Math.random()>0.5?'50%':'2px')+
+          ';animation:fall '+(1.5+Math.random())+'s ease-in forwards';
+        wrap.appendChild(p);
+        setTimeout(function(){ p.remove(); }, 2500);
+      }, i * 30);
+    })(i);
+  }
+  setTimeout(function(){ wrap.innerHTML=''; }, 3500);
+}
+
+// Add confetti animation to page
+(function() {
+  var style = document.createElement('style');
+  style.textContent = '@keyframes fall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}' +
+    '.cycle-bar{height:6px;background:var(--bg3);border-radius:99px;margin:8px 0}' +
+    '.cycle-fill{height:6px;border-radius:99px;background:var(--green);transition:width .5s}' +
+    '.cycle-fill.break{background:var(--orange)}' +
+    '.cycle-fill.warn{background:var(--red)}';
+  document.head.appendChild(style);
+})();
+
+// ─── PATCH toggleTaken to fire confetti on 100% ───
+var _origToggleTaken = toggleTaken;
+toggleTaken = function(id) {
+  _origToggleTaken(id);
+  if (S.taken.size === STACK.length) {
+    setTimeout(fireConfetti, 200);
+    toast('🎉 Все добавки приняты!');
+  }
+};
 
 
 </script>
