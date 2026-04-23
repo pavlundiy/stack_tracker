@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>СтекАп</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#212121;
+  --bg2:#2b2b2b;
+  --bg3:#333;
+  --line:#ffffff14;
+  --t1:#fff;
+  --t2:#aaa;
+  --t3:#666;
+  --blue:#2AABEE;
+  --blue2:#1a96d4;
+  --green:#4CAF50;
+  --red:#F44336;
+  --orange:#FF9800;
+  --nav:56px;
+  --head:52px;
+  --safe:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;background:#000;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:16px;color:var(--t1);overflow:hidden}
+#root{position:fixed;inset:0;max-width:430px;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+
+/* ── HEADER ── */
+.hd{
+  height:var(--head);flex-shrink:0;
+  background:var(--bg2);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;
+  padding:0 8px;gap:4px;
+  position:relative;z-index:10;
+}
+.hd-back{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:22px;cursor:pointer;transition:background .15s}
+.hd-back:active{background:#fff1}
+.hd-ava{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.hd-info{flex:1;min-width:0;margin-left:8px}
+.hd-title{font-size:16px;font-weight:600;color:var(--t1);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd-sub{font-size:12px;color:var(--t2)}
+.hd-btn{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:20px;cursor:pointer;transition:background .15s;border:none;background:none}
+.hd-btn:active{background:#fff1}
+
+/* ── SCREENS ── */
+.pages{flex:1;position:relative;overflow:hidden}
+.page{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;
+  transform:translateX(100%);
+  transition:transform .28s cubic-bezier(.25,.46,.45,.94);
+  will-change:transform;
+  visibility:hidden;
+}
+.page.cur{transform:translateX(0);visibility:visible}
+.page.left{transform:translateX(-25%);visibility:visible}
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:var(--bg)}
+.scroll::-webkit-scrollbar{display:none}
+
+/* ── NAV ── */
+.nav{
+  height:calc(var(--nav) + var(--safe));
+  padding-bottom:var(--safe);
+  flex-shrink:0;
+  background:var(--bg2);
+  border-top:1px solid var(--line);
+  display:flex;
+}
+.nt{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--t3);cursor:pointer;padding:6px 0;border:none;background:none;transition:color .15s;font-family:inherit}
+.nt.on{color:var(--blue)}
+.nt svg{width:24px;height:24px}
+.nt span{font-size:10px;font-weight:500}
+
+/* ── LIST ROWS (Telegram chat style) ── */
+.rows{background:var(--bg2);margin:8px 0;border-radius:0}
+.row{
+  display:flex;align-items:center;
+  padding:12px 16px;gap:12px;
+  background:var(--bg2);
+  cursor:pointer;
+  position:relative;
+  min-height:60px;
+  transition:background .1s;
+}
+.row:active{background:#fff08}
+.row+.row::before{content:'';position:absolute;top:0;left:72px;right:0;height:1px;background:var(--line)}
+.row-ava{width:50px;height:50px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px}
+.row-body{flex:1;min-width:0}
+.row-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px}
+.row-name{font-size:16px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:65%}
+.row-time{font-size:12px;color:var(--t3);flex-shrink:0}
+.row-sub{font-size:14px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.badge{background:var(--blue);color:#fff;border-radius:99px;font-size:12px;font-weight:600;padding:2px 7px;min-width:20px;text-align:center;flex-shrink:0}
+.badge.g{background:var(--green)}
+.badge.r{background:var(--red)}
+
+/* ── SECTION LABEL ── */
+.slbl{padding:18px 16px 6px;font-size:13px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.05em}
+
+/* ── CELLS (settings style) ── */
+.cells{background:var(--bg2);margin:0 0 8px;overflow:hidden}
+.cell{
+  display:flex;align-items:center;padding:14px 16px;gap:12px;
+  background:var(--bg2);cursor:pointer;min-height:52px;
+  transition:background .1s;position:relative;
+}
+.cell:active{background:#fff08}
+.cell+.cell::before{content:'';position:absolute;top:0;left:60px;right:0;height:1px;background:var(--line)}
+.cell-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.cell-lbl{flex:1;font-size:16px;color:var(--t1)}
+.cell-val{font-size:15px;color:var(--t2)}
+.cell-arr{color:var(--t3);font-size:14px;margin-left:4px}
+
+/* ── CHECK ITEMS ── */
+.chk{
+  display:flex;align-items:center;padding:14px 16px;gap:14px;
+  background:var(--bg2);cursor:pointer;
+  transition:background .1s;position:relative;min-height:58px;
+}
+.chk:active{background:#fff08}
+.chk+.chk::before{content:'';position:absolute;top:0;left:62px;right:16px;height:1px;background:var(--line)}
+.chk-ring{
+  width:28px;height:28px;border-radius:50%;
+  border:2px solid var(--t3);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .2s;
+}
+.chk-ring.done{background:var(--green);border-color:var(--green);animation:pop .22s ease}
+@keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+.chk-ring svg{opacity:0;transition:opacity .15s .05s}
+.chk-ring.done svg{opacity:1}
+.chk-info{flex:1;min-width:0}
+.chk-name{font-size:15px;font-weight:500;color:var(--t1);transition:color .2s}
+.chk-name.done{color:var(--t3);text-decoration:line-through}
+.chk-dose{font-size:13px;color:var(--t2);margin-top:1px}
+.chk-note{font-size:12px;color:var(--t3)}
+
+/* ── CARD ── */
+.card{background:var(--bg2);margin:4px 0;padding:14px 16px}
+.card-t{font-size:13px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+
+/* ── STATS ROW ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:8px 12px}
+.stat{background:var(--bg2);border-radius:10px;padding:12px 4px;text-align:center}
+.stat-v{font-size:22px;font-weight:700;color:var(--t1);line-height:1.1}
+.stat-l{font-size:10px;color:var(--t2);margin-top:3px}
+
+/* ── CHIPS ── */
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:8px 16px;border-radius:20px;font-size:14px;font-weight:500;background:var(--bg3);color:var(--t2);border:none;font-family:inherit;cursor:pointer;transition:all .15s}
+.chip.on{background:var(--blue);color:#fff}
+.chip:active{opacity:.8}
+
+/* ── INPUTS ── */
+.inp{
+  width:100%;background:var(--bg3);border:none;border-radius:10px;
+  padding:13px 14px;font-size:15px;color:var(--t1);
+  font-family:inherit;outline:none;transition:background .15s;
+}
+.inp:focus{background:#3a3a3a}
+.inp::placeholder{color:var(--t3)}
+select.inp{-webkit-appearance:none;appearance:none}
+textarea.inp{resize:none}
+
+/* ── BUTTONS ── */
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:14px;border-radius:12px;
+  font-size:16px;font-weight:600;font-family:inherit;
+  cursor:pointer;border:none;transition:all .15s;
+}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-blue:active{background:var(--blue2)}
+.btn-ghost{background:var(--bg3);color:var(--blue)}
+.btn-ghost:active{opacity:.8}
+.btn-sm{padding:10px 18px;font-size:14px;border-radius:20px;width:auto}
+
+/* ── PROGRESS RING ── */
+.ring-wrap{position:relative;display:inline-flex}
+.ring-lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-n{font-size:22px;font-weight:800;line-height:1}
+.ring-t{font-size:10px;color:var(--t2)}
+
+/* ── SEARCH ── */
+.search{
+  margin:8px 12px 4px;
+  background:var(--bg3);border-radius:10px;
+  display:flex;align-items:center;padding:9px 12px;gap:8px;
+}
+.search input{flex:1;background:none;border:none;outline:none;font-size:15px;color:var(--t1);font-family:inherit}
+.search input::placeholder{color:var(--t3)}
+.search-ico{color:var(--t3);font-size:15px}
+
+/* ── SEGS ── */
+.seg{display:flex;background:var(--bg3);border-radius:9px;padding:2px;margin:0 12px 10px}
+.seg-b{flex:1;padding:7px 4px;border-radius:7px;font-size:12px;font-weight:500;color:var(--t2);border:none;font-family:inherit;cursor:pointer;transition:all .15s}
+.seg-b.on{background:var(--bg2);color:var(--t1);box-shadow:0 1px 4px #0004}
+
+/* ── TAGS ── */
+.tag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:99px;font-size:12px;font-weight:500}
+.tg{background:#4CAF5020;color:var(--green)}
+.ta{background:#FF980020;color:var(--orange)}
+.tr{background:#F4433620;color:var(--red)}
+.tb{background:#2AABEE20;color:var(--blue)}
+
+/* ── ALERT CARD ── */
+.alert{
+  margin:4px 12px;
+  border-radius:10px;padding:12px 14px;
+  display:flex;gap:10px;align-items:flex-start;
+}
+.alert-r{background:#F4433618;color:#FF8A80}
+.alert-o{background:#FF980018;color:#FFB74D}
+.alert-g{background:#4CAF5018;color:#81C784}
+.alert-ico{font-size:18px;flex-shrink:0;margin-top:1px}
+.alert-txt{font-size:13px;line-height:1.5}
+
+/* ── BOTTOM SHEET ── */
+.ovl{position:fixed;inset:0;background:#0008;z-index:50;opacity:0;pointer-events:none;transition:opacity .25s}
+.ovl.on{opacity:1;pointer-events:all}
+.sheet{
+  position:fixed;bottom:0;left:50%;
+  transform:translateX(-50%) translateY(100%);
+  width:100%;max-width:430px;
+  background:var(--bg2);border-radius:16px 16px 0 0;
+  z-index:51;transition:transform .3s cubic-bezier(.25,.46,.45,.94);
+  max-height:88vh;display:flex;flex-direction:column;
+  padding-bottom:var(--safe);
+}
+.sheet.on{transform:translateX(-50%) translateY(0)}
+.sheet-handle{width:36px;height:4px;background:var(--t3);border-radius:2px;margin:10px auto 6px;flex-shrink:0}
+.sheet-title{font-size:18px;font-weight:600;padding:4px 16px 12px;border-bottom:1px solid var(--line);flex-shrink:0}
+.sheet-body{flex:1;overflow-y:auto;padding:12px 0}
+.sheet-body::-webkit-scrollbar{display:none}
+
+/* ── BUBBLES (AI screen) ── */
+.bubbles{padding:8px 0 4px}
+.brow{display:flex;padding:2px 12px;margin-bottom:2px}
+.brow.out{justify-content:flex-end}
+.bub{
+  max-width:80%;padding:9px 13px;
+  border-radius:18px;font-size:14px;line-height:1.5;
+  word-break:break-word;
+}
+.bub.in{background:var(--bg2);color:var(--t1);border-bottom-left-radius:5px}
+.bub.out{background:#2b5278;color:#fff;border-bottom-right-radius:5px}
+.bub-t{font-size:11px;color:#ffffff60;text-align:right;margin-top:3px}
+.bub.in .bub-t{color:var(--t3)}
+.daydiv{text-align:center;margin:8px 0;font-size:12px;color:var(--t3)}
+.daydiv span{background:var(--bg3);padding:3px 10px;border-radius:99px}
+
+/* ── COMPOSER ── */
+.composer{
+  background:var(--bg2);border-top:1px solid var(--line);
+  padding:8px 12px;display:flex;align-items:center;gap:8px;
+  padding-bottom:calc(8px + var(--safe));flex-shrink:0;
+}
+.composer-inp{
+  flex:1;background:var(--bg3);border:none;border-radius:20px;
+  padding:10px 16px;font-size:15px;color:var(--t1);
+  font-family:inherit;outline:none;
+}
+.composer-inp::placeholder{color:var(--t3)}
+.composer-send{
+  width:42px;height:42px;border-radius:50%;
+  background:var(--blue);color:#fff;border:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;cursor:pointer;flex-shrink:0;
+  transition:all .15s;
+}
+.composer-send:active{transform:scale(.9)}
+.composer-action{
+  padding:9px 18px;border-radius:20px;background:var(--blue);
+  color:#fff;border:none;font-size:14px;font-weight:600;
+  font-family:inherit;cursor:pointer;flex:1;transition:all .15s;
+}
+.composer-action:active{background:var(--blue2)}
+.composer-copy{
+  width:42px;height:42px;border-radius:50%;
+  background:var(--bg3);color:var(--t2);border:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;cursor:pointer;flex-shrink:0;
+}
+
+/* ── FAB ── */
+.fab{
+  position:absolute;bottom:16px;right:16px;
+  width:56px;height:56px;border-radius:50%;
+  background:var(--blue);color:#fff;border:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;cursor:pointer;
+  box-shadow:0 4px 20px #2AABEE50;
+  transition:all .15s;z-index:5;
+}
+.fab:active{transform:scale(.92)}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:calc(var(--nav) + 16px + var(--safe));
+  left:50%;transform:translateX(-50%) translateY(10px);
+  background:#444;color:#fff;padding:10px 18px;border-radius:20px;
+  font-size:14px;white-space:nowrap;z-index:100;
+  opacity:0;pointer-events:none;
+  transition:all .25s;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── CANVAS ── */
+canvas{display:block;width:100%!important}
+
+/* ── DOSE TABLE ── */
+.dtable{width:100%;border-collapse:collapse;font-size:13px}
+.dtable th{font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase;padding:4px 6px 8px;text-align:right}
+.dtable th:first-child{text-align:left}
+.dtable td{padding:9px 6px;border-top:1px solid var(--line)}
+.dtable td:not(:first-child){text-align:right}
+.dok{color:var(--green)}.dwarn{color:var(--orange)}.derr{color:var(--red)}
+
+/* ── MISC ── */
+.empty{padding:48px 24px;text-align:center;color:var(--t3)}
+.empty-ico{font-size:52px;margin-bottom:14px}
+.empty-t{font-size:17px;font-weight:600;color:var(--t2);margin-bottom:8px}
+.empty-s{font-size:14px;line-height:1.5}
+.gap{height:16px}
+.divider{height:1px;background:var(--line);margin:0 16px}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- OVERLAY + SHEET -->
+<div class="ovl" id="ovl" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title" id="sh-title"></div>
+  <div class="sheet-body" id="sh-body"></div>
+</div>
+
+<div id="root">
+
+  <!-- HEADER -->
+  <div class="hd" id="hd">
+    <button class="hd-back" id="hd-back" onclick="goBack()" style="display:none">‹</button>
+    <div class="hd-ava" id="hd-ava" style="background:#2b5278;font-size:20px">💊</div>
+    <div class="hd-info">
+      <div class="hd-title" id="hd-title">СтекАп</div>
+      <div class="hd-sub" id="hd-sub">мой стек</div>
+    </div>
+    <button class="hd-btn" onclick="openProfile()" title="Профиль">👤</button>
+    <button class="hd-btn" id="hd-btn2" onclick="hdAction()">⋮</button>
+  </div>
+
+  <!-- PAGES -->
+  <div class="pages" id="pages">
+
+    <!-- ══ TODAY ══ -->
+    <div class="page cur" id="p-today">
+      <div class="scroll" id="s-today">
+
+        <!-- Ring + greeting -->
+        <div style="display:flex;align-items:center;gap:16px;padding:16px 16px 8px">
+          <div class="ring-wrap">
+            <svg width="86" height="86" style="transform:rotate(-90deg)">
+              <circle cx="43" cy="43" r="36" fill="none" stroke="#333" stroke-width="7"/>
+              <circle id="ring" cx="43" cy="43" r="36" fill="none" stroke="var(--green)" stroke-width="7"
+                stroke-dasharray="226.2" stroke-dashoffset="226.2"
+                stroke-linecap="round" style="transition:stroke-dashoffset .5s ease"/>
+            </svg>
+            <div class="ring-lbl">
+              <div class="ring-n" id="ring-n">0</div>
+              <div class="ring-t" id="ring-t">из 10</div>
+            </div>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:21px;font-weight:700" id="greet">Привет!</div>
+            <div style="font-size:13px;color:var(--t2);margin-top:3px" id="tdate"></div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px" id="today-pills"></div>
+          <div style="margin-top:6px" id="age-badge"></div>
+          </div>
+        </div>
+
+        <!-- Alerts -->
+        <div id="alerts"></div>
+
+        <!-- Schedule -->
+        <div id="sched"></div>
+        <div class="gap"></div>
+
+      </div>
+    </div>
+
+    <!-- ══ DIARY ══ -->
+    <div class="page" id="p-diary">
+      <div class="scroll" id="s-diary">
+
+        <div class="stats" id="d-stats"></div>
+
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div style="font-size:15px;font-weight:600" id="d-lbl">Сегодня</div>
+            <div style="display:flex;gap:6px">
+              <button onclick="dayShift(-1)" style="background:var(--bg3);color:var(--blue);border:none;border-radius:16px;padding:5px 12px;font-size:13px;font-family:inherit;cursor:pointer">← вчера</button>
+              <button onclick="dayShift(1)" id="d-fwd" style="background:var(--bg3);color:var(--t3);border:none;border-radius:16px;padding:5px 12px;font-size:13px;font-family:inherit;cursor:pointer">сег →</button>
+            </div>
+          </div>
+          <div id="d-retro" style="display:none;background:#FF980018;color:var(--orange);border-radius:8px;padding:8px 12px;font-size:13px;margin-bottom:10px">Ретро-запись — дата сохранится правильно</div>
+
+          <div style="margin-bottom:12px">
+            <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:8px">ЭНЕРГИЯ</div>
+            <div class="chips" id="c-energy">
+              <button class="chip" onclick="pickChip('energy',1,this)">😴 Низкая</button>
+              <button class="chip" onclick="pickChip('energy',2,this)">⚡ Норм</button>
+              <button class="chip" onclick="pickChip('energy',3,this)">🚀 Высокая</button>
+            </div>
+          </div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:8px">СОН</div>
+            <div class="chips" id="c-sleep">
+              <button class="chip" onclick="pickChip('sleep',1,this)">😫 Плохой</button>
+              <button class="chip" onclick="pickChip('sleep',2,this)">😐 Средний</button>
+              <button class="chip" onclick="pickChip('sleep',3,this)">😴 Хороший</button>
+            </div>
+          </div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:8px">НАСТРОЙ</div>
+            <div class="chips" id="c-mood">
+              <button class="chip" onclick="pickChip('mood',1,this)">😞 Плохо</button>
+              <button class="chip" onclick="pickChip('mood',2,this)">😊 Норм</button>
+              <button class="chip" onclick="pickChip('mood',3,this)">😄 Отлично</button>
+            </div>
+          </div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:8px">ТРЕНИРОВКА</div>
+            <div class="chips" id="c-workout">
+              <button class="chip" onclick="pickChip('workout',0,this)">— Нет</button>
+              <button class="chip" onclick="pickChip('workout',1,this)">💪 Была</button>
+              <button class="chip" onclick="pickChip('workout',2,this)">🔥 Огонь</button>
+            </div>
+          </div>
+
+          <textarea id="d-note" class="inp" rows="3" placeholder="Заметки о самочувствии..." style="margin-bottom:12px"></textarea>
+          <button class="btn btn-blue" id="d-save" onclick="saveDiary()">Сохранить</button>
+        </div>
+
+        <div class="slbl">История</div>
+        <div class="rows" id="d-hist"></div>
+        <div class="gap"></div>
+
+      </div>
+    </div>
+
+    <!-- ══ BODY ══ -->
+    <div class="page" id="p-body">
+      <div class="scroll" id="s-body">
+
+        <div id="whtr-blk"></div>
+
+        <div class="card" id="chart-card" style="display:none">
+          <div class="card-t">Динамика</div>
+          <div class="seg" id="chart-seg" style="margin:0 0 12px">
+            <button class="seg-b on" onclick="swChart('weight',this)">Вес</button>
+            <button class="seg-b" onclick="swChart('fat',this)">Жир%</button>
+            <button class="seg-b" onclick="swChart('waist',this)">Талия</button>
+            <button class="seg-b" onclick="swChart('pushup',this)">Отжим</button>
+            <button class="seg-b" onclick="swChart('plank',this)">Планка</button>
+          </div>
+          <canvas id="bchart" height="160"></canvas>
+        </div>
+
+        <div class="slbl">Новый замер</div>
+        <div class="card">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Вес (кг)</div><input class="inp" id="bw" type="number" step="0.1" placeholder="78.5"></div>
+            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">% жира</div><input class="inp" id="bf" type="number" step="0.1" placeholder="18"></div>
+            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Рост (см)</div><input class="inp" id="bh" type="number" step="0.5" placeholder="176"></div>
+            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Талия (см)</div><input class="inp" id="bwa" type="number" step="0.5" placeholder="84"></div>
+            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Грудь (см)</div><input class="inp" id="bch" type="number" step="0.5" placeholder="98"></div>
+            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Бицепс (см)</div><input class="inp" id="bbi" type="number" step="0.5" placeholder="36"></div>
+          </div>
+          <div class="card-t">Силовые</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Отжимания</div><input class="inp" id="bpu" type="number" placeholder="30"></div>
+            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Подтягивания</div><input class="inp" id="bpl" type="number" placeholder="8"></div>
+            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Пресс (повт)</div><input class="inp" id="bab" type="number" placeholder="40"></div>
+            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Планка (сек)</div><input class="inp" id="bpk" type="number" placeholder="60"></div>
+            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Кольца ТРХ</div><input class="inp" id="bri" type="number" placeholder="15"></div>
+          </div>
+          <button class="btn btn-blue" onclick="saveBody()">Сохранить замеры</button>
+        </div>
+
+        <div class="slbl">Тренировка</div>
+        <div class="card" id="workout-log-card">
+          <div class="card-t">Добавить тренировку</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Тип тренировки</div>
+              <select class="inp" id="wt-type">
+                <option value="">— Выбрать —</option>
+                <option value="Грудь + бицепс">Грудь + бицепс (вт)</option>
+                <option value="Спина + трицепс">Спина + трицепс (чт)</option>
+                <option value="Ноги + плечи">Ноги + плечи (сб)</option>
+                <option value="Виньяса йога">Виньяса йога</option>
+                <option value="Кардио">Кардио</option>
+                <option value="Другое">Другое</option>
+              </select>
+            </div>
+            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Длительность (мин)</div>
+              <input class="inp" id="wt-dur" type="number" placeholder="45">
+            </div>
+            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Калории (ккал)</div>
+              <input class="inp" id="wt-cal" type="number" placeholder="280">
+            </div>
+            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Интенсивность</div>
+              <select class="inp" id="wt-int">
+                <option value="низкая">🟢 Низкая</option>
+                <option value="средняя" selected>🟡 Средняя</option>
+                <option value="высокая">🔴 Высокая</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-bottom:12px">
+            <div style="font-size:12px;color:var(--t3);margin-bottom:4px">Заметки</div>
+            <input class="inp" id="wt-note" placeholder="Ощущения, что сделал...">
+          </div>
+          <button class="btn btn-blue" onclick="saveWorkout()">Добавить тренировку</button>
+        </div>
+
+        <div class="card" id="wt-chart-card" style="display:none">
+          <div class="card-t">📈 График тренировок</div>
+          <div class="seg" id="wt-chart-seg" style="margin:0 0 12px">
+            <button class="seg-b on" onclick="swWtChart('cal',this)">Калории</button>
+            <button class="seg-b" onclick="swWtChart('dur',this)">Время</button>
+          </div>
+          <canvas id="wt-canvas" height="140"></canvas>
+        </div>
+
+        <div class="slbl">История замеров тела</div>
+        <div class="rows" id="b-hist"></div>
+
+        <div class="slbl">История тренировок</div>
+        <div class="rows" id="wt-hist"></div>
+        <div class="gap"></div>
+
+      </div>
+    </div>
+
+    <!-- ══ BASE ══ -->
+    <div class="page" id="p-base">
+      <div class="scroll" id="s-base" style="position:relative">
+
+        <!-- DISCLAIMER -->
+        <div style="margin:8px 12px 0;background:#2b5278;border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start">
+          <span style="font-size:18px;flex-shrink:0">⚠️</span>
+          <div style="font-size:12px;color:#90caf9;line-height:1.5">
+            <b style="color:#fff">Персональная база.</b> Эти данные вы формируете сами под свой стек.
+            Информация носит справочный характер и не заменяет консультацию врача.
+            Перед приёмом любых добавок проконсультируйтесь со специалистом.
+          </div>
+        </div>
+
+        <div class="search" style="margin-top:8px">
+          <span class="search-ico">🔍</span>
+          <input type="text" placeholder="Поиск по базе..." id="base-q" oninput="renderBase()">
+        </div>
+        <div class="seg" id="base-seg">
+          <button class="seg-b on" onclick="baseCat('all',this)">Все</button>
+          <button class="seg-b" onclick="baseCat('vitamins',this)">Витам.</button>
+          <button class="seg-b" onclick="baseCat('minerals',this)">Минер.</button>
+          <button class="seg-b" onclick="baseCat('sport',this)">Спорт</button>
+          <button class="seg-b" onclick="baseCat('adapto',this)">Адапто</button>
+        </div>
+
+        <!-- Import/Export base -->
+        <div style="display:flex;gap:8px;padding:0 12px 8px">
+          <button class="btn btn-ghost btn-sm" onclick="exportBase()" style="flex:1;font-size:13px">↓ Экспорт базы</button>
+          <label class="btn btn-ghost btn-sm" style="flex:1;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center">
+            ↑ Импорт базы
+            <input type="file" accept=".json" onchange="importBase(event)" style="display:none">
+          </label>
+        </div>
+
+        <!-- Synergy checker -->
+        <div class="card">
+          <div class="card-t">🔬 Проверка совместимости</div>
+          <div style="font-size:13px;color:var(--t2);margin-bottom:10px">
+            Выберите 2+ БАД ниже чтобы проверить синергии и конфликты
+          </div>
+          <div id="syn-picks" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;min-height:32px"></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" onclick="checkMySyn()" style="flex:1;margin-bottom:8px">Проверить мой стек</button>
+            <button class="btn btn-ghost" onclick="clearSynPicks()" style="flex:1;margin-bottom:8px">Очистить</button>
+          </div>
+          <div id="syn-result"></div>
+        </div>
+
+        <!-- My active stack pills for quick synergy check -->
+        <div class="card" style="padding:12px 16px">
+          <div class="card-t" style="margin-bottom:8px">Мой стек — быстрый выбор</div>
+          <div id="my-stack-pills" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+        </div>
+
+        <div class="slbl">База добавок</div>
+        <div class="rows" id="base-list"></div>
+        <div class="gap" style="height:80px"></div>
+
+      </div>
+      <button class="fab" onclick="openAddBad()">＋</button>
+    </div>
+
+    <!-- ══ AI ══ -->
+    <div class="page" id="p-ai">
+      <div class="scroll" id="s-ai">
+
+        <!-- PROMPT BLOCK -->
+        <div class="card" style="margin-top:8px">
+          <div class="card-t">📋 Промт для ИИ</div>
+          <div style="font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:12px">
+            Скопируйте промт и вставьте в <b style="color:var(--t1)">Claude, ChatGPT, Gemini</b> или любой другой ИИ.
+            Затем вставьте ответ ниже — он сохранится в дневнике разборов.
+          </div>
+          <div style="background:var(--bg3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--t3);max-height:80px;overflow:hidden;margin-bottom:10px;line-height:1.5" id="ai-prompt-preview">Нажмите кнопку для генерации промта...</div>
+          <button class="btn btn-blue" onclick="copyPrompt()" id="ai-copy-btn">📋 Скопировать промт</button>
+        </div>
+
+        <!-- PASTE ANSWER BLOCK -->
+        <div class="card">
+          <div class="card-t">✍️ Вставить ответ ИИ</div>
+          <div style="margin-bottom:10px">
+            <div style="font-size:12px;color:var(--t3);margin-bottom:5px">Какой ИИ использовали?</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap" id="ai-source-chips">
+              <button class="chip on" onclick="selAiSource('Claude',this)">Claude</button>
+              <button class="chip" onclick="selAiSource('ChatGPT',this)">ChatGPT</button>
+              <button class="chip" onclick="selAiSource('Gemini',this)">Gemini</button>
+              <button class="chip" onclick="selAiSource('Другой',this)">Другой</button>
+            </div>
+          </div>
+          <textarea id="ai-answer-input" class="inp" rows="6" placeholder="Вставьте сюда ответ ИИ..." style="margin-bottom:10px;resize:none"></textarea>
+          <div style="margin-bottom:10px">
+            <div style="font-size:12px;color:var(--t3);margin-bottom:5px">Ваш комментарий (необязательно)</div>
+            <input id="ai-user-note" class="inp" placeholder="Что думаете об ответе? Что попробуете?">
+          </div>
+          <button class="btn btn-blue" onclick="saveAiReview()" id="ai-save-btn">Сохранить в дневник разборов</button>
+        </div>
+
+        <!-- HISTORY -->
+        <div class="slbl">Дневник разборов</div>
+        <div id="ai-reviews-list"></div>
+        <div style="height:16px"></div>
+
+      </div>
+    </div>
+
+  </div><!-- /pages -->
+
+  <!-- BOTTOM NAV -->
+  <nav class="nav">
+    <button class="nt on" onclick="go('today',this)" id="nt-today">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+      <span>Приём</span>
+    </button>
+    <button class="nt" onclick="go('diary',this)" id="nt-diary">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      <span>Дневник</span>
+    </button>
+    <button class="nt" onclick="go('body',this)" id="nt-body">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      <span>Тело</span>
+    </button>
+    <button class="nt" onclick="go('base',this)" id="nt-base">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.07-.44.18-.86.18-1.3C18 2.57 15.43 1 12.99 1c-1.4 0-2.71.57-3.66 1.56L8 4H5c-1.66 0-3 1.34-3 3v11c0 1.66 1.34 3 3 3h14c1.66 0 3-1.34 3-3V9c0-1.66-1.34-3-3-3zM9.73 6l1.68-1.69C11.97 3.74 12.48 3.5 13 3.5c1.06 0 1.96.65 1.96 1.2 0 .44-.21.9-.5 1.3H9.73zM20 18H5V7h14v11z"/></svg>
+      <span>База</span>
+    </button>
+    <button class="nt" onclick="go('ai',this)" id="nt-ai">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/></svg>
+      <span>ИИ</span>
+    </button>
+  </nav>
+
+</div><!-- /root -->
+
+<script>
+// ─────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────
+const ld = (k,d) => { try{return JSON.parse(localStorage.getItem(k))||d}catch{return d} };
+const sv = (k,v) => localStorage.setItem(k, JSON.stringify(v));
+const $ = id => document.getElementById(id);
+const fmt = d => d.toLocaleDateString('ru-RU');
+
+// ─────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────
+const S = {
+  cur: 'today',
+  stack: ['today'],
+  diary:    ld('diary_v5', []),
+  body:     ld('body_v4', []),
+  workouts: ld('workouts_v1', []),
+  taken:    new Set(ld('taken_v2', [])),
+  m: {energy:0,sleep:0,mood:0,workout:0},
+  off: 0,
+  bad: ld('bad_v2', defaultBad()),
+  bcat: 'all',
+  synPicks: [],
+  cfield: 'weight',
+  wcField: 'cal',
+};
+
+// ─────────────────────────────────────────────────
+// DEFAULT BAD DB
+// ─────────────────────────────────────────────────
+function defaultBad() {
+  return [
+    {id:'d3',     name:'Витамин D3',       cat:'vitamins', e:'☀️', dose:'1000–4000 МЕ', time:'утро с едой',    syn:['omega3','k2'],     con:['mg_same'], note:'Жирорастворимый. При >2000 МЕ нужен K2.'},
+    {id:'k2',     name:'Витамин K2-MK7',   cat:'vitamins', e:'🦴', dose:'90–200 мкг',   time:'с едой',         syn:['d3'],              con:[], note:'Направляет кальций в кости. Обязателен при D3 >2000 МЕ.'},
+    {id:'vitc',   name:'Витамин C',         cat:'vitamins', e:'🍋', dose:'500–2000 мг',  time:'с едой',         syn:['collagen'],        con:[], note:'Катализирует синтез коллагена.'},
+    {id:'vitb',   name:'Витамин B-комплекс',cat:'vitamins', e:'🅱️', dose:'по составу',   time:'утром с едой',   syn:[],                  con:[], note:'Натощак вызывает тошноту.'},
+    {id:'optimen',name:'Opti Men',           cat:'vitamins', e:'💪', dose:'1 таб/день',   time:'с завтраком',   syn:['omega3','collagen'],con:[], note:'Содержит D3 ~1000 МЕ, Mg ~40 мг, Zn ~15 мг, C ~300 мг.'},
+    {id:'mg',     name:'Магний цитрат',     cat:'minerals', e:'🔮', dose:'310–420 мг Mg', time:'вечером',       syn:['ltean'],           con:[], note:'Вечером — улучшает сон и расслабляет мышцы.'},
+    {id:'zinc',   name:'Цинк',              cat:'minerals', e:'⚡', dose:'8–11 мг',       time:'с едой',        syn:[],                  con:['iron'], note:'Opti Men даёт 100% нормы. Не добавлять отдельно.'},
+    {id:'iron',   name:'Железо',            cat:'minerals', e:'🔩', dose:'по анализам',   time:'натощак',       syn:['vitc'],            con:['zinc','calcium'], note:'Только при подтверждённом дефиците.'},
+    {id:'omega3', name:'Омега-3 (EPA/DHA)', cat:'sport',    e:'🐟', dose:'1–3 г EPA+DHA', time:'с жирной едой', syn:['d3'],              con:[], note:'Без жирной еды усвоение −50%.'},
+    {id:'creatine',name:'Креатин',          cat:'sport',    e:'⚡', dose:'3–5 г/день',    time:'после трен.',   syn:['leuzea'],          con:[], note:'Ежедневно. Время приёма не критично.'},
+    {id:'collagen',name:'Коллаген',         cat:'sport',    e:'💎', dose:'5–15 г/день',   time:'натощак/после трен.',syn:['vitc','hond'],con:[], note:'После тренировки — максимальная эффективность.'},
+    {id:'hond',   name:'Хондроитин+Глюкозамин+MSM',cat:'sport',e:'🦴',dose:'1500 мг глюкозамина',time:'с едой',syn:['collagen'],con:[], note:'Полная цепочка для суставов. Эффект через 4–8 нед.'},
+    {id:'ashwa',  name:'Ашваганда KSM-66',  cat:'adapto',   e:'🌿', dose:'300–600 мг',    time:'вечером',       syn:['mg','ltean'],      con:[], note:'Снижает кортизол. Эффект через 3–4 недели.'},
+    {id:'ltean',  name:'L-теанин',          cat:'adapto',   e:'🍵', dose:'100–400 мг',    time:'по потребности', syn:['mg'],             con:[], note:'Альфа-волны + медитация = синергия.'},
+    {id:'leuzea', name:'Левзея',            cat:'adapto',   e:'🌱', dose:'500–1000 мг',   time:'утром до 16:00',syn:['creatine'],        con:[], note:'После 16:00 нарушает сон.'},
+    {id:'tribulus',name:'Трибулус',         cat:'adapto',   e:'🪴', dose:'250–750 мг',    time:'утром',         syn:[],                  con:[], note:'Только циклами: 6 нед — 3 нед перерыв.'},
+  ];
+}
+
+// Default synergy rules
+const DEFAULT_SYN_RULES = [
+  {id1:'d3',       id2:'omega3',   t:'good', txt:'D3 + Омега-3: Омега-3 усиливает усвоение D3 до +50%'},
+  {id1:'d3',       id2:'k2',       t:'good', txt:'D3 + K2: K2 направляет кальций в кости — обязательная пара'},
+  {id1:'mg',       id2:'ltean',    t:'good', txt:'Магний + L-теанин: оба через ГАМК снижают кортизол'},
+  {id1:'creatine', id2:'leuzea',   t:'good', txt:'Креатин + Левзея: синергия по АТФ и синтезу белка'},
+  {id1:'collagen', id2:'vitc',     t:'good', txt:'Коллаген + Вит.C: C необходим для синтеза коллагена'},
+  {id1:'collagen', id2:'hond',     t:'good', txt:'Коллаген + Хондроитин/MSM: полная поддержка суставов'},
+  {id1:'zinc',     id2:'iron',     t:'bad',  txt:'Цинк + Железо: блокируют усвоение друг друга — разнести!'},
+  {id1:'optimen',  id2:'collagen', t:'good', txt:'Opti Men + Коллаген: витамин C из Opti Men катализирует синтез коллагена'},
+  {id1:'mg',       id2:'ashwa',    t:'good', txt:'Магний + Ашваганда: усиливают расслабляющий эффект вечером'},
+  {id1:'d3',       id2:'mg',       t:'warn', txt:'D3 и Магний: принимать в разное время — конкурируют за транспорт'},
+  {id1:'iron',     id2:'calcium',  t:'bad',  txt:'Железо + Кальций: кальций блокирует усвоение железа'},
+  {id1:'omega3',   id2:'vitc',     t:'good', txt:'Омега-3 + Вит.C: витамин C защищает омега-3 от окисления'},
+];
+
+// Synergy DB — загружается из localStorage, дополняется пользователем
+function loadSynDb() {
+  var custom = ld('syn_db_v1', []);
+  // Merge: custom rules override defaults by id1+id2
+  var all = DEFAULT_SYN_RULES.slice();
+  custom.forEach(function(r) {
+    var exists = all.findIndex(function(x) {
+      return (x.id1===r.id1&&x.id2===r.id2)||(x.id1===r.id2&&x.id2===r.id1);
+    });
+    if (exists >= 0) all[exists] = r; else all.push(r);
+  });
+  return all;
+}
+function getSynRules() { return loadSynDb(); }
+
+function getSyn(ids) {
+  var rules = getSynRules();
+  var res = [];
+  var seen = {};
+  for (var i=0; i<ids.length; i++) {
+    for (var j=i+1; j<ids.length; j++) {
+      var a=ids[i], b=ids[j];
+      var key = a<b ? a+'+'+b : b+'+'+a;
+      if (seen[key]) continue;
+      seen[key] = 1;
+      var r = rules.find(function(x) {
+        return (x.id1===a&&x.id2===b)||(x.id1===b&&x.id2===a);
+      });
+      if (r) res.push(r);
+    }
+  }
+  return res;
+}
+
+
+// Synergy pick set for manual checker
+var synPicksSet = new Set(ld('syn_picks', []));
+S.synPicks = Array.from(synPicksSet);
+
+
+
+/* removed old getSyn */
+
+// MY STACK
+const STACK = [
+  {id:'collagen', slot:'morning', dose:'5 г', note:'натощак / до еды'},
+  {id:'d3',       slot:'morning', dose:'2000 МЕ', note:'с завтраком'},
+  {id:'optimen',  slot:'morning', dose:'1 таб',   note:'с едой обязательно'},
+  {id:'leuzea',   slot:'morning', dose:'500–1000 мг', note:'до 16:00'},
+  {id:'tribulus', slot:'morning', dose:'250–750 мг',  note:'до тренировки'},
+  {id:'creatine', slot:'after',   dose:'5 г',     note:'после тренировки'},
+  {id:'hond',     slot:'after',   dose:'по дозировке', note:'с едой'},
+  {id:'omega3',   slot:'day',     dose:'~2000 мг', note:'с жирным обедом'},
+  {id:'ltean',    slot:'day',     dose:'100–200 мг', note:'по потребности'},
+  {id:'mg',       slot:'evening', dose:'½ ч.л.',   note:'перед сном'},
+];
+const SLOTS = {morning:'☀️ Утро', after:'💪 После тренировки', day:'🌤 День', evening:'🌙 Вечер'};
+const SLOT_ORDER = ['morning','after','day','evening'];
+
+// ─────────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────────
+const HD_CFG = {
+  today:  {title:'СтекАп',   sub:'мой стек',     ava:'💊', bg:'#1a5276'},
+  diary:  {title:'Дневник',  sub:'самочувствие',  ava:'📓', bg:'#1a3a5c'},
+  body:   {title:'Тело',     sub:'замеры',        ava:'📊', bg:'#1a4a3a'},
+  base:   {title:'База БАД', sub:'синергии',      ava:'🗄', bg:'#2d1b69'},
+  ai:     {title:'ИИ-анализ',sub:'Claude',        ava:'🤖', bg:'#1a2a4a'},
+};
+
+function go(name, btn) {
+  if (S.cur === name) return;
+  const prev = $('p-'+S.cur);
+  const next = $('p-'+name);
+  prev.classList.add('left'); prev.classList.remove('cur');
+  next.classList.add('cur');
+  setTimeout(() => prev.classList.remove('left'), 320);
+  S.cur = name; S.stack = [name];
+  document.querySelectorAll('.nt').forEach(t=>t.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  $('hd-back').style.display = 'none';
+  setHd(name);
+  if (name==='diary') { renderDStats(); renderDHist(); }
+  if (name==='body')  renderBody();
+  if (name==='base')  renderBase();
+  if (name==='ai')    initAiScreen();
+}
+
+function setHd(name) {
+  const c = HD_CFG[name]||HD_CFG.today;
+  $('hd-title').textContent = c.title;
+  $('hd-sub').textContent   = c.sub;
+  $('hd-ava').textContent   = c.ava;
+  $('hd-ava').style.background = c.bg;
+}
+
+function goBack() {
+  if (S.stack.length<=1) return;
+  S.stack.pop();
+  const prev = S.stack[S.stack.length-1];
+  // just close sheet or go back
+  closeSheet();
+}
+
+function hdAction() {
+  const menus = {
+    today: [
+      {ico:'🔄', lbl:'Сбросить отметки дня',  fn:'resetTaken()'},
+      {ico:'👤', lbl:'Профиль',               fn:'openProfile()'},
+      {ico:'↓',  lbl:'Экспорт данных (JSON)', fn:'exportAll()'},
+      {ico:'↑',  lbl:'Импорт данных (JSON)',  fn:'triggerImport()'},
+    ],
+    diary: [
+      {ico:'↓',  lbl:'Экспорт дневника',      fn:'exportAll()'},
+      {ico:'↑',  lbl:'Импорт данных',         fn:'triggerImport()'},
+    ],
+    body: [
+      {ico:'↓',  lbl:'Экспорт замеров',       fn:'exportAll()'},
+      {ico:'↑',  lbl:'Импорт данных',         fn:'triggerImport()'},
+    ],
+    base: [
+      {ico:'＋', lbl:'Добавить БАД',          fn:'openAddBad()'},
+      {ico:'🔗', lbl:'Добавить правило синергии', fn:'openAddSynRule()'},
+      {ico:'↓',  lbl:'Экспорт базы + синергий', fn:'exportBase()'},
+      {ico:'🔄', lbl:'Сбросить базу',         fn:'resetBadDb()'},
+    ],
+    ai: [
+      {ico:'📋', lbl:'Скопировать промт',       fn:'copyPrompt()'},
+      {ico:'↓',  lbl:'Экспорт дневника разборов', fn:'exportReviews()'},
+      {ico:'🗑',  lbl:'Очистить дневник разборов', fn:'clearReviews()'},
+    ],
+  };
+  const items = menus[S.cur] || menus.today;
+  const rows = items.map(function(it) {
+    return '<div class="cell" onclick="closeSheet();'+it.fn+'" style="border-radius:0">'+
+      '<div class="cell-ico" style="background:var(--bg3);font-size:16px">'+it.ico+'</div>'+
+      '<div class="cell-lbl">'+it.lbl+'</div>'+
+    '</div>';
+  }).join('');
+  openSheet('Действия', '<div class="cells" style="margin:0">'+rows+'</div>'+
+    '<input type="file" id="import-input" accept=".json" onchange="importAll(event)" style="display:none">'+
+    '<div style="padding:12px 16px;font-size:12px;color:var(--t3);text-align:center">'+
+      'Дневник: '+S.diary.length+' зап. · Замеры: '+S.body.length+' · БАД: '+S.bad.length+
+    '</div>');
+}
+/* removed duplicate */
+/* removed duplicate */
+/* removed duplicate */
+/* removed duplicate */
+
+// ─────────────────────────────────────────────────
+// SHEET
+// ─────────────────────────────────────────────────
+function openSheet(title, html) {
+  $('sh-title').textContent = title;
+  $('sh-body').innerHTML = html;
+  $('ovl').classList.add('on');
+  $('sheet').classList.add('on');
+}
+function closeSheet() {
+  $('ovl').classList.remove('on');
+  $('sheet').classList.remove('on');
+}
+
+// ─────────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────────
+function toast(msg) {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('on');
+  setTimeout(()=>el.classList.remove('on'), 2200);
+}
+
+// ─────────────────────────────────────────────────
+// TODAY
+// ─────────────────────────────────────────────────
+function renderToday() {
+  const now = new Date();
+  const h = now.getHours();
+  const DAYS=['Воскресенье','Понедельник','Вторник','Среда','Четверг','Пятница','Суббота'];
+  const MONS=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  $('greet').textContent = h<12?'Доброе утро!':h<17?'Добрый день!':'Добрый вечер!';
+  $('tdate').textContent = DAYS[now.getDay()]+', '+now.getDate()+' '+MONS[now.getMonth()];
+  const str = streak();
+  const pct = STACK.length ? S.taken.size/STACK.length : 0;
+  $('today-pills').innerHTML =
+    '<span class="tag tg">🔥 '+str+' дн.</span> '+
+    '<span class="tag '+(pct===1?'tg':'ta')+'">'+Math.round(pct*100)+'% принято</span>';
+  updateRing();
+  // Synergy alerts
+  const myIds = STACK.map(function(s){return s.id;});
+  const syns = getSyn(myIds);
+  const badSyns = syns.filter(function(s){return s.t==='bad';});
+  $('alerts').innerHTML = badSyns.map(function(a){
+    return '<div class="alert alert-r"><span class="alert-ico">⛔</span><span class="alert-txt">'+a.txt+'</span></div>';
+  }).join('');
+  // Build schedule
+  var bySlot = {};
+  STACK.forEach(function(s){ if(!bySlot[s.slot]) bySlot[s.slot]=[]; bySlot[s.slot].push(s); });
+  var html = '';
+  SLOT_ORDER.forEach(function(sl) {
+    if (!bySlot[sl]) return;
+    html += '<div class="slbl">'+SLOTS[sl]+'</div><div class="cells">';
+    bySlot[sl].forEach(function(s) {
+      var b = S.bad.find(function(x){return x.id===s.id;})||{name:s.id,e:'💊'};
+      var done = S.taken.has(s.id);
+      var dc = done ? 'done' : '';
+      html += '<div class="chk" onclick="toggleTaken(\''+s.id+'\')">'+
+        '<div class="chk-ring '+dc+'" id="cr-'+s.id+'">'+
+          '<svg width="13" height="11" viewBox="0 0 13 11" fill="none">'+
+            '<polyline points="1.5,5.5 5,9 11.5,1.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>'+
+          '</svg>'+
+        '</div>'+
+        '<div class="chk-info">'+
+          '<div class="chk-name '+dc+'" id="cn-'+s.id+'">'+b.e+' '+b.name+'</div>'+
+          '<div class="chk-dose">'+s.dose+'</div>'+
+          '<div class="chk-note">'+s.note+'</div>'+
+        '</div>'+
+        '<button onclick="event.stopPropagation();showBad(\''+s.id+'\')" '+
+          'style="color:var(--t3);font-size:20px;padding:4px 6px;border:none;background:none;cursor:pointer">ⓘ</button>'+
+      '</div>';
+    });
+    html += '</div>';
+  });
+  $('sched').innerHTML = html;
+}
+
+
+function toggleTaken(id) {
+  if (S.taken.has(id)) S.taken.delete(id);
+  else S.taken.add(id);
+  sv('taken_v2', Array.from(S.taken));
+  const cr = $('cr-'+id), cn = $('cn-'+id);
+  if (cr) cr.classList.toggle('done', S.taken.has(id));
+  if (cn) cn.classList.toggle('done', S.taken.has(id));
+  updateRing();
+}
+
+function updateRing() {
+  const total = STACK.length, done = S.taken.size;
+  const pct = total ? done/total : 0;
+  const r=36, circ=2*Math.PI*r;
+  const ring = $('ring');
+  ring.style.strokeDashoffset = circ*(1-pct);
+  ring.style.stroke = pct===1?'var(--green)':pct>.6?'var(--blue)':'var(--orange)';
+  $('ring-n').textContent = done;
+  $('ring-t').textContent = 'из '+total;
+}
+
+function showBad(id) {
+  var b = S.bad.find(function(x){return x.id===id;}); if(!b) return;
+  var myIds = STACK.map(function(s){return s.id;});
+  var rules = getSynRules();
+
+  // Conflicts with MY current stack
+  var conflicts = [];
+  var synergies = [];
+  myIds.forEach(function(mid) {
+    if (mid === id) return;
+    var r = rules.find(function(x){return (x.id1===id&&x.id2===mid)||(x.id1===mid&&x.id2===id);});
+    if (!r) return;
+    var mBad = S.bad.find(function(x){return x.id===mid;});
+    var mName = mBad ? mBad.name : mid;
+    if (r.t==='bad') conflicts.push({name:mName, txt:r.txt});
+    else if (r.t==='good') synergies.push({name:mName, txt:r.txt});
+  });
+
+  // Suggestions from DB (not in stack)
+  var suggestions = [];
+  rules.forEach(function(r) {
+    if (r.t !== 'good') return;
+    var otherId = r.id1===id ? r.id2 : (r.id2===id ? r.id1 : null);
+    if (!otherId) return;
+    if (myIds.includes(otherId)) return; // already in stack
+    var ob = S.bad.find(function(x){return x.id===otherId;});
+    if (ob) suggestions.push({bad:ob, txt:r.txt});
+  });
+
+  // Also check against all bad DB items (not just stack) for new-item synergies
+  var allSynFromDb = (b.syn||[]).map(function(sid) {
+    return S.bad.find(function(x){return x.id===sid;});
+  }).filter(Boolean);
+
+  var html = '<div style="padding:0 16px 16px">';
+  html += '<div style="font-size:14px;color:var(--t2);line-height:1.6;margin-bottom:12px">'+b.note+'</div>';
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">';
+  html += '<span class="tag tb">📅 '+b.dose+'</span>';
+  html += '<span class="tag tg">⏰ '+b.time+'</span>';
+  if (b.custom) html += '<span class="tag ta">✏️ Моя добавка</span>';
+  html += '</div>';
+
+  // ⛔ Conflicts with MY stack
+  if (conflicts.length) {
+    html += '<div style="background:var(--red)18;border-radius:10px;padding:12px;margin-bottom:12px">';
+    html += '<div style="font-size:12px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">⛔ Конфликты с вашим стеком</div>';
+    conflicts.forEach(function(cf) {
+      html += '<div style="font-size:13px;color:#ff8a80;margin-bottom:4px">• '+cf.txt+'</div>';
+    });
+    html += '</div>';
+  }
+
+  // ✦ Synergies with MY stack
+  if (synergies.length) {
+    html += '<div style="background:var(--green)15;border-radius:10px;padding:12px;margin-bottom:12px">';
+    html += '<div style="font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">✦ Синергии с вашим стеком</div>';
+    synergies.forEach(function(s) {
+      html += '<div style="font-size:13px;color:#a5d6a7;margin-bottom:4px">• '+s.txt+'</div>';
+    });
+    html += '</div>';
+  }
+
+  // 💡 Suggestions from DB (not in stack)
+  if (suggestions.length) {
+    html += '<div style="background:#2b5278;border-radius:10px;padding:12px;margin-bottom:12px">';
+    html += '<div style="font-size:12px;font-weight:700;color:#90caf9;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">💡 Рекомендуем добавить</div>';
+    suggestions.forEach(function(s) {
+      html += '<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">'+
+        '<span style="font-size:20px">'+s.bad.e+'</span>'+
+        '<div><div style="font-size:14px;color:#fff;font-weight:500">'+s.bad.name+'</div>'+
+        '<div style="font-size:12px;color:#90caf9">'+s.txt+'</div></div></div>';
+    });
+    html += '</div>';
+  }
+
+  // Synergies from bad.syn (DB links)
+  if (allSynFromDb.length) {
+    html += '<div style="margin-bottom:12px"><div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Синергии в базе</div>';
+    allSynFromDb.forEach(function(ob) {
+      html += '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)">'+
+        '<span style="font-size:20px">'+ob.e+'</span>'+
+        '<div style="font-size:14px;color:var(--t1)">'+ob.name+'</div>'+
+      '</div>';
+    });
+    html += '</div>';
+  }
+
+  if (b.custom) {
+    html += '<button class="btn btn-ghost" onclick="editBad(\''+b.id+'\');closeSheet()" style="margin-bottom:8px">✏️ Редактировать</button>';
+    html += '<button class="btn btn-ghost" style="color:var(--red)" onclick="deleteBad(\''+b.id+'\');closeSheet()">🗑 Удалить</button>';
+  }
+
+  html += '<div style="margin-top:12px;font-size:11px;color:var(--t3);line-height:1.5;text-align:center">'+
+    'Данные справочные. Консультируйтесь с врачом перед изменением стека.'+
+  '</div>';
+  html += '</div>';
+  openSheet(b.e+' '+b.name, html);
+}
+
+function deleteBad(id) {
+  S.bad = S.bad.filter(function(b){return b.id!==id;});
+  sv('bad_v2', S.bad);
+  renderBase(); toast('БАД удалён');
+}
+
+function editBad(id) {
+  var b = S.bad.find(function(x){return x.id===id;}); if(!b) return;
+  // Open edit sheet (reuse add sheet with prefill)
+  openAddBad();
+  setTimeout(function() {
+    if($('an')) $('an').value = b.name||'';
+    if($('ae')) $('ae').value = b.e||'💊';
+    if($('ac')) $('ac').value = b.cat||'vitamins';
+    if($('ad')) $('ad').value = b.dose||'';
+    if($('at')) $('at').value = b.time||'';
+    if($('ano')) $('ano').value = b.note||'';
+    // Change save button to update
+    var btn = $('sh-body').querySelector('.btn-blue');
+    if (btn) { btn.textContent = 'Сохранить изменения'; btn.onclick = function(){updateBad(id);}; }
+  }, 150);
+}
+
+function updateBad(id) {
+  var b = S.bad.find(function(x){return x.id===id;}); if(!b) return;
+  b.name = ($('an')||{}).value||""||b.name;
+  b.e    = ($('ae')||{}).value||""||b.e;
+  b.cat  = ($('ac')||{}).value||b.cat;
+  b.dose = ($('ad')||{}).value||""||b.dose;
+  b.time = ($('at')||{}).value||""||b.time;
+  b.note = ($('ano')||{}).value||""||b.note;
+  sv('bad_v2', S.bad);
+  closeSheet(); renderBase(); toast('Обновлено: '+b.name);
+}
+
+function baseCat(cat, btn) {
+  S.bcat=cat;
+  $('base-seg').querySelectorAll('.seg-b').forEach(function(b){b.classList.remove('on');});
+  if(btn) btn.classList.add('on');
+  renderBase();
+}
+
+function renderBase() {
+  var q = ($('base-q')||{}).value&&($('base-q')||{}).value.toLowerCase()||'';
+  var list = S.bad.filter(function(b) {
+    if (S.bcat!=='all' && b.cat!==S.bcat) return false;
+    if (q && !b.name.toLowerCase().includes(q) && !(b.note||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  var el = $('base-list'); if(!el) return;
+  if(!list.length){
+    el.innerHTML='<div class="empty"><div class="empty-ico">🔍</div><div class="empty-t">Ничего не найдено</div></div>';
+    return;
+  }
+  var CC={vitamins:'#f39c12',minerals:'#2AABEE',sport:'#4CAF50',adapto:'#9b59b6'};
+  var myIds = STACK.map(function(s){return s.id;});
+  var rules = getSynRules();
+
+  el.innerHTML = list.map(function(b) {
+    var myConflicts=0, mySynergies=0;
+    myIds.forEach(function(mid) {
+      if (mid===b.id) return;
+      var r = rules.find(function(x){return (x.id1===b.id&&x.id2===mid)||(x.id1===mid&&x.id2===b.id);});
+      if (!r) return;
+      if (r.t==='bad') myConflicts++; else if (r.t==='good') mySynergies++;
+    });
+    var inStack = myIds.includes(b.id);
+    var col = CC[b.cat]||'#555';
+    var badge = inStack ? '<span style="position:absolute;bottom:0;right:0;width:14px;height:14px;border-radius:50%;background:var(--green);border:2px solid var(--bg);font-size:8px;display:flex;align-items:center;justify-content:center">✓</span>' : '';
+    var counters = (mySynergies ? '<span style="color:var(--green);font-size:12px">✦'+mySynergies+'</span> ' : '') +
+                   (myConflicts ? '<span style="color:var(--red);font-size:12px">⛔'+myConflicts+'</span>' : '');
+    return '<div class="row" data-bad-id="'+b.id+'">' +
+      '<div class="row-ava" style="background:'+col+'22;border:2px solid '+col+'44;font-size:24px;position:relative">'+b.e+badge+'</div>' +
+      '<div class="row-body">' +
+        '<div class="row-top"><span class="row-name">'+b.name+(b.custom?' ✏️':'')+'</span>' +
+        '<span class="row-time">'+counters+'</span></div>' +
+        '<div class="row-sub">'+b.dose+' · '+b.time+'</div>' +
+      '</div>' +
+      '<span style="color:var(--t3);font-size:18px">›</span>' +
+    '</div>';
+  }).join('');
+
+  // Wire click via delegation
+  el.onclick = function(e) {
+    var row = e.target.closest('[data-bad-id]');
+    if (row) showBad(row.dataset.badId);
+  };
+
+  // Render my-stack pills
+  var pEl = $('my-stack-pills'); if(!pEl) return;
+  pEl.innerHTML = STACK.map(function(s) {
+    var b = S.bad.find(function(x){return x.id===s.id;})||{e:'💊',name:s.id};
+    var isSelected = synPicksSet.has(s.id);
+    return '<button class="chip '+(isSelected?'on':'')+'" data-pick-id="'+s.id+'" style="font-size:13px">'+
+      b.e+' '+b.name.split(' ')[0]+'</button>';
+  }).join('');
+  pEl.onclick = function(e) {
+    var btn = e.target.closest('[data-pick-id]');
+    if (btn) toggleSynPick(btn.dataset.pickId);
+  };
+}
+
+
+
+function toggleSynPick(id) {
+  if (synPicksSet.has(id)) synPicksSet.delete(id);
+  else synPicksSet.add(id);
+  S.synPicks = Array.from(synPicksSet);
+  sv('syn_picks', S.synPicks);
+  renderBase();
+  if (S.synPicks.length >= 2) runSynCheck();
+  else { var el=$('syn-result'); if(el) el.innerHTML=''; }
+}
+
+function clearSynPicks() {
+  synPicksSet.clear(); S.synPicks=[];
+  sv('syn_picks',[]); renderBase();
+  var el=$('syn-result'); if(el) el.innerHTML='';
+}
+
+function runSynCheck() {
+  var ids = S.synPicks;
+  var syns = getSyn(ids);
+  var el = $('syn-result'); if(!el) return;
+  if (!syns.length) {
+    el.innerHTML='<div style="color:var(--t3);font-size:13px;text-align:center;padding:8px">Правил для этих добавок нет в базе</div>';
+    return;
+  }
+  el.innerHTML = syns.map(function(s) {
+    var ico=s.t==='good'?'✦':s.t==='bad'?'⛔':'⚠️';
+    var cls=s.t==='good'?'alert-g':s.t==='bad'?'alert-r':'alert-o';
+    return '<div class="alert '+cls+'" style="margin:4px 0"><span class="alert-ico">'+ico+'</span><span class="alert-txt">'+s.txt+'</span></div>';
+  }).join('');
+}
+
+function checkMySyn() {
+  var ids = STACK.map(function(s){return s.id;});
+  var syns = getSyn(ids);
+  var el=$('syn-result'); if(!el) return;
+  if(!syns.length){
+    el.innerHTML='<div style="color:var(--t3);font-size:13px;text-align:center;padding:8px">Конфликтов в стеке не найдено</div>';
+    return;
+  }
+  el.innerHTML='<div style="font-size:12px;color:var(--t3);margin-bottom:6px;font-weight:600">МОЙ СТЕК — ПОЛНЫЙ АНАЛИЗ</div>'+
+    syns.map(function(s){
+      var ico=s.t==='good'?'✦':s.t==='bad'?'⛔':'⚠️';
+      var cls=s.t==='good'?'alert-g':s.t==='bad'?'alert-r':'alert-o';
+      return '<div class="alert '+cls+'" style="margin:4px 0"><span class="alert-ico">'+ico+'</span><span class="alert-txt">'+s.txt+'</span></div>';
+    }).join('');
+}
+
+function exportBase() {
+  var data={bad:S.bad.filter(function(b){return b.custom;}),synRules:ld('syn_db_v1',[]),exportedAt:new Date().toISOString(),version:2};
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='stackup_base_'+fmt(new Date()).replace(/\./g,'-')+'.json';a.click();
+  toast('База экспортирована');
+}
+
+function importBase(e) {
+  var f=e.target.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    try{
+      var d=JSON.parse(ev.target.result);
+      var imported=0;
+      if(d.bad&&Array.isArray(d.bad)){
+        d.bad.forEach(function(b){b.custom=true;if(!S.bad.find(function(x){return x.id===b.id;})){S.bad.push(b);imported++;}});
+        sv('bad_v2',S.bad);
+      }
+      var customRules=ld('syn_db_v1',[]);var synImported=0;
+      if(d.synRules&&Array.isArray(d.synRules)){
+        d.synRules.forEach(function(r){
+          var exists=customRules.findIndex(function(x){return (x.id1===r.id1&&x.id2===r.id2)||(x.id1===r.id2&&x.id2===r.id1);});
+          if(exists>=0)customRules[exists]=r;else{customRules.push(r);synImported++;}
+        });
+        sv('syn_db_v1',customRules);
+      }
+      renderBase();toast('Импорт: '+imported+' БАД, '+synImported+' правил');
+    }catch(err){toast('Ошибка: '+err.message);}
+  };
+  r.readAsText(f);
+}
+
+function openAddSynRule() {
+  var opts=S.bad.map(function(b){return '<option value="'+b.id+'">'+b.e+' '+b.name+'</option>';}).join('');
+  openSheet('Добавить правило синергии',
+    '<div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:10px">'+
+    '<div style="font-size:13px;color:var(--t2)">Задайте правило совместимости двух добавок</div>'+
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Добавка 1</div><select id="sr-a" class="inp"><option value="">— выбрать —</option>'+opts+'</select></div>'+
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Добавка 2</div><select id="sr-b" class="inp"><option value="">— выбрать —</option>'+opts+'</select></div>'+
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Тип</div>'+
+      '<select id="sr-t" class="inp">'+
+        '<option value="good">✦ Синергия</option>'+
+        '<option value="warn">⚠️ Осторожно</option>'+
+        '<option value="bad">⛔ Конфликт</option>'+
+      '</select></div>'+
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Описание</div>'+
+      '<input id="sr-txt" class="inp" placeholder="напр. X + Y: усиливают усвоение"></div>'+
+    '<button class="btn btn-blue" onclick="saveSynRule()">Добавить</button></div>'
+  );
+}
+
+function saveSynRule() {
+  var a=($('sr-a')||{}).value, b=($('sr-b')||{}).value;
+  var t=($('sr-t')||{}).value||'good';
+  var txt=($('sr-txt')||{}).value||"";
+  if(!a||!b||!txt){toast('Заполните все поля');return;}
+  if(a===b){toast('Выберите разные добавки');return;}
+  var rules=ld('syn_db_v1',[]);
+  var exists=rules.findIndex(function(r){return (r.id1===a&&r.id2===b)||(r.id1===b&&r.id2===a);});
+  var rule={id1:a,id2:b,t:t,txt:txt,custom:true};
+  if(exists>=0)rules[exists]=rule;else rules.push(rule);
+  sv('syn_db_v1',rules);closeSheet();toast('Правило добавлено');
+}
+
+// ─── DIARY ────────────────────────────────────────
+function pickChip(name, val, btn) {
+  S.m[name]=val;
+  btn.closest('.chips').querySelectorAll('.chip').forEach(function(c){c.classList.remove('on');});
+  btn.classList.add('on');
+}
+
+function dayShift(d) {
+  var n=S.off+d; if(n>0) return;
+  S.off=n; updateDLbl(); prefillD();
+}
+
+function updateDLbl() {
+  var d=new Date(); d.setDate(d.getDate()+S.off);
+  var DS=['вс','пн','вт','ср','чт','пт','сб'];
+  var fwd=$('d-fwd'), rn=$('d-retro');
+  if(S.off===0){$('d-lbl').textContent='Сегодня';rn.style.display='none';fwd.style.color='var(--t3)';}
+  else{var n=Math.abs(S.off);$('d-lbl').textContent=n===1?'Вчера':n+' дня назад ('+DS[d.getDay()]+')';rn.style.display='block';fwd.style.color='var(--blue)';}
+}
+
+function prefillD() {
+  var d=new Date();d.setDate(d.getDate()+S.off);
+  var key=fmt(d),ex=S.diary.find(function(e){return e.date===key;});
+  ['energy','sleep','mood','workout'].forEach(function(m){
+    S.m[m]=0;
+    var g=$('c-'+m); if(g) g.querySelectorAll('.chip').forEach(function(c){c.classList.remove('on');});
+  });
+  $('d-note').value='';
+  if(ex){
+    ['energy','sleep','mood','workout'].forEach(function(m){
+      if(ex[m]===undefined&&ex[m]!==0) return;
+      S.m[m]=ex[m];
+      var btns=($('c-'+m)||{}).querySelectorAll?$('c-'+m).querySelectorAll('.chip'):[];
+      var idx=m==='workout'?ex[m]:ex[m]-1;
+      if(btns[idx]) btns[idx].classList.add('on');
+    });
+    $('d-note').value=ex.note||'';
+  }
+}
+
+function saveDiary() {
+  var d=new Date();d.setDate(d.getDate()+S.off);
+  var e={date:fmt(d),ts:new Date(d.getFullYear(),d.getMonth(),d.getDate(),23,59).getTime(),energy:S.m.energy,sleep:S.m.sleep,mood:S.m.mood,workout:S.m.workout,note:$('d-note').value.trim(),taken:S.taken.size,retro:S.off<0};
+  var i=S.diary.findIndex(function(x){return x.date===e.date;});
+  if(i>=0)S.diary[i]=e;else S.diary.unshift(e);
+  S.diary.sort(function(a,b){return b.ts-a.ts;});sv('diary_v5',S.diary);
+  S.off=0;updateDLbl();prefillD();renderDStats();renderDHist();
+  var btn=$('d-save');btn.textContent='✓ Сохранено';btn.style.background='var(--green)';
+  setTimeout(function(){btn.textContent='Сохранить';btn.style.background='';},1500);
+}
+
+function streak() {
+  if(!S.diary.length) return 0;
+  var s=1;
+  for(var i=1;i<S.diary.length;i++){if(S.diary[i-1].ts-S.diary[i].ts<36*3600000)s++;else break;}
+  return s;
+}
+
+function renderDStats() {
+  var eV=S.diary.filter(function(e){return e.energy>0;}).map(function(e){return e.energy;});
+  var sV=S.diary.filter(function(e){return e.sleep>0;}).map(function(e){return e.sleep;});
+  var ae=eV.length?(eV.reduce(function(a,b){return a+b;},0)/eV.length).toFixed(1):'—';
+  var as_=sV.length?(sV.reduce(function(a,b){return a+b;},0)/sV.length).toFixed(1):'—';
+  $('d-stats').innerHTML='<div class="stat"><div class="stat-v">'+streak()+'</div><div class="stat-l">стрик</div></div>'+
+    '<div class="stat"><div class="stat-v">'+S.diary.length+'</div><div class="stat-l">записей</div></div>'+
+    '<div class="stat"><div class="stat-v">'+ae+'</div><div class="stat-l">энергия</div></div>'+
+    '<div class="stat"><div class="stat-v">'+as_+'</div><div class="stat-l">сон</div></div>';
+}
+
+function renderDHist() {
+  var el=$('d-hist');if(!el) return;
+  if(!S.diary.length){el.innerHTML='<div class="empty"><div class="empty-ico">📓</div><div class="empty-t">Записей нет</div><div class="empty-s">Добавьте первую запись</div></div>';return;}
+  var EE=['','😴','⚡','🚀'],SE=['','😫','😐','😴'],ME=['','😞','😊','😄'],WE=['','','💪','🔥'];
+  el.innerHTML=S.diary.slice(0,12).map(function(e,i){
+    var emos=[e.energy?EE[e.energy]:'',e.sleep?SE[e.sleep]:'',e.workout&&e.workout>0?WE[e.workout]:''].filter(Boolean).join(' ');
+    return '<div class="row" data-di="'+i+'">'+
+      '<div class="row-ava" style="background:var(--bg3)">'+(e.mood?ME[e.mood]:'📝')+'</div>'+
+      '<div class="row-body"><div class="row-top"><span class="row-name">'+e.date+(e.retro?' 🕐':'')+'</span><span class="row-time">'+emos+'</span></div>'+
+      '<div class="row-sub">'+(e.note||'<span style="color:var(--t3)">нет заметок</span>')+'</div></div></div>';
+  }).join('');
+  el.onclick=function(e){var r=e.target.closest('[data-di]');if(r) openDI(r.dataset.di);};
+}
+
+function openDI(idx) {
+  var e=S.diary[parseInt(idx)];if(!e) return;
+  var ME=['','😞','😊','😄'],EE=['','😴','⚡','🚀'],SE=['','😫','😐','😴'];
+  var html='<div style="padding:0 16px 16px"><div style="display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap">';
+  if(e.energy) html+='<div style="text-align:center"><div style="font-size:32px">'+EE[e.energy]+'</div><div style="font-size:11px;color:var(--t3)">энергия</div></div>';
+  if(e.sleep) html+='<div style="text-align:center"><div style="font-size:32px">'+SE[e.sleep]+'</div><div style="font-size:11px;color:var(--t3)">сон</div></div>';
+  if(e.mood) html+='<div style="text-align:center"><div style="font-size:32px">'+ME[e.mood]+'</div><div style="font-size:11px;color:var(--t3)">настрой</div></div>';
+  if(e.workout>0) html+='<div style="text-align:center"><div style="font-size:32px">'+(['','💪','🔥'][e.workout]||'')+'</div><div style="font-size:11px;color:var(--t3)">трен.</div></div>';
+  html+='</div>';
+  html+=e.note?'<div style="background:var(--bg3);border-radius:10px;padding:13px 14px;font-size:14px;line-height:1.6">'+e.note+'</div>':'<div style="color:var(--t3)">Заметок нет</div>';
+  html+='</div>';
+  openSheet('Запись '+e.date,html);
+}
+
+// ─── BODY ─────────────────────────────────────────
+function saveBody() {
+  var g=function(id){var v=parseFloat($(id).value);return isNaN(v)?null:v;};
+  var e={date:fmt(new Date()),ts:Date.now(),weight:g('bw'),fat:g('bf'),height:g('bh'),waist:g('bwa'),chest:g('bch'),bicep:g('bbi'),pushup:g('bpu'),pullup:g('bpl'),abs:g('bab'),plank:g('bpk'),rings:g('bri')};
+  var i=S.body.findIndex(function(b){return b.date===e.date;});
+  if(i>=0)S.body[i]=e;else S.body.unshift(e);
+  S.body.sort(function(a,b){return b.ts-a.ts;});sv('body_v4',S.body);
+  ['bw','bf','bh','bwa','bch','bbi','bpu','bpl','bab','bpk','bri'].forEach(function(id){$(id).value='';});
+  renderBody();toast('Замеры сохранены!');
+}
+
+function d_(c,p,f) {
+  if(!p||p[f]==null||c[f]==null) return '';
+  var d=c[f]-p[f];if(Math.abs(d)<0.01) return '';
+  var good=['fat','waist'].includes(f)?d<0:d>0;
+  return '<span style="font-size:11px;color:'+(good?'var(--green)':'var(--red)')+'">'+( d>0?'+':'')+d.toFixed(1)+'</span>';
+}
+
+function renderBody() {
+  var lat=S.body[0];
+  var wb=$('whtr-blk');
+  if(lat&&lat.waist&&lat.height){
+    var wh=(lat.waist/lat.height).toFixed(3);
+    var n=parseFloat(wh);
+    var r=n<0.43?{l:'Очень стройное',c:'var(--blue)'}:n<0.53?{l:'Норма ✓',c:'var(--green)'}:n<0.58?{l:'Умеренный риск',c:'var(--orange)'}:{l:'Высокий риск',c:'var(--red)'};
+    var lean=lat.weight&&lat.fat?(lat.weight*(1-lat.fat/100)).toFixed(1):null;
+    wb.innerHTML='<div class="card"><div class="card-t">⚖ WHtR (лучше ИМТ для атлетов)</div>'+
+      '<div style="display:flex;align-items:center;gap:14px">'+
+        '<div style="font-size:44px;font-weight:800;color:'+r.c+';line-height:1">'+wh+'</div>'+
+        '<div><div style="font-size:17px;font-weight:700;color:'+r.c+'">'+r.l+'</div>'+
+        '<div style="font-size:12px;color:var(--t3);margin-top:2px">'+lat.waist+' ÷ '+lat.height+' см</div>'+
+        (lean?'<div style="font-size:12px;color:var(--t2);margin-top:2px">Сухая масса: <b>'+lean+' кг</b></div>':'')+
+        '</div></div>'+
+      '<div style="margin-top:10px;font-size:12px;color:var(--t3)">ИМТ не учитывает мышцы. WHtR &lt; 0.50 = низкий риск.</div></div>';
+  } else if(wb) wb.innerHTML='';
+
+  var cc=$('chart-card');
+  if(S.body.length>1){cc.style.display='';setTimeout(function(){drawChart(S.cfield);},50);}else cc.style.display='none';
+  renderWorkouts();
+
+  var hist=$('b-hist');if(!hist) return;
+  if(!S.body.length){hist.innerHTML='<div class="empty"><div class="empty-ico">📊</div><div class="empty-t">Замеров нет</div><div class="empty-s">Добавьте первый замер</div></div>';return;}
+  hist.innerHTML=S.body.slice(0,6).map(function(e,i){
+    var p=S.body[i+1]||null;
+    return '<div class="row" data-be="'+i+'">'+
+      '<div class="row-ava" style="background:var(--bg3)">📏</div>'+
+      '<div class="row-body"><div class="row-top"><span class="row-name">'+e.date+'</span>'+
+      '<span class="row-time" style="color:var(--t2)">'+(e.weight?e.weight+'кг ':'' )+(e.fat?e.fat+'% ':'')+d_(e,p,'weight')+'</span></div>'+
+      '<div class="row-sub">'+(
+        [e.pushup?'Отж:'+e.pushup:'',e.pullup?'Подт:'+e.pullup:'',e.plank?'Планка:'+e.plank+'с':'',e.abs?'Пресс:'+e.abs:''].filter(Boolean).join(' · ')||'—'
+      )+'</div></div></div>';
+  }).join('');
+  hist.onclick=function(e){var r=e.target.closest('[data-be]');if(r) openBE(r.dataset.be);};
+}
+
+function openBE(i) {
+  var e=S.body[parseInt(i)],p=S.body[parseInt(i)+1]||null;
+  var lean=e.weight&&e.fat?(e.weight*(1-e.fat/100)).toFixed(1):null;
+  var box=function(v,lbl,f){return v!=null?'<div style="background:var(--bg3);border-radius:10px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:700">'+v+d_(e,p,f)+'</div><div style="font-size:11px;color:var(--t3)">'+lbl+'</div></div>':'';};
+  var html='<div style="padding:0 16px 16px"><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">'+
+    box(e.weight,'вес кг','weight')+box(e.fat,'жир%','fat')+
+    (lean?'<div style="background:var(--bg3);border-radius:10px;padding:12px;text-align:center"><div style="font-size:20px;font-weight:700">'+lean+'</div><div style="font-size:11px;color:var(--t3)">сухая кг</div></div>':'')+
+    box(e.waist,'талия','waist')+box(e.chest,'грудь','chest')+box(e.bicep,'бицепс','bicep')+
+    '</div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap">'+
+    (e.pushup!=null?'<span class="tag tg">Отж: '+e.pushup+d_(e,p,'pushup')+'</span>':'')+
+    (e.pullup!=null?'<span class="tag tg">Подт: '+e.pullup+d_(e,p,'pullup')+'</span>':'')+
+    (e.abs!=null?'<span class="tag tg">Пресс: '+e.abs+d_(e,p,'abs')+'</span>':'')+
+    (e.plank!=null?'<span class="tag tg">Планка: '+e.plank+'с'+d_(e,p,'plank')+'</span>':'')+
+    (e.rings!=null?'<span class="tag tg">Кольца: '+e.rings+d_(e,p,'rings')+'</span>':'')+
+    '</div></div>';
+  openSheet('Замер '+e.date,html);
+}
+
+// ─── CHART ────────────────────────────────────────
+var CLBL={weight:'Вес (кг)',fat:'Жир (%)',waist:'Талия (см)',pushup:'Отжимания',pullup:'Подтягивания',plank:'Планка (с)',abs:'Пресс'};
+function swChart(f, btn) {
+  S.cfield=f;
+  ($('chart-seg')||{}).querySelectorAll && $('chart-seg').querySelectorAll('.seg-b').forEach(function(b){b.classList.remove('on');});
+  if(btn) btn.classList.add('on');
+  drawChart(f);
+}
+
+function drawChart(field) {
+  var canvas=$('bchart');if(!canvas) return;
+  var data=S.body.filter(function(e){return e[field]!=null;}).reverse();
+  if(data.length<2) return;
+  var dpr=window.devicePixelRatio||1;
+  var W=canvas.parentElement.offsetWidth||340,H=160;
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  var ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  var LC='#2AABEE',TC='#666',BG='#2b2b2b';
+  var vals=data.map(function(d){return d[field];});
+  var mn=Math.min.apply(null,vals),mx=Math.max.apply(null,vals),rng=mx-mn||1;
+  var pad={l:38,r:10,t:14,b:28};var gW=W-pad.l-pad.r,gH=H-pad.t-pad.b;
+  ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=.5;
+  for(var i=0;i<=3;i++){var y=pad.t+gH*(1-i/3);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();ctx.fillStyle=TC;ctx.font='9px -apple-system,sans-serif';ctx.textAlign='right';ctx.fillText((mn+rng*i/3).toFixed(1),pad.l-3,y+3);}
+  var pts=data.map(function(d,i){return {x:pad.l+gW*(i/(data.length-1)),y:pad.t+gH*(1-(d[field]-mn)/rng)};});
+  var grad=ctx.createLinearGradient(0,pad.t,0,pad.t+gH);grad.addColorStop(0,'rgba(42,171,238,0.28)');grad.addColorStop(1,'rgba(42,171,238,0)');
+  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);pts.slice(1).forEach(function(p){ctx.lineTo(p.x,p.y);});
+  ctx.lineTo(pts[pts.length-1].x,pad.t+gH);ctx.lineTo(pts[0].x,pad.t+gH);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);pts.slice(1).forEach(function(p){ctx.lineTo(p.x,p.y);});
+  ctx.strokeStyle=LC;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
+  pts.forEach(function(p,i){ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fillStyle=LC;ctx.fill();ctx.fillStyle=TC;ctx.font='9px -apple-system,sans-serif';ctx.textAlign='center';ctx.fillText(data[i].date.slice(0,5),p.x,H-4);});
+  ctx.fillStyle=TC;ctx.font='10px -apple-system,sans-serif';ctx.textAlign='left';ctx.fillText(CLBL[field]||field,pad.l,11);
+}
+
+// ─── WORKOUTS ─────────────────────────────────────
+function saveWorkout() {
+  var type=($('wt-type')||{}).value||'';
+  var dur=parseFloat(($('wt-dur')||{}).value)||null;
+  var cal=parseFloat(($('wt-cal')||{}).value)||null;
+  var inten=($('wt-int')||{}).value||'средняя';
+  var note=($('wt-note')||{}).value||""||'';
+  if(!type){toast('Выберите тип тренировки');return;}
+  var entry={date:fmt(new Date()),ts:Date.now(),type,dur,cal,inten,note};
+  S.workouts.unshift(entry);S.workouts.sort(function(a,b){return b.ts-a.ts;});
+  sv('workouts_v1',S.workouts);
+  ['wt-type','wt-dur','wt-cal','wt-note'].forEach(function(id){var el=$(id);if(el)el.value='';});
+  renderWorkouts();toast('Тренировка добавлена!');
+}
+
+function renderWorkouts() {
+  var cc=$('wt-chart-card');
+  if(S.workouts.length>1){cc.style.display='';setTimeout(function(){drawWtChart(S.wcField);},50);}else if(cc) cc.style.display='none';
+  var el=$('wt-hist');if(!el) return;
+  if(!S.workouts.length){el.innerHTML='<div class="empty"><div class="empty-ico">🏋️</div><div class="empty-t">Тренировок нет</div><div class="empty-s">Добавьте первую</div></div>';return;}
+  var II={низкая:'🟢',средняя:'🟡',высокая:'🔴'};
+  el.innerHTML=S.workouts.slice(0,15).map(function(w,i){
+    return '<div class="row" data-wt="'+i+'">'+
+      '<div class="row-ava" style="background:var(--bg3);font-size:22px">🏋️</div>'+
+      '<div class="row-body"><div class="row-top"><span class="row-name">'+w.type+'</span>'+
+      '<span class="row-time" style="color:var(--t2)">'+(w.cal?w.cal+'ккал':'')+'</span></div>'+
+      '<div class="row-sub">'+w.date+(w.dur?' · '+w.dur+'мин':'')+(w.inten?' · '+(II[w.inten]||'')+' '+w.inten:'')+'</div>'+
+      '</div></div>';
+  }).join('');
+  el.onclick=function(e){var r=e.target.closest('[data-wt]');if(r) openWT(r.dataset.wt);};
+}
+
+function openWT(i) {
+  var w=S.workouts[parseInt(i)];if(!w) return;
+  var II={низкая:'🟢',средняя:'🟡',высокая:'🔴'};
+  var html='<div style="padding:0 16px 16px"><div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px">';
+  if(w.dur) html+='<span class="tag tb">⏱ '+w.dur+' мин</span>';
+  if(w.cal) html+='<span class="tag tg">🔥 '+w.cal+' ккал</span>';
+  if(w.inten) html+='<span class="tag ta">'+(II[w.inten]||'')+' '+w.inten+'</span>';
+  html+='</div>';
+  if(w.note) html+='<div style="background:var(--bg3);border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.6">'+w.note+'</div>';
+  html+='<div style="margin-top:12px"><button class="btn btn-ghost" style="color:var(--red)" onclick="deleteWT('+i+');closeSheet()">🗑 Удалить</button></div>';
+  html+='</div>';
+  openSheet(w.type+' · '+w.date,html);
+}
+
+function deleteWT(i) {S.workouts.splice(i,1);sv('workouts_v1',S.workouts);renderWorkouts();toast('Удалено');}
+
+function swWtChart(field,btn) {
+  S.wcField=field;
+  ($('wt-chart-seg')||{}).querySelectorAll&&$('wt-chart-seg').querySelectorAll('.seg-b').forEach(function(b){b.classList.remove('on');});
+  if(btn)btn.classList.add('on');drawWtChart(field);
+}
+
+function drawWtChart(field) {
+  var canvas=$('wt-canvas');if(!canvas) return;
+  var data=S.workouts.filter(function(w){return w[field]!=null;}).slice(0,14).reverse();
+  if(data.length<2) return;
+  var dpr=window.devicePixelRatio||1,W=canvas.parentElement.offsetWidth||340,H=140;
+  canvas.width=W*dpr;canvas.height=H*dpr;
+  var ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+  var LC='#4CAF50',TC='#666',BG='#2b2b2b';
+  var vals=data.map(function(d){return d[field];});
+  var mn=Math.min.apply(null,vals),mx=Math.max.apply(null,vals),rng=mx-mn||1;
+  var pad={l:38,r:10,t:14,b:28};var gW=W-pad.l-pad.r,gH=H-pad.t-pad.b;
+  ctx.fillStyle=BG;ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=.5;
+  for(var i=0;i<=3;i++){var y=pad.t+gH*(1-i/3);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();ctx.fillStyle=TC;ctx.font='9px -apple-system,sans-serif';ctx.textAlign='right';ctx.fillText((mn+rng*i/3).toFixed(0),pad.l-3,y+3);}
+  var pts=data.map(function(d,i){return {x:pad.l+gW*(i/(data.length-1)),y:pad.t+gH*(1-(d[field]-mn)/rng)};});
+  var grad=ctx.createLinearGradient(0,pad.t,0,pad.t+gH);grad.addColorStop(0,'rgba(76,175,80,0.3)');grad.addColorStop(1,'rgba(76,175,80,0)');
+  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);pts.slice(1).forEach(function(p){ctx.lineTo(p.x,p.y);});
+  ctx.lineTo(pts[pts.length-1].x,pad.t+gH);ctx.lineTo(pts[0].x,pad.t+gH);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+  ctx.beginPath();ctx.moveTo(pts[0].x,pts[0].y);pts.slice(1).forEach(function(p){ctx.lineTo(p.x,p.y);});
+  ctx.strokeStyle=LC;ctx.lineWidth=2.5;ctx.lineJoin='round';ctx.stroke();
+  pts.forEach(function(p,i){ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fillStyle=LC;ctx.fill();ctx.fillStyle=TC;ctx.font='9px -apple-system,sans-serif';ctx.textAlign='center';ctx.fillText(data[i].date.slice(0,5),p.x,H-2);});
+  ctx.fillStyle=TC;ctx.font='10px -apple-system,sans-serif';ctx.textAlign='left';ctx.fillText(field==='cal'?'Калории (ккал)':'Время (мин)',pad.l,11);
+}
+
+// ─── AI ───────────────────────────────────────────
+var promptTxt = '';
+var aiSource = 'Claude';
+
+function selAiSource(src, btn) {
+  aiSource = src;
+  var chips = $('ai-source-chips');
+  if (chips) chips.querySelectorAll('.chip').forEach(function(c){c.classList.remove('on');});
+  if (btn) btn.classList.add('on');
+}
+
+function initAiScreen() {
+  buildPrompt();
+  // Show preview of prompt (first 120 chars)
+  var prev = $('ai-prompt-preview');
+  if (prev) {
+    var short = promptTxt.slice(0, 200).replace(/\n/g, ' ');
+    prev.textContent = short + (promptTxt.length > 200 ? '…' : '');
+  }
+  renderAiReviews();
+}
+
+function saveAiReview() {
+  var answer = ($('ai-answer-input')||{}).value||"";
+  if (!answer) { toast('Вставьте ответ ИИ'); return; }
+  var note = ($('ai-user-note')||{}).value||"" || '';
+
+  // Snapshot of current body/strength at save time
+  var lat = S.body[0];
+  var snap = '';
+  if (lat) {
+    snap = [
+      lat.weight ? lat.weight+'кг' : '',
+      lat.fat    ? lat.fat+'%ж'   : '',
+      lat.pushup ? 'отж:'+lat.pushup : '',
+      lat.pullup ? 'подт:'+lat.pullup : '',
+    ].filter(Boolean).join(' · ');
+  }
+
+  var review = {
+    id: 'r_' + Date.now(),
+    ts: Date.now(),
+    date: fmt(new Date()),
+    source: aiSource,
+    prompt: promptTxt,
+    answer: answer,
+    note: note,
+    bodySnap: snap,
+    stackSize: STACK.length,
+  };
+
+  var reviews = ld('ai_reviews_v1', []);
+  reviews.unshift(review);
+  sv('ai_reviews_v1', reviews);
+
+  // Clear inputs
+  if ($('ai-answer-input')) $('ai-answer-input').value = '';
+  if ($('ai-user-note'))    $('ai-user-note').value    = '';
+
+  renderAiReviews();
+  toast('Сохранено в дневник разборов!');
+
+  // Scroll to history
+  var el = $('ai-reviews-list');
+  if (el) setTimeout(function(){ el.scrollIntoView({behavior:'smooth'}); }, 300);
+}
+
+function renderAiReviews() {
+  var el = $('ai-reviews-list'); if (!el) return;
+  var reviews = ld('ai_reviews_v1', []);
+  if (!reviews.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-ico">🤖</div>' +
+      '<div class="empty-t">Разборов пока нет</div>' +
+      '<div class="empty-s">Скопируйте промт, получите ответ от ИИ и сохраните его здесь</div></div>';
+    return;
+  }
+  var SRC_ICO = {Claude:'🔵', ChatGPT:'🟢', Gemini:'🟡', Другой:'⚪'};
+  el.innerHTML = reviews.map(function(r, i) {
+    var ico = SRC_ICO[r.source] || '⚪';
+    var shortAnswer = r.answer.slice(0, 90) + (r.answer.length > 90 ? '…' : '');
+    return '<div class="row" data-ri="' + i + '">' +
+      '<div class="row-ava" style="background:var(--bg3);font-size:22px">' + ico + '</div>' +
+      '<div class="row-body">' +
+        '<div class="row-top">' +
+          '<span class="row-name">' + r.source + ' · ' + r.date + '</span>' +
+          (r.bodySnap ? '<span class="row-time" style="font-size:10px;color:var(--t3)">' + r.bodySnap + '</span>' : '') +
+        '</div>' +
+        '<div class="row-sub">' + shortAnswer + '</div>' +
+        (r.note ? '<div style="font-size:11px;color:var(--blue);margin-top:2px">💬 ' + r.note + '</div>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+  el.onclick = function(e) {
+    var row = e.target.closest('[data-ri]');
+    if (row) openAiReview(parseInt(row.dataset.ri));
+  };
+}
+
+function openAiReview(i) {
+  var reviews = ld('ai_reviews_v1', []);
+  var r = reviews[i]; if (!r) return;
+  var html = '<div style="padding:0 16px 16px">';
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">';
+  html += '<span class="tag tb">🤖 ' + r.source + '</span>';
+  html += '<span class="tag tg">📅 ' + r.date + '</span>';
+  if (r.bodySnap) html += '<span class="tag ta">📊 ' + r.bodySnap + '</span>';
+  html += '</div>';
+
+  if (r.note) {
+    html += '<div style="background:#2b5278;border-radius:8px;padding:10px 12px;font-size:13px;color:#90caf9;margin-bottom:12px">💬 ' + r.note + '</div>';
+  }
+
+  html += '<div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Ответ ИИ</div>';
+  html += '<div style="background:var(--bg3);border-radius:10px;padding:13px 14px;font-size:13px;line-height:1.7;color:var(--t1);white-space:pre-wrap;max-height:320px;overflow-y:auto">' + r.answer + '</div>';
+
+  html += '<div style="display:flex;gap:8px;margin-top:12px">';
+  html += '<button class="btn btn-ghost" style="flex:1" onclick="reloadPromptFromReview(' + i + ');closeSheet()">↺ Повторить запрос</button>';
+  html += '<button class="btn btn-ghost" style="flex:1;color:var(--red)" onclick="deleteReview(' + i + ');closeSheet()">🗑 Удалить</button>';
+  html += '</div>';
+  html += '</div>';
+  openSheet(r.source + ' · ' + r.date, html);
+}
+
+function deleteReview(i) {
+  var reviews = ld('ai_reviews_v1', []);
+  reviews.splice(i, 1);
+  sv('ai_reviews_v1', reviews);
+  renderAiReviews();
+  toast('Запись удалена');
+}
+
+function reloadPromptFromReview(i) {
+  var reviews = ld('ai_reviews_v1', []);
+  var r = reviews[i]; if (!r) return;
+  promptTxt = r.prompt;
+  var prev = $('ai-prompt-preview');
+  if (prev) {
+    var short = promptTxt.slice(0, 200).replace(/\n/g, ' ');
+    prev.textContent = short + (promptTxt.length > 200 ? '…' : '');
+  }
+  toast('Промт восстановлен — можно скопировать');
+}
+
+function exportReviews() {
+  var reviews = ld('ai_reviews_v1', []);
+  var blob = new Blob([JSON.stringify({reviews: reviews, exportedAt: new Date().toISOString()}, null, 2)], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'stackup_ai_reviews_' + fmt(new Date()).replace(/\./g,'-') + '.json';
+  a.click();
+  closeSheet();
+  toast('Экспортировано');
+}
+
+function clearReviews() {
+  if (!confirm('Удалить все записи дневника разборов?')) return;
+  sv('ai_reviews_v1', []);
+  renderAiReviews();
+  closeSheet();
+  toast('Дневник очищен');
+}
+
+function copyPrompt() {
+  buildPrompt();
+  var prev = $('ai-prompt-preview');
+  if (prev) {
+    var short = promptTxt.slice(0, 200).replace(/\n/g, ' ');
+    prev.textContent = short + (promptTxt.length > 200 ? '…' : '');
+  }
+  var copy = function() {
+    var t = document.createElement('textarea');
+    t.value = promptTxt; document.body.appendChild(t); t.select();
+    document.execCommand('copy'); document.body.removeChild(t);
+    toast('Промт скопирован!');
+  };
+  if (navigator.clipboard) navigator.clipboard.writeText(promptTxt).then(function(){toast('Промт скопирован!');}).catch(copy);
+  else copy();
+}
+
+// Legacy stub — no longer used directly
+function clearAiChat() { clearReviews(); }
+
+// ─── EXPORT/IMPORT ALL ────────────────────────────
+function exportAll(){
+  var blob=new Blob([JSON.stringify({diary:S.diary,body:S.body,workouts:S.workouts,bad:S.bad.filter(function(x){return x.custom;}),synRules:ld('syn_db_v1',[]),v:5},null,2)],{type:'application/json'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='stackup_'+fmt(new Date()).replace(/\./g,'-')+'.json';a.click();closeSheet();
+}
+function importAll(e){
+  var f=e.target.files[0];if(!f) return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    try{
+      var d=JSON.parse(ev.target.result);
+      if(d.diary){S.diary.push.apply(S.diary,d.diary);S.diary.sort(function(a,b){return b.ts-a.ts;});sv('diary_v5',S.diary);}
+      if(d.body){S.body.push.apply(S.body,d.body);S.body.sort(function(a,b){return b.ts-a.ts;});sv('body_v4',S.body);}
+      if(d.workouts){S.workouts.push.apply(S.workouts,d.workouts);S.workouts.sort(function(a,b){return b.ts-a.ts;});sv('workouts_v1',S.workouts);}
+      if(d.bad){d.bad.filter(function(b){return b.custom&&!S.bad.find(function(x){return x.id===b.id;});}).forEach(function(b){S.bad.push(b);});sv('bad_v2',S.bad);}
+      if(d.synRules){var cr=ld('syn_db_v1',[]);d.synRules.forEach(function(r){var ex=cr.findIndex(function(x){return (x.id1===r.id1&&x.id2===r.id2)||(x.id1===r.id2&&x.id2===r.id1);});if(ex>=0)cr[ex]=r;else cr.push(r);});sv('syn_db_v1',cr);}
+      closeSheet();toast('Импортировано!');
+    }catch{toast('Ошибка файла');}
+  };r.readAsText(f);
+}
+
+// ─── PROFILE ──────────────────────────────────────
+function getProfile(){return ld('profile_v1',{name:'',dob:''});}
+function saveProfile(){
+  var name=($('prof-name')||{}).value||""||'';
+  var dob=($('prof-dob')||{}).value||'';
+  sv('profile_v1',{name,dob});updateGreeting();closeSheet();toast('Профиль сохранён');
+}
+function getAge(dob){if(!dob) return null;var b=new Date(dob),now=new Date();var age=now.getFullYear()-b.getFullYear();if(now.getMonth()-b.getMonth()<0||(now.getMonth()===b.getMonth()&&now.getDate()<b.getDate())) age--;return age;}
+function getDaysToB(dob){if(!dob) return null;var now=new Date(),b=new Date(dob),next=new Date(now.getFullYear(),b.getMonth(),b.getDate());if(next<now)next.setFullYear(now.getFullYear()+1);return Math.ceil((next-now)/86400000);}
+function updateGreeting(){
+  var p=getProfile(),h=new Date().getHours();
+  var base=h<12?'Доброе утро':h<17?'Добрый день':'Добрый вечер';
+  var g=$('greet');if(g) g.textContent=p.name?base+', '+p.name+'!':(h<12?'Доброе утро!':h<17?'Добрый день!':'Добрый вечер!');
+  var ava=$('hd-ava');if(ava&&p.name){ava.textContent=p.name.charAt(0).toUpperCase();ava.style.fontSize='20px';ava.style.fontWeight='700';}
+  var ab=$('age-badge');if(ab&&p.dob){var age=getAge(p.dob),days=getDaysToB(p.dob),dob=new Date(p.dob),bdStr=dob.toLocaleDateString('ru-RU',{day:'numeric',month:'long'});var txt=age+' лет';if(days<=7)txt+=' 🎂 '+(days===0?'Сегодня др!':days+'д до др');ab.innerHTML='<span class="tag tb">🎂 '+txt+'</span>';ab.title='День рождения: '+bdStr;}
+}
+function openProfile(){
+  var p=getProfile();var age=p.dob?getAge(p.dob):null;var days=p.dob?getDaysToB(p.dob):null;
+  var dob=p.dob?new Date(p.dob):null;var bdStr=dob?dob.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}):'';
+  openSheet('👤 Профиль',
+    '<div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:12px">'+
+    (age!==null?'<div style="background:var(--bg3);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px"><div style="font-size:42px">🎂</div><div>'+
+      '<div style="font-size:22px;font-weight:800">'+age+' лет</div>'+
+      '<div style="font-size:13px;color:var(--t2)">'+bdStr+'</div>'+
+      (days!==null&&days<=30?'<div style="font-size:12px;color:var(--orange);margin-top:2px">'+(days===0?'🎉 Сегодня день рождения!':'🎂 До дня рождения: '+days+' дн.')+'</div>':'<div style="font-size:12px;color:var(--t3);margin-top:2px">До ДР: '+days+' дн.</div>')+
+    '</div></div>':'')+
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:5px;font-weight:600;text-transform:uppercase">Имя</div><input id="prof-name" class="inp" placeholder="Введите имя" value="'+p.name+'"></div>'+
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:5px;font-weight:600;text-transform:uppercase">Дата рождения</div><input id="prof-dob" class="inp" type="date" value="'+p.dob+'"></div>'+
+    '<button class="btn btn-blue" onclick="saveProfile()">Сохранить</button></div>'
+  );
+}
+
+// ─── MISC ─────────────────────────────────────────
+function resetTaken(){S.taken.clear();sv('taken_v2',[]);renderToday();toast('Отметки сброшены');}
+function resetBadDb(){if(!confirm('Сбросить базу? Свои добавки будут удалены.')) return;S.bad=defaultBad();sv('bad_v2',S.bad);renderBase();toast('База сброшена');}
+function triggerImport(){var inp=$('import-input');if(inp)inp.click();}
+
+// ─── DAILY RESET + INIT ───────────────────────────
+function dailyReset(){var today=fmt(new Date());if(localStorage.getItem('last_d')!==today){S.taken.clear();sv('taken_v2',[]);localStorage.setItem('last_d',today);}}
+
+dailyReset();
+updateGreeting();
+renderToday();
+updateDLbl();
+// ai-today-lbl removed
+function openAddBad() {
+  var badOptions = S.bad.map(function(b){return '<option value="'+b.id+'">'+b.e+' '+b.name+'</option>';}).join('');
+  openSheet('Добавить БАД',
+    '<div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:10px">'+
+    '<div style="background:#2b5278;border-radius:8px;padding:10px 12px;font-size:12px;color:#90caf9;line-height:1.5">'+
+      '⚠️ <b style="color:#fff">Важно:</b> Персональная база. Данные справочные, не медицинская рекомендация.'+
+    '</div>'+
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Название</div><input id="an" class="inp" placeholder="Название добавки"></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Эмодзи</div><input id="ae" class="inp" placeholder="💊" style="font-size:22px;text-align:center"></div>'+
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Категория</div>'+
+        '<select id="ac" class="inp"><option value="vitamins">Витамины</option><option value="minerals">Минералы</option><option value="sport">Спорт</option><option value="adapto">Адаптогены</option></select>'+
+      '</div>'+
+    '</div>'+
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Дозировка</div><input id="ad" class="inp" placeholder="напр. 1000–4000 МЕ/день"></div>'+
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Время приёма</div><input id="at" class="inp" placeholder="напр. утром с едой"></div>'+
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Заметки</div><textarea id="ano" class="inp" rows="2" placeholder="Особенности..."></textarea></div>'+
+    '<div style="border-top:1px solid var(--line);padding-top:10px">'+
+      '<div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:6px">🔗 Синергии</div>'+
+      '<select id="syn-add-sel" class="inp" style="margin-bottom:6px"><option value="">— Добавить синергию —</option>'+badOptions+'</select>'+
+      '<div id="syn-add-list" style="display:flex;gap:6px;flex-wrap:wrap;min-height:28px"></div>'+
+      '<div id="syn-add-hidden"></div>'+
+    '</div>'+
+    '<div>'+
+      '<div style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:6px">⛔ Конфликты</div>'+
+      '<select id="con-add-sel" class="inp" style="margin-bottom:6px"><option value="">— Добавить конфликт —</option>'+badOptions+'</select>'+
+      '<div id="con-add-list" style="display:flex;gap:6px;flex-wrap:wrap;min-height:28px"></div>'+
+      '<div id="con-add-hidden"></div>'+
+    '</div>'+
+    '<button class="btn btn-blue" onclick="saveNewBad()">Добавить в базу</button></div>'
+  );
+  setTimeout(function() {
+    var ss=$('syn-add-sel');
+    if(ss) ss.onchange=function(){addRelation('syn',this.value,this.options[this.selectedIndex].text);this.value='';};
+    var cs=$('con-add-sel');
+    if(cs) cs.onchange=function(){addRelation('con',this.value,this.options[this.selectedIndex].text);this.value='';};
+  },100);
+}
+
+function addRelation(type, id, label) {
+  if(!id) return;
+  var listEl=$(type+'-add-list'), hiddenEl=$(type+'-add-hidden');
+  if(!listEl) return;
+  if(hiddenEl.querySelector('[data-id="'+id+'"]')) return;
+  var chip=document.createElement('span');
+  chip.className='tag '+(type==='syn'?'tg':'tr');chip.style.cursor='pointer';
+  chip.innerHTML=label.split(' ').slice(0,3).join(' ')+' ✕';
+  chip.onclick=function(){chip.remove();hiddenEl.querySelector('[data-id="'+id+'"]').remove();};
+  listEl.appendChild(chip);
+  var inp=document.createElement('input');inp.type='hidden';inp.value=id;inp.dataset.id=id;
+  hiddenEl.appendChild(inp);
+}
+
+function saveNewBad() {
+  var name=($('an')||{}).value||"";
+  if(!name){toast('Введите название');return;}
+  var newId='c_'+Date.now();
+  var synEls=($('syn-add-hidden')||{}).querySelectorAll?$('syn-add-hidden').querySelectorAll('[data-id]'):[];
+  var synIds=[].map.call(synEls,function(el){return el.value;});
+  var conEls=($('con-add-hidden')||{}).querySelectorAll?$('con-add-hidden').querySelectorAll('[data-id]'):[];
+  var conIds=[].map.call(conEls,function(el){return el.value;});
+  var b={id:newId,name:name,e:($('ae')||{}).value||""||'💊',cat:($('ac')||{}).value||'vitamins',dose:($('ad')||{}).value||""||'—',time:($('at')||{}).value||""||'—',syn:synIds,con:conIds,note:($('ano')||{}).value||""||'',custom:true};
+  S.bad.push(b);sv('bad_v2',S.bad);
+  var customRules=ld('syn_db_v1',[]);
+  synIds.forEach(function(sid){
+    var exists=customRules.findIndex(function(r){return (r.id1===newId&&r.id2===sid)||(r.id1===sid&&r.id2===newId);});
+    var rule={id1:newId,id2:sid,t:'good',txt:name+' + '+((S.bad.find(function(x){return x.id===sid;})||{}).name||sid)+': синергия (задано вами)',custom:true};
+    if(exists>=0)customRules[exists]=rule;else customRules.push(rule);
+  });
+  conIds.forEach(function(cid){
+    var exists=customRules.findIndex(function(r){return (r.id1===newId&&r.id2===cid)||(r.id1===cid&&r.id2===newId);});
+    var rule={id1:newId,id2:cid,t:'bad',txt:name+' + '+((S.bad.find(function(x){return x.id===cid;})||{}).name||cid)+': конфликт (задано вами)',custom:true};
+    if(exists>=0)customRules[exists]=rule;else customRules.push(rule);
+  });
+  sv('syn_db_v1',customRules);
+  closeSheet();renderBase();toast('Добавлен: '+name);
+}
+
+
+</script>
+</body>
+</html>
