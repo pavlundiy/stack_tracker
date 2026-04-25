@@ -366,6 +366,90 @@ canvas{display:block;width:100%!important}
 </head>
 <body>
 
+<!-- ONBOARDING OVERLAY -->
+<div id="ob-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;max-width:430px;margin:0 auto;overflow:hidden">
+
+  <!-- Progress dots -->
+  <div style="display:flex;justify-content:center;gap:8px;padding:20px 0 0" id="ob-dots">
+    <div class="ob-dot ob-dot-active" id="od-0"></div>
+    <div class="ob-dot" id="od-1"></div>
+    <div class="ob-dot" id="od-2"></div>
+  </div>
+
+  <!-- Steps container -->
+  <div style="flex:1;overflow:hidden;position:relative">
+
+    <!-- STEP 0: Welcome + Name + DOB -->
+    <div class="ob-step" id="ob-step-0">
+      <div style="text-align:center;padding:32px 32px 0">
+        <div style="font-size:64px;margin-bottom:16px">💊</div>
+        <div style="font-size:26px;font-weight:700;color:var(--t1);margin-bottom:8px">Добро пожаловать<br>в СтекАп</div>
+        <div style="font-size:15px;color:var(--t2);line-height:1.6;margin-bottom:32px">Персональный трекер БАД, дневник самочувствия и ИИ-анализ вашего стека</div>
+      </div>
+      <div style="padding:0 24px">
+        <div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Как вас зовут?</div>
+        <input id="ob-name" class="inp" placeholder="Введите имя" style="font-size:16px;margin-bottom:16px" oninput="obCheckStep0()">
+        <div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Дата рождения <span style="color:var(--t3);font-weight:400;text-transform:none">(необязательно)</span></div>
+        <input id="ob-dob" class="inp" type="date" style="font-size:16px;margin-bottom:24px">
+        <button class="btn btn-blue" id="ob-btn-0" onclick="obNext(1)" style="opacity:.4;pointer-events:none">Продолжить →</button>
+      </div>
+    </div>
+
+    <!-- STEP 1: Choose stack -->
+    <div class="ob-step" id="ob-step-1" style="display:none">
+      <div style="padding:28px 24px 0">
+        <div style="font-size:22px;font-weight:700;color:var(--t1);margin-bottom:6px">Ваши добавки</div>
+        <div style="font-size:14px;color:var(--t2);line-height:1.5;margin-bottom:16px">Отметьте что принимаете — это станет вашим расписанием. Можно изменить позже.</div>
+        <div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Выберите добавки</div>
+        <div id="ob-stack-list" style="max-height:340px;overflow-y:auto;border-radius:10px;background:var(--bg2)"></div>
+        <div style="margin-top:16px">
+          <button class="btn btn-blue" onclick="obSaveStack()">Сохранить и продолжить →</button>
+          <button class="btn btn-ghost" onclick="obNext(2)" style="margin-top:8px;font-size:13px;color:var(--t2)">Пропустить, настрою позже</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: First diary entry -->
+    <div class="ob-step" id="ob-step-2" style="display:none">
+      <div style="padding:28px 24px 0">
+        <div style="font-size:22px;font-weight:700;color:var(--t1);margin-bottom:6px">Как вы себя чувствуете?</div>
+        <div style="font-size:14px;color:var(--t2);line-height:1.5;margin-bottom:20px">Первая запись в дневнике — точка отсчёта для отслеживания прогресса.</div>
+
+        <div style="margin-bottom:14px">
+          <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:8px">ЭНЕРГИЯ СЕЙЧАС</div>
+          <div style="display:flex;gap:8px" id="ob-c-energy">
+            <button class="chip" onclick="obChip('energy',1,this)">😴 Низкая</button>
+            <button class="chip" onclick="obChip('energy',2,this)">⚡ Норм</button>
+            <button class="chip" onclick="obChip('energy',3,this)">🚀 Высокая</button>
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:8px">СОН ПРОШЛОЙ НОЧЬЮ</div>
+          <div style="display:flex;gap:8px" id="ob-c-sleep">
+            <button class="chip" onclick="obChip('sleep',1,this)">😫 Плохой</button>
+            <button class="chip" onclick="obChip('sleep',2,this)">😐 Средний</button>
+            <button class="chip" onclick="obChip('sleep',3,this)">😴 Хороший</button>
+          </div>
+        </div>
+        <div style="margin-bottom:20px">
+          <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:6px">ЗАМЕТКИ (необязательно)</div>
+          <textarea id="ob-note" class="inp" rows="2" placeholder="Что хотите улучшить с помощью БАД?" style="resize:none"></textarea>
+        </div>
+        <button class="btn btn-blue" onclick="obFinish()">Начать пользоваться 🚀</button>
+        <button class="btn btn-ghost" onclick="obFinish()" style="margin-top:8px;font-size:13px;color:var(--t2)">Пропустить</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--bg3);transition:all .3s}
+.ob-dot-active{background:var(--blue);width:24px;border-radius:4px}
+.ob-step{position:absolute;inset:0;overflow-y:auto;transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.ob-step::-webkit-scrollbar{display:none}
+</style>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -847,18 +931,20 @@ S.synPicks = Array.from(synPicksSet);
 /* removed old getSyn */
 
 // MY STACK
-const STACK = [
-  {id:'collagen', slot:'morning', dose:'5 г', note:'натощак / до еды'},
-  {id:'d3',       slot:'morning', dose:'2000 МЕ', note:'с завтраком'},
-  {id:'optimen',  slot:'morning', dose:'1 таб',   note:'с едой обязательно'},
+var DEFAULT_STACK = [
+  {id:'collagen', slot:'morning', dose:'5 г',         note:'натощак / до еды'},
+  {id:'d3',       slot:'morning', dose:'2000 МЕ',     note:'с завтраком'},
+  {id:'optimen',  slot:'morning', dose:'1 таб',       note:'с едой обязательно'},
   {id:'leuzea',   slot:'morning', dose:'500–1000 мг', note:'до 16:00'},
   {id:'tribulus', slot:'morning', dose:'250–750 мг',  note:'до тренировки'},
-  {id:'creatine', slot:'after',   dose:'5 г',     note:'после тренировки'},
-  {id:'hond',     slot:'after',   dose:'по дозировке', note:'с едой'},
-  {id:'omega3',   slot:'day',     dose:'~2000 мг', note:'с жирным обедом'},
-  {id:'ltean',    slot:'day',     dose:'100–200 мг', note:'по потребности'},
-  {id:'mg',       slot:'evening', dose:'½ ч.л.',   note:'перед сном'},
+  {id:'creatine', slot:'after',   dose:'5 г',         note:'после тренировки'},
+  {id:'hond',     slot:'after',   dose:'по дозировке',note:'с едой'},
+  {id:'omega3',   slot:'day',     dose:'~2000 мг',    note:'с жирным обедом'},
+  {id:'ltean',    slot:'day',     dose:'100–200 мг',  note:'по потребности'},
+  {id:'mg',       slot:'evening', dose:'½ ч.л.',      note:'перед сном'},
 ];
+var STACK = ld('stack_v1', DEFAULT_STACK);
+function saveStack() { sv('stack_v1', STACK); }
 const SLOTS = {morning:'☀️ Утро', after:'💪 После тренировки', day:'🌤 День', evening:'🌙 Вечер'};
 const SLOT_ORDER = ['morning','after','day','evening'];
 
@@ -910,8 +996,10 @@ function goBack() {
 function hdAction() {
   const menus = {
     today: [
+      {ico:'✏️', lbl:'Редактировать стек',    fn:'openStackEditor()'},
       {ico:'🔄', lbl:'Сбросить отметки дня',  fn:'resetTaken()'},
       {ico:'👤', lbl:'Профиль',               fn:'openProfile()'},
+      {ico:'🔁', lbl:'Показать знакомство',    fn:'resetOnboarding()'},
       {ico:'↓',  lbl:'Экспорт данных (JSON)', fn:'exportAll()'},
       {ico:'↑',  lbl:'Импорт данных (JSON)',  fn:'triggerImport()'},
     ],
@@ -924,10 +1012,10 @@ function hdAction() {
       {ico:'↑',  lbl:'Импорт данных',         fn:'triggerImport()'},
     ],
     base: [
-      {ico:'＋', lbl:'Добавить БАД',          fn:'openAddBad()'},
-      {ico:'🔗', lbl:'Добавить правило синергии', fn:'openAddSynRule()'},
-      {ico:'↓',  lbl:'Экспорт базы + синергий', fn:'exportBase()'},
-      {ico:'🔄', lbl:'Сбросить базу',         fn:'resetBadDb()'},
+      {ico:'＋', lbl:'Добавить БАД',              fn:'openAddBad()'},
+      {ico:'🔗', lbl:'Добавить правило синергии',  fn:'openAddSynRule()'},
+      {ico:'↓',  lbl:'Экспорт базы + синергий',   fn:'exportBase()'},
+      {ico:'🔄', lbl:'Сбросить базу БАД',          fn:'resetBadDb()'},
     ],
     ai: [
       {ico:'📋', lbl:'Скопировать промт',       fn:'copyPrompt()'},
@@ -1683,6 +1771,77 @@ function selAiSource(src, btn) {
   if (btn) btn.classList.add('on');
 }
 
+function buildPrompt() {
+  var lat = S.body[0];
+  var p = getProfile ? getProfile() : {name:'', dob:''};
+  var profCtx = p.name ? 'Имя: ' + p.name + (p.dob ? ', возраст: ' + getAge(p.dob) + ' лет' : '') : '';
+
+  var bctx = 'Замеров нет';
+  if (lat) {
+    var lean = (lat.weight && lat.fat) ? (lat.weight*(1-lat.fat/100)).toFixed(1)+' кг' : null;
+    var whtr = (lat.waist && lat.height) ? (lat.waist/lat.height).toFixed(2) : null;
+    bctx = [
+      lat.weight ? 'Вес: '+lat.weight+' кг' : '',
+      lat.fat    ? 'Жир: '+lat.fat+'%'      : '',
+      lean       ? 'Сухая масса: '+lean      : '',
+      lat.waist  ? 'Талия: '+lat.waist+' см': '',
+      lat.chest  ? 'Грудь: '+lat.chest+' см': '',
+      lat.bicep  ? 'Бицепс: '+lat.bicep+' см':'',
+      whtr       ? 'WHtR: '+whtr              : '',
+    ].filter(Boolean).join(', ');
+  }
+
+  var sctx = 'нет данных';
+  if (lat) {
+    sctx = [
+      lat.pushup ? 'Отжимания: '+lat.pushup+' повт' : '',
+      lat.pullup ? 'Подтягивания: '+lat.pullup+' повт':'',
+      lat.abs    ? 'Пресс: '+lat.abs+' повт'          : '',
+      lat.plank  ? 'Планка: '+lat.plank+' с'           : '',
+      lat.rings  ? 'Кольца ТРХ: '+lat.rings+' повт'   : '',
+    ].filter(Boolean).join(', ') || 'нет данных';
+  }
+
+  var wctx = 'нет данных';
+  if (S.workouts && S.workouts.length) {
+    var totalCal = S.workouts.slice(0,10).reduce(function(a,w){return a+(w.cal||0);},0);
+    var totalDur = S.workouts.slice(0,10).reduce(function(a,w){return a+(w.dur||0);},0);
+    var types = {};
+    S.workouts.slice(0,20).forEach(function(w){types[w.type]=(types[w.type]||0)+1;});
+    var top = Object.keys(types).sort(function(a,b){return types[b]-types[a];}).slice(0,3)
+      .map(function(t){return t+'(x'+types[t]+')';}).join(', ');
+    wctx = 'Всего: '+S.workouts.length+', посл.10: '+totalCal+'ккал / '+totalDur+'мин | '+top;
+    wctx += '\nПосл.3: '+S.workouts.slice(0,3).map(function(w){
+      return w.date+' '+w.type+(w.dur?' '+w.dur+'м':'')+(w.cal?' '+w.cal+'кк':'');
+    }).join(' | ');
+  }
+
+  var dctx = S.diary.slice(0,7).map(function(e){
+    return e.date+': энергия='+(['','низкая','норм','высокая'][e.energy]||'?')+
+      ', сон='+(['','плохой','средний','хороший'][e.sleep]||'?')+
+      (e.note?' — '+e.note:'');
+  }).join('\n');
+
+  // Current stack summary
+  var stackSummary = STACK.map(function(s){
+    var b = S.bad.find(function(x){return x.id===s.id;}) || {name:s.id};
+    return '- ' + b.name + ' ' + s.dose + ' (' + s.note + ')';
+  }).join('\n');
+
+  promptTxt = 'Ты — нутрициолог и спортивный специалист. Проанализируй данные. Отвечай на русском.\n\n' +
+    (profCtx ? 'ПРОФИЛЬ: ' + profCtx + '\n\n' : '') +
+    'МОЙ ТЕКУЩИЙ СТЕК (' + STACK.length + ' добавок):\n' + stackSummary + '\n\n' +
+    'РЕЖИМ: Виньяса йога, медитация 12мин, контрастный душ.\n' +
+    'Сплит: вт (грудь+бицепс), чт (спина+трицепс), сб (ноги+плечи).\n\n' +
+    'ЗАМЕРЫ ТЕЛА: ' + bctx + '\n\n' +
+    'СИЛОВЫЕ: ' + sctx + '\n\n' +
+    'ТРЕНИРОВКИ: ' + wctx + '\n\n' +
+    'ДНЕВНИК (7 дней):\n' + (dctx || 'нет') + '\n\n' +
+    'Задача: 1) Оценка стека и прогресса 2) Топ-3 риска 3) Конкретная рекомендация прямо сейчас.\n' +
+    'Без markdown-заголовков. До 300 слов.';
+}
+
+
 function initAiScreen() {
   buildPrompt();
   // Show preview of prompt (first 120 chars)
@@ -1912,12 +2071,160 @@ function resetTaken(){S.taken.clear();sv('taken_v2',[]);renderToday();toast('О�
 function resetBadDb(){if(!confirm('Сбросить базу? Свои добавки будут удалены.')) return;S.bad=defaultBad();sv('bad_v2',S.bad);renderBase();toast('База сброшена');}
 function triggerImport(){var inp=$('import-input');if(inp)inp.click();}
 
+
+// ─── ONBOARDING ────────────────────────────────────
+var obMetrics = {energy:0, sleep:0};
+
+function obCheckStep0() {
+  var name = ($('ob-name')||{}).value.trim();
+  var btn  = $('ob-btn-0');
+  if (!btn) return;
+  if (name.length >= 1) {
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+  } else {
+    btn.style.opacity = '.4';
+    btn.style.pointerEvents = 'none';
+  }
+}
+
+function obSetDot(step) {
+  [0,1,2].forEach(function(i) {
+    var d = $('od-'+i);
+    if (!d) return;
+    d.className = 'ob-dot' + (i === step ? ' ob-dot-active' : '');
+  });
+}
+
+function obNext(step) {
+  // Save step 0 data
+  if (step === 1) {
+    var name = ($('ob-name')||{}).value.trim();
+    if (!name) return;
+    var dob = ($('ob-dob')||{}).value || '';
+    sv('profile_v1', {name: name, dob: dob});
+    updateGreeting();
+    // Populate stack picker
+    obRenderStackList();
+  }
+
+  // Slide transition
+  var steps = [0,1,2];
+  steps.forEach(function(i) {
+    var el = $('ob-step-'+i);
+    if (!el) return;
+    if (i === step) {
+      el.style.display = 'block';
+      el.style.transform = 'translateX(100%)';
+      setTimeout(function(){ el.style.transform = 'translateX(0)'; }, 10);
+    } else if (i < step) {
+      el.style.transform = 'translateX(-100%)';
+      setTimeout(function(){ el.style.display = 'none'; }, 310);
+    }
+  });
+  obSetDot(step);
+}
+
+function obRenderStackList() {
+  var el = $('ob-stack-list'); if (!el) return;
+  var selected = new Set(STACK.map(function(s){ return s.id; }));
+  el.innerHTML = S.bad.map(function(b) {
+    var checked = selected.has(b.id);
+    return '<div style="display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)">' +
+      '<span style="font-size:22px;margin-right:12px">' + b.e + '</span>' +
+      '<div style="flex:1">' +
+        '<div style="font-size:14px;font-weight:500;color:var(--t1)">' + b.name + '</div>' +
+        '<div style="font-size:12px;color:var(--t2)">' + b.dose + ' · ' + b.time + '</div>' +
+      '</div>' +
+      '<div class="cell-switch ' + (checked ? 'on' : '') + '" data-ob-id="' + b.id + '"></div>' +
+    '</div>';
+  }).join('');
+  el.onclick = function(e) {
+    var sw = e.target.closest('[data-ob-id]');
+    if (!sw) return;
+    sw.classList.toggle('on');
+    var id = sw.dataset.obId;
+    var inStack = STACK.findIndex(function(s){ return s.id === id; });
+    if (sw.classList.contains('on')) {
+      if (inStack < 0) {
+        var b = S.bad.find(function(x){ return x.id === id; });
+        if (b) {
+          var slot = b.time.indexOf('вечер') >= 0 ? 'evening' :
+                    (b.time.indexOf('после') >= 0 || b.time.indexOf('трен') >= 0) ? 'after' :
+                    (b.time.indexOf('день') >= 0 || b.time.indexOf('обед') >= 0) ? 'day' : 'morning';
+          STACK.push({id: b.id, slot: slot, dose: b.dose, note: b.time});
+        }
+      }
+    } else {
+      if (inStack >= 0) STACK.splice(inStack, 1);
+    }
+  };
+}
+
+
+function obSaveStack() {
+  saveStack();
+  S.taken.clear(); sv('taken_v2', []);
+  obNext(2);
+}
+
+function obChip(name, val, btn) {
+  obMetrics[name] = val;
+  btn.closest('[id^="ob-c-"]').querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
+  btn.classList.add('on');
+}
+
+function obFinish() {
+  // Save first diary entry if metrics were set
+  if (obMetrics.energy || obMetrics.sleep) {
+    var note = ($('ob-note')||{}).value.trim();
+    var entry = {
+      date: fmt(new Date()),
+      ts: Date.now(),
+      energy: obMetrics.energy,
+      sleep: obMetrics.sleep,
+      mood: 0, workout: 0,
+      note: note || 'Первая запись — начало отсчёта',
+      taken: 0, retro: false
+    };
+    var idx = S.diary.findIndex(function(e){ return e.date === entry.date; });
+    if (idx >= 0) S.diary[idx] = entry; else S.diary.unshift(entry);
+    sv('diary_v5', S.diary);
+  }
+  // Mark onboarding done
+  sv('ob_done', true);
+  // Hide overlay
+  var ovl = $('ob-overlay');
+  if (ovl) {
+    ovl.style.opacity = '0';
+    ovl.style.transition = 'opacity .4s';
+    setTimeout(function(){ ovl.style.display = 'none'; }, 400);
+  }
+  renderToday();
+  updateGreeting();
+  toast('Добро пожаловать! 🎉');
+}
+
+function checkOnboarding() {
+  var done = ld('ob_done', false);
+  var p = getProfile();
+  if (done || p.name) return; // already onboarded
+  var ovl = $('ob-overlay');
+  if (ovl) {
+    ovl.style.display = 'flex';
+    ovl.style.opacity = '0';
+    setTimeout(function(){ ovl.style.opacity = '1'; ovl.style.transition = 'opacity .3s'; }, 10);
+  }
+}
+
+
 // ─── DAILY RESET + INIT ───────────────────────────
 function dailyReset(){var today=fmt(new Date());if(localStorage.getItem('last_d')!==today){S.taken.clear();sv('taken_v2',[]);localStorage.setItem('last_d',today);}}
 
 dailyReset();
 updateGreeting();
 renderToday();
+checkOnboarding();
 updateDLbl();
 // ai-today-lbl removed
 function openAddBad() {
@@ -2224,6 +2531,176 @@ toggleTaken = function(id) {
 };
 
 
+
+
+// ─── STACK EDITOR ─────────────────────────────────
+function openStackEditor() {
+  renderStackEditorSheet();
+}
+
+function renderStackEditorSheet() {
+  var slotLabels = {morning:'☀️ Утро', after:'💪 После тренировки', day:'🌤 День', evening:'🌙 Вечер'};
+  var slotOrder  = ['morning','after','day','evening'];
+
+  var html = '<div style="padding:0 0 16px">';
+
+  // Warning
+  html += '<div style="margin:0 16px 12px;background:#2b5278;border-radius:8px;padding:10px 12px;font-size:12px;color:#90caf9;line-height:1.5">' +
+    '✏️ Изменения применяются сразу. Удалённые добавки исчезнут из расписания.' +
+  '</div>';
+
+  // Items by slot
+  slotOrder.forEach(function(slot) {
+    var items = STACK.filter(function(s){ return s.slot === slot; });
+    if (!items.length) return;
+    html += '<div style="padding:6px 16px 2px;font-size:11px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:.05em">' + slotLabels[slot] + '</div>';
+    items.forEach(function(item, i) {
+      var b = S.bad.find(function(x){ return x.id === item.id; }) || {e:'💊', name:item.id};
+      var globalIdx = STACK.indexOf(item);
+      html += '<div style="display:flex;align-items:center;padding:10px 16px;gap:10px;border-bottom:1px solid var(--line)">' +
+        '<span style="font-size:22px">' + b.e + '</span>' +
+        '<div style="flex:1;min-width:0">' +
+          '<div style="font-size:14px;font-weight:500;color:var(--t1)">' + b.name + '</div>' +
+          '<div style="font-size:12px;color:var(--t2)">' + item.dose + ' · ' + item.note + '</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px">' +
+          '<button onclick="editStackItem(' + globalIdx + ')" style="background:var(--bg3);border:none;border-radius:8px;padding:6px 10px;color:var(--blue);cursor:pointer;font-size:13px">✏️</button>' +
+          '<button onclick="removeStackItem(' + globalIdx + ')" style="background:var(--red-dim,#f4433618);border:none;border-radius:8px;padding:6px 10px;color:var(--red);cursor:pointer;font-size:13px">✕</button>' +
+        '</div>' +
+      '</div>';
+    });
+  });
+
+  // Add button
+  html += '<div style="padding:12px 16px 0">' +
+    '<button class="btn btn-blue" onclick="openAddToStack()">＋ Добавить добавку</button>' +
+  '</div>';
+  html += '</div>';
+
+  openSheet('Мой стек', html);
+}
+
+function removeStackItem(idx) {
+  if (!confirm('Убрать "' + (S.bad.find(function(x){return x.id===STACK[idx].id;})||{name:STACK[idx].id}).name + '" из стека?')) return;
+  STACK.splice(idx, 1);
+  saveStack();
+  // Remove from taken
+  S.taken.delete(STACK[idx] && STACK[idx].id);
+  sv('taken_v2', Array.from(S.taken));
+  renderToday();
+  renderStackEditorSheet(); // refresh sheet
+  toast('Убрано из стека');
+}
+
+function editStackItem(idx) {
+  var item = STACK[idx];
+  var b = S.bad.find(function(x){ return x.id === item.id; }) || {e:'💊', name:item.id};
+  var slotOpts = ['morning','after','day','evening'].map(function(s) {
+    var lbl = {morning:'☀️ Утро', after:'💪 После тренировки', day:'🌤 День', evening:'🌙 Вечер'}[s];
+    return '<option value="' + s + '"' + (item.slot === s ? ' selected' : '') + '>' + lbl + '</option>';
+  }).join('');
+
+  openSheet('Редактировать: ' + b.name,
+    '<div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:10px">' +
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Дозировка</div>' +
+    '<input id="ei-dose" class="inp" value="' + item.dose + '"></div>' +
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Заметка (время, условия)</div>' +
+    '<input id="ei-note" class="inp" value="' + item.note + '"></div>' +
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Слот времени</div>' +
+    '<select id="ei-slot" class="inp">' + slotOpts + '</select></div>' +
+    '<button class="btn btn-blue" onclick="saveStackItem(' + idx + ')">Сохранить</button>' +
+    '<button class="btn btn-ghost" onclick="renderStackEditorSheet()">← Назад к стеку</button>' +
+    '</div>'
+  );
+}
+
+function saveStackItem(idx) {
+  var dose = ($('ei-dose')||{}).value.trim();
+  var note = ($('ei-note')||{}).value.trim();
+  var slot = ($('ei-slot')||{}).value;
+  if (!dose) { toast('Введите дозировку'); return; }
+  STACK[idx].dose = dose;
+  STACK[idx].note = note;
+  STACK[idx].slot = slot;
+  saveStack();
+  renderToday();
+  renderStackEditorSheet();
+  toast('Сохранено');
+}
+
+function openAddToStack() {
+  // Show BAD from DB that are not yet in stack
+  var inStack = STACK.map(function(s){ return s.id; });
+  var available = S.bad.filter(function(b){ return !inStack.includes(b.id); });
+
+  var slotOpts = ['morning','after','day','evening'].map(function(s) {
+    var lbl = {morning:'☀️ Утро', after:'💪 После тренировки', day:'🌤 День', evening:'🌙 Вечер'}[s];
+    return '<option value="' + s + '">' + lbl + '</option>';
+  }).join('');
+
+  var badOpts = available.map(function(b) {
+    return '<option value="' + b.id + '">' + b.e + ' ' + b.name + '</option>';
+  }).join('');
+
+  if (!available.length) {
+    openSheet('Добавить в стек',
+      '<div style="padding:16px;text-align:center;color:var(--t2)">' +
+      'Все добавки из базы уже в стеке.<br>Добавьте новую добавку в Базу (раздел База → ＋)' +
+      '</div>'
+    );
+    return;
+  }
+
+  openSheet('Добавить в стек',
+    '<div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:10px">' +
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Добавка</div>' +
+    '<select id="as-id" class="inp"><option value="">— выбрать —</option>' + badOpts + '</select></div>' +
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Дозировка</div>' +
+    '<input id="as-dose" class="inp" placeholder="напр. 5 г"></div>' +
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Заметка</div>' +
+    '<input id="as-note" class="inp" placeholder="напр. с едой"></div>' +
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Время приёма</div>' +
+    '<select id="as-slot" class="inp">' + slotOpts + '</select></div>' +
+    '<button class="btn btn-blue" onclick="addToStack()">Добавить в расписание</button>' +
+    '<button class="btn btn-ghost" onclick="renderStackEditorSheet()">← Назад</button>' +
+    '</div>'
+  );
+}
+
+function addToStack() {
+  var id   = ($('as-id')||{}).value;
+  var dose = ($('as-dose')||{}).value.trim();
+  var note = ($('as-note')||{}).value.trim();
+  var slot = ($('as-slot')||{}).value || 'morning';
+  if (!id)   { toast('Выберите добавку'); return; }
+  if (!dose) { toast('Укажите дозировку'); return; }
+  // Check not already in stack
+  if (STACK.find(function(s){ return s.id === id; })) {
+    toast('Уже в стеке'); return;
+  }
+  STACK.push({ id: id, slot: slot, dose: dose, note: note });
+  saveStack();
+  renderToday();
+  renderStackEditorSheet();
+  toast('Добавлено в стек!');
+}
+
+function resetStack() {
+  if (!confirm('Сбросить стек до стандартного?')) return;
+  STACK.length = 0;
+  DEFAULT_STACK.forEach(function(item){ STACK.push(Object.assign({}, item)); });
+  saveStack();
+  S.taken.clear(); sv('taken_v2', []);
+  renderToday();
+  closeSheet();
+  toast('Стек сброшен до стандартного');
+}
+
+function resetOnboarding() {
+  sv('ob_done', false);
+  closeSheet();
+  checkOnboarding();
+}
 </script>
 </body>
 </html>
