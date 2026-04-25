@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>СтекАп</title>
+<meta name="application-name" content="СтекАп">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="СтекАп">
+<meta name="theme-color" content="#212121">
+<meta name="description" content="Персональный трекер БАД, дневник самочувствия и ИИ-анализ">
+<link rel="manifest" id="pwa-manifest">
+<link rel="apple-touch-icon" id="pwa-icon-link">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
@@ -591,7 +599,63 @@ canvas{display:block;width:100%!important}
       </div>
     </div>
 
-    <!-- ══ BODY ══ -->
+    <!-- ══ STATS ══ -->
+    <div class="page" id="p-stats">
+      <div class="scroll" id="s-stats">
+
+        <!-- Period selector -->
+        <div style="padding:8px 12px 4px">
+          <div class="seg" id="stats-period-seg" style="margin:0">
+            <button class="seg-b on" onclick="swStatsPeriod(7,this)">7 дней</button>
+            <button class="seg-b" onclick="swStatsPeriod(14,this)">14 дней</button>
+            <button class="seg-b" onclick="swStatsPeriod(30,this)">30 дней</button>
+          </div>
+        </div>
+
+        <!-- Summary cards -->
+        <div class="stats" id="stats-summary" style="padding:8px 12px"></div>
+
+        <!-- Mood/Energy/Sleep chart -->
+        <div class="card" id="stats-wellbeing-card">
+          <div class="card-t">Самочувствие</div>
+          <div class="seg" id="stats-wbl-seg" style="margin:0 0 12px">
+            <button class="seg-b on" onclick="swStatsWbl('energy',this)">Энергия</button>
+            <button class="seg-b" onclick="swStatsWbl('sleep',this)">Сон</button>
+            <button class="seg-b" onclick="swStatsWbl('mood',this)">Настрой</button>
+          </div>
+          <canvas id="stats-wbl-canvas" height="160"></canvas>
+        </div>
+
+        <!-- Adherence chart -->
+        <div class="card">
+          <div class="card-t">Приём стека</div>
+          <div style="font-size:12px;color:var(--t2);margin-bottom:10px" id="stats-adh-sub"></div>
+          <canvas id="stats-adh-canvas" height="120"></canvas>
+        </div>
+
+        <!-- Insights -->
+        <div class="card" id="stats-insights-card">
+          <div class="card-t">💡 Инсайты</div>
+          <div id="stats-insights-body"></div>
+        </div>
+
+        <!-- Workout stats -->
+        <div class="card" id="stats-workout-card" style="display:none">
+          <div class="card-t">Тренировки</div>
+          <div id="stats-workout-body"></div>
+        </div>
+
+        <!-- Best / worst days -->
+        <div class="card">
+          <div class="card-t">Лучшие и худшие дни</div>
+          <div id="stats-bestworst"></div>
+        </div>
+
+        <div class="gap"></div>
+      </div>
+    </div>
+
+<!-- ══ BODY ══ -->
     <div class="page" id="p-body">
       <div class="scroll" id="s-body">
 
@@ -803,6 +867,10 @@ canvas{display:block;width:100%!important}
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
       <span>Дневник</span>
     </button>
+    <button class="nt" onclick="go('stats',this)" id="nt-stats">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+      <span>Статистика</span>
+    </button>
     <button class="nt" onclick="go('body',this)" id="nt-body">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
       <span>Тело</span>
@@ -954,6 +1022,7 @@ const SLOT_ORDER = ['morning','after','day','evening'];
 const HD_CFG = {
   today:  {title:'СтекАп',   sub:'мой стек',     ava:'💊', bg:'#1a5276'},
   diary:  {title:'Дневник',  sub:'самочувствие',  ava:'📓', bg:'#1a3a5c'},
+  stats:  {title:'Статистика', sub:'прогресс и инсайты', ava:'📈', bg:'#1a3050'},
   body:   {title:'Тело',     sub:'замеры',        ava:'📊', bg:'#1a4a3a'},
   base:   {title:'База БАД', sub:'синергии',      ava:'🗄', bg:'#2d1b69'},
   ai:     {title:'ИИ-анализ',sub:'Claude',        ava:'🤖', bg:'#1a2a4a'},
@@ -972,6 +1041,7 @@ function go(name, btn) {
   $('hd-back').style.display = 'none';
   setHd(name);
   if (name==='diary') { renderDStats(); renderDHist(); }
+  if (name==='stats') renderStats();
   if (name==='body')  renderBody();
   if (name==='base')  renderBase();
   if (name==='ai')    initAiScreen();
@@ -1000,6 +1070,8 @@ function hdAction() {
       {ico:'🔄', lbl:'Сбросить отметки дня',  fn:'resetTaken()'},
       {ico:'👤', lbl:'Профиль',               fn:'openProfile()'},
       {ico:'🔁', lbl:'Показать знакомство',    fn:'resetOnboarding()'},
+      {ico:'🔔', lbl:'Уведомления',               fn:'openNotifSettings()'},
+      {ico:'📲', lbl:'Установить на экран',        fn:'installPWA()'},
       {ico:'↓',  lbl:'Экспорт данных (JSON)', fn:'exportAll()'},
       {ico:'↑',  lbl:'Импорт данных (JSON)',  fn:'triggerImport()'},
     ],
@@ -2219,12 +2291,576 @@ function checkOnboarding() {
 
 
 // ─── DAILY RESET + INIT ───────────────────────────
+
+// ─── PWA: MANIFEST + SERVICE WORKER + NOTIFICATIONS ──────────────
+
+// ── Generate SVG icon as data URL ──
+function makeSvgIcon(size) {
+  var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">' +
+    '<rect width="'+size+'" height="'+size+'" rx="'+(size*0.22)+'" fill="#212121"/>' +
+    '<rect x="'+(size*0.2)+'" y="'+(size*0.12)+'" width="'+(size*0.6)+'" height="'+(size*0.18)+'" rx="'+(size*0.05)+'" fill="#2AABEE"/>' +
+    '<rect x="'+(size*0.2)+'" y="'+(size*0.38)+'" width="'+(size*0.6)+'" height="'+(size*0.18)+'" rx="'+(size*0.05)+'" fill="#2AABEE" opacity="0.7"/>' +
+    '<rect x="'+(size*0.2)+'" y="'+(size*0.64)+'" width="'+(size*0.6)+'" height="'+(size*0.18)+'" rx="'+(size*0.05)+'" fill="#2AABEE" opacity="0.4"/>' +
+    '<circle cx="'+(size*0.35)+'" cy="'+(size*0.21)+'" r="'+(size*0.065)+'" fill="#fff"/>' +
+    '<circle cx="'+(size*0.35)+'" cy="'+(size*0.47)+'" r="'+(size*0.065)+'" fill="#fff" opacity="0.7"/>' +
+    '<circle cx="'+(size*0.35)+'" cy="'+(size*0.73)+'" r="'+(size*0.065)+'" fill="#fff" opacity="0.4"/>' +
+  '</svg>';
+  return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+}
+
+// ── Inject manifest dynamically ──
+function injectManifest() {
+  var icon192 = makeSvgIcon(192);
+  var icon512 = makeSvgIcon(512);
+  var manifest = {
+    name: 'СтекАп',
+    short_name: 'СтекАп',
+    description: 'Персональный трекер БАД и дневник самочувствия',
+    start_url: './',
+    display: 'standalone',
+    background_color: '#212121',
+    theme_color: '#212121',
+    orientation: 'portrait',
+    lang: 'ru',
+    icons: [
+      { src: icon192, sizes: '192x192', type: 'image/svg+xml' },
+      { src: icon512, sizes: '512x512', type: 'image/svg+xml' }
+    ]
+  };
+  var blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  var url  = URL.createObjectURL(blob);
+  var link = document.getElementById('pwa-manifest');
+  if (link) link.href = url;
+  var iconLink = document.getElementById('pwa-icon-link');
+  if (iconLink) iconLink.href = icon192;
+}
+
+// ── Service Worker ──
+// SW requires a real file URL — not available in this context.
+// Notifications work directly via Notification API without SW.
+function registerSW() {
+  // SW registration skipped — blob URLs not supported for SW scope.
+  // Notifications use Notification API directly (works in Chrome/Firefox).
+  window._swReg = null;
+}
+
+// ── NOTIFICATIONS ──
+var NOTIF_KEY = 'notif_settings_v1';
+
+function getNotifSettings() {
+  return ld(NOTIF_KEY, {
+    enabled: false,
+    morningTime: '08:00',
+    eveningTime: '21:30',
+    cycleAlerts: true
+  });
+}
+
+function openNotifSettings() {
+  var s = getNotifSettings();
+  var granted = Notification && Notification.permission === 'granted';
+  var supported = 'Notification' in window;
+
+  openSheet('🔔 Уведомления',
+    '<div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:14px">' +
+
+    (!supported ? '<div style="background:#F4433618;border-radius:8px;padding:10px 12px;font-size:13px;color:#FF8A80">Ваш браузер не поддерживает уведомления. Установите приложение на экран и используйте Chrome/Safari.</div>' : '') +
+
+    (supported && !granted ? '<div style="background:#FF980018;border-radius:8px;padding:10px 12px;font-size:13px;color:#FFB74D">Нужно разрешение на уведомления. Нажмите кнопку ниже.</div>' : '') +
+
+    '<div style="display:flex;align-items:center;justify-content:space-between">' +
+      '<div><div style="font-size:15px;font-weight:500;color:var(--t1)">Включить уведомления</div>' +
+      '<div style="font-size:12px;color:var(--t2)">Напоминания о приёме БАД</div></div>' +
+      '<div class="cell-switch ' + (s.enabled && granted ? 'on' : '') + '" id="notif-toggle" onclick="toggleNotif()"></div>' +
+    '</div>' +
+
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:5px;font-weight:600;text-transform:uppercase">Утреннее напоминание</div>' +
+    '<input id="notif-morning" class="inp" type="time" value="' + s.morningTime + '"></div>' +
+
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:5px;font-weight:600;text-transform:uppercase">Вечернее (магний + итог дня)</div>' +
+    '<input id="notif-evening" class="inp" type="time" value="' + s.eveningTime + '"></div>' +
+
+    '<div style="display:flex;align-items:center;justify-content:space-between">' +
+      '<div><div style="font-size:15px;font-weight:500;color:var(--t1)">Напоминания о циклах</div>' +
+      '<div style="font-size:12px;color:var(--t2)">Скоро перерыв / возобновить</div></div>' +
+      '<div class="cell-switch ' + (s.cycleAlerts ? 'on' : '') + '" id="notif-cycles" onclick="this.classList.toggle(\'on\')"></div>' +
+    '</div>' +
+
+    (!granted && supported ?
+      '<button class="btn btn-blue" onclick="requestNotifPermission()">Разрешить уведомления</button>' : '') +
+
+    '<button class="btn ' + (granted ? 'btn-blue' : 'btn-ghost') + '" onclick="saveNotifSettings()">Сохранить настройки</button>' +
+
+    (granted ? '<button class="btn btn-ghost" onclick="sendTestNotif()" style="font-size:13px;color:var(--t2)">Тестовое уведомление</button>' : '') +
+
+    '</div>'
+  );
+}
+
+function toggleNotif() {
+  var sw = document.getElementById('notif-toggle');
+  if (!sw) return;
+  var granted = Notification && Notification.permission === 'granted';
+  if (!granted && !sw.classList.contains('on')) {
+    requestNotifPermission(); return;
+  }
+  sw.classList.toggle('on');
+}
+
+function requestNotifPermission() {
+  if (!('Notification' in window)) { toast('Уведомления не поддерживаются'); return; }
+  Notification.requestPermission().then(function(perm) {
+    if (perm === 'granted') {
+      toast('Уведомления разрешены!');
+      var sw = document.getElementById('notif-toggle');
+      if (sw) sw.classList.add('on');
+      scheduleNotifications();
+    } else {
+      toast('Разрешение отклонено');
+    }
+  });
+}
+
+function saveNotifSettings() {
+  var s = {
+    enabled: document.getElementById('notif-toggle') && document.getElementById('notif-toggle').classList.contains('on'),
+    morningTime: (document.getElementById('notif-morning') || {}).value || '08:00',
+    eveningTime:  (document.getElementById('notif-evening') || {}).value  || '21:30',
+    cycleAlerts: document.getElementById('notif-cycles') && document.getElementById('notif-cycles').classList.contains('on'),
+  };
+  sv(NOTIF_KEY, s);
+  closeSheet();
+  if (s.enabled && Notification.permission === 'granted') {
+    scheduleNotifications();
+    toast('Уведомления настроены!');
+  } else {
+    toast('Настройки сохранены');
+  }
+}
+
+function scheduleNotifications() {
+  var s = getNotifSettings();
+  if (!s.enabled || Notification.permission !== 'granted') return;
+  // Clear old timers
+  if (window._notifTimers) window._notifTimers.forEach(function(t){ clearTimeout(t); });
+  window._notifTimers = [];
+
+  function msUntil(timeStr) {
+    var now = new Date();
+    var parts = timeStr.split(':');
+    var target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(parts[0]), parseInt(parts[1]), 0);
+    if (target <= now) target.setDate(target.getDate() + 1);
+    return target - now;
+  }
+
+  // Morning notification
+  var msM = msUntil(s.morningTime);
+  window._notifTimers.push(setTimeout(function() {
+    var taken = S.taken.size;
+    var total = STACK.length;
+    var p = getProfile ? getProfile() : {name:''};
+    var title = p.name ? 'Доброе утро, ' + p.name + '! 💊' : 'Доброе утро! 💊';
+    var body = taken === 0
+      ? 'Пора принимать добавки — ' + total + ' в расписании на сегодня'
+      : 'Принято ' + taken + ' из ' + total + ' — не забудьте остальные!';
+    showNotif(title, body, '💊');
+    scheduleNotifications(); // reschedule next day
+  }, msM));
+
+  // Evening notification
+  var msE = msUntil(s.eveningTime);
+  window._notifTimers.push(setTimeout(function() {
+    var taken = S.taken.size;
+    var total = STACK.length;
+    var title = 'Вечерний ритуал 🌙';
+    var body = taken < total
+      ? 'Магний перед сном! И ещё ' + (total - taken) + ' добавок не отмечено'
+      : 'Все добавки приняты ✓ Не забудьте магний перед сном!';
+    showNotif(title, body, '🌙');
+    scheduleNotifications();
+  }, msE));
+
+  // Cycle alerts (check now + daily)
+  if (s.cycleAlerts) checkCycleNotifs();
+}
+
+function checkCycleNotifs() {
+  STACK.forEach(function(item) {
+    var b = S.bad.find(function(x){ return x.id === item.id; });
+    if (!b || !b.cycleWeeks) return;
+    var cs = getCycleStatus(b);
+    if (!cs || !cs.cycleStart) return;
+    if (!cs.isBreak && cs.daysLeft === 3) {
+      showNotif('⏸ Скоро перерыв', b.name + ' — через 3 дня начинается перерыв ' + b.breakWeeks + ' нед.', '⏸');
+    } else if (cs.isBreak && cs.daysLeft === 1) {
+      showNotif('▶ Возобновить приём', b.name + ' — завтра заканчивается перерыв. Готовьтесь!', '▶');
+    }
+  });
+}
+
+function showNotif(title, body, icon) {
+  if (!('Notification' in window)) return;
+  if (Notification.permission !== 'granted') return;
+  try {
+    new Notification(title, {
+      body: body,
+      icon: makeSvgIcon(192),
+      tag: 'stackup-' + Date.now(),
+      renotify: true,
+      silent: false
+    });
+  } catch(e) {
+    console.log('Notification error:', e);
+  }
+}
+
+function sendTestNotif() {
+  var p = getProfile ? getProfile() : {name:''};
+  showNotif(
+    p.name ? 'Привет, ' + p.name + '! 👋' : 'Тест уведомления 👋',
+    'СтекАп работает. Уведомления настроены правильно!',
+    '✅'
+  );
+  toast('Тестовое уведомление отправлено');
+}
+
+// ── Install prompt (Android) ──
+var _installPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  _installPrompt = e;
+  // Show install button in menu
+  window._canInstall = true;
+});
+
+function installPWA() {
+  if (_installPrompt) {
+    _installPrompt.prompt();
+    _installPrompt.userChoice.then(function(r) {
+      if (r.outcome === 'accepted') toast('СтекАп установлен! 🎉');
+      _installPrompt = null;
+    });
+  } else {
+    openSheet('Установка на экран',
+      '<div style="padding:0 16px 16px">' +
+      '<div style="font-size:15px;font-weight:600;color:var(--t1);margin-bottom:12px">Как установить СтекАп</div>' +
+      '<div style="background:var(--bg3);border-radius:10px;padding:14px;margin-bottom:10px">' +
+        '<div style="font-size:13px;font-weight:600;color:var(--blue);margin-bottom:6px">📱 iPhone (Safari)</div>' +
+        '<div style="font-size:13px;color:var(--t2);line-height:1.6">1. Нажмите кнопку <b style="color:var(--t1)">Поделиться</b> (квадрат со стрелкой)<br>' +
+        '2. Прокрутите вниз → <b style="color:var(--t1)">На экран «Домой»</b><br>3. Нажмите <b style="color:var(--t1)">Добавить</b></div>' +
+      '</div>' +
+      '<div style="background:var(--bg3);border-radius:10px;padding:14px">' +
+        '<div style="font-size:13px;font-weight:600;color:var(--green);margin-bottom:6px">🤖 Android (Chrome)</div>' +
+        '<div style="font-size:13px;color:var(--t2);line-height:1.6">1. Нажмите меню <b style="color:var(--t1)">⋮</b> в браузере<br>' +
+        '2. Выберите <b style="color:var(--t1)">Добавить на главный экран</b><br>3. Подтвердите установку</div>' +
+      '</div>' +
+      '</div>'
+    );
+  }
+}
+
+// ── Init PWA ──
+function initPWA() {
+  injectManifest();
+  registerSW();
+  // Auto-schedule if already permitted
+  var s = getNotifSettings();
+  if (s.enabled && Notification && Notification.permission === 'granted') {
+    scheduleNotifications();
+  }
+}
+
+
+
+// ─── STATISTICS ───────────────────────────────────
+var statsPeriod = 7;
+var statsWblField = 'energy';
+
+function swStatsPeriod(days, btn) {
+  statsPeriod = days;
+  var seg = $('stats-period-seg');
+  if (seg) seg.querySelectorAll('.seg-b').forEach(function(b){ b.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+  renderStats();
+}
+
+function swStatsWbl(field, btn) {
+  statsWblField = field;
+  var seg = $('stats-wbl-seg');
+  if (seg) seg.querySelectorAll('.seg-b').forEach(function(b){ b.classList.remove('on'); });
+  if (btn) btn.classList.add('on');
+  drawStatsWbl(field);
+}
+
+function renderStats() {
+  var days = statsPeriod;
+  var entries = S.diary.slice(0, days);
+  if (!entries.length) {
+    // Show empty state
+    var sumEl = $('stats-summary');
+    if (sumEl) sumEl.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-ico">📊</div><div class="empty-t">Нет данных</div><div class="empty-s">Заполните дневник — статистика появится здесь</div></div>';
+    return;
+  }
+
+  // ── Summary cards ──
+  var eVals = entries.filter(function(e){ return e.energy > 0; }).map(function(e){ return e.energy; });
+  var sVals = entries.filter(function(e){ return e.sleep  > 0; }).map(function(e){ return e.sleep;  });
+  var wDays = entries.filter(function(e){ return e.workout > 0; }).length;
+  var avgE  = eVals.length ? (eVals.reduce(function(a,b){return a+b;},0)/eVals.length).toFixed(1) : '—';
+  var avgS  = sVals.length ? (sVals.reduce(function(a,b){return a+b;},0)/sVals.length).toFixed(1) : '—';
+  var compDays = entries.filter(function(e){ return e.taken >= STACK.length-1; }).length;
+
+  var sumEl = $('stats-summary');
+  if (sumEl) sumEl.innerHTML =
+    '<div class="stat"><div class="stat-v">' + avgE + '</div><div class="stat-l">⚡ энергия</div></div>' +
+    '<div class="stat"><div class="stat-v">' + avgS + '</div><div class="stat-l">😴 сон</div></div>' +
+    '<div class="stat"><div class="stat-v">' + wDays + '</div><div class="stat-l">💪 трен.</div></div>' +
+    '<div class="stat"><div class="stat-v">' + compDays + '</div><div class="stat-l">✅ полных</div></div>';
+
+  // ── Charts ──
+  drawStatsWbl(statsWblField);
+  drawAdherence(entries);
+  renderStatsInsights(entries);
+  renderBestWorst(entries);
+
+  // ── Workout summary ──
+  var wtCard = $('stats-workout-card');
+  var recentWt = S.workouts ? S.workouts.filter(function(w){
+    return w.ts > Date.now() - days * 86400000;
+  }) : [];
+  if (wtCard) {
+    if (recentWt.length) {
+      wtCard.style.display = '';
+      var totalCal = recentWt.reduce(function(a,w){return a+(w.cal||0);},0);
+      var totalDur = recentWt.reduce(function(a,w){return a+(w.dur||0);},0);
+      var types = {};
+      recentWt.forEach(function(w){types[w.type]=(types[w.type]||0)+1;});
+      var typeStr = Object.keys(types).map(function(t){return t+' ×'+types[t];}).join(', ');
+      var wb = $('stats-workout-body');
+      if (wb) wb.innerHTML =
+        '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px">' +
+          '<span class="tag tg">🔥 ' + totalCal + ' ккал</span>' +
+          '<span class="tag tb">⏱ ' + totalDur + ' мин</span>' +
+          '<span class="tag ta">💪 ' + recentWt.length + ' тренировок</span>' +
+        '</div>' +
+        '<div style="font-size:12px;color:var(--t2)">' + typeStr + '</div>';
+    } else {
+      wtCard.style.display = 'none';
+    }
+  }
+}
+
+function drawStatsWbl(field) {
+  var canvas = $('stats-wbl-canvas'); if (!canvas) return;
+  var entries = S.diary.slice(0, statsPeriod).filter(function(e){ return e[field] > 0; }).reverse();
+  if (entries.length < 2) { canvas.style.display = 'none'; return; }
+  canvas.style.display = '';
+
+  var colors = {energy:'#2AABEE', sleep:'#7ecb8f', mood:'#FF9800'};
+  var LC = colors[field] || '#2AABEE';
+
+  var dpr = window.devicePixelRatio || 1;
+  var W = canvas.parentElement.offsetWidth || 340, H = 160;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  var ctx = canvas.getContext('2d'); ctx.scale(dpr, dpr);
+
+  var BG = document.body.classList.contains('light') ? '#ffffff' : '#2b2b2b';
+  var TC = document.body.classList.contains('light') ? '#999' : '#666';
+  ctx.fillStyle = BG; ctx.fillRect(0,0,W,H);
+
+  var vals = entries.map(function(e){ return e[field]; });
+  var mn = 1, mx = 3, rng = 2;
+  var pad = {l:30, r:10, t:16, b:30};
+  var gW = W-pad.l-pad.r, gH = H-pad.t-pad.b;
+
+  // Grid lines at 1, 2, 3
+  var labels = {1:'низко', 2:'норм', 3:'высоко'};
+  [1,2,3].forEach(function(v) {
+    var y = pad.t + gH*(1-(v-mn)/rng);
+    ctx.strokeStyle = document.body.classList.contains('light') ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.05)';
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(W-pad.r,y); ctx.stroke();
+    ctx.fillStyle = TC; ctx.font = '9px -apple-system,sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText(labels[v], pad.l-3, y+3);
+  });
+
+  var pts = entries.map(function(e,i) {
+    return { x: pad.l + gW*(i/(entries.length-1)), y: pad.t + gH*(1-(e[field]-mn)/rng) };
+  });
+
+  // Fill area
+  var grad = ctx.createLinearGradient(0,pad.t,0,pad.t+gH);
+  grad.addColorStop(0, LC+'44'); grad.addColorStop(1, LC+'00');
+  ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y);
+  pts.slice(1).forEach(function(p){ ctx.lineTo(p.x,p.y); });
+  ctx.lineTo(pts[pts.length-1].x, pad.t+gH); ctx.lineTo(pts[0].x, pad.t+gH); ctx.closePath();
+  ctx.fillStyle = grad; ctx.fill();
+
+  // Line
+  ctx.beginPath(); ctx.moveTo(pts[0].x,pts[0].y);
+  pts.slice(1).forEach(function(p){ ctx.lineTo(p.x,p.y); });
+  ctx.strokeStyle = LC; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.stroke();
+
+  // Dots + date labels
+  pts.forEach(function(p,i) {
+    ctx.beginPath(); ctx.arc(p.x,p.y,4,0,Math.PI*2); ctx.fillStyle = LC; ctx.fill();
+    ctx.fillStyle = TC; ctx.font = '9px -apple-system,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(entries[i].date.slice(0,5), p.x, H-4);
+  });
+}
+
+function drawAdherence(entries) {
+  var canvas = $('stats-adh-canvas'); if (!canvas) return;
+  if (!entries.length) { canvas.style.display = 'none'; return; }
+  canvas.style.display = '';
+
+  // Adherence = taken / STACK.length per day, shown as bar chart
+  var subEl = $('stats-adh-sub');
+  var totalPct = 0, count = 0;
+  entries.forEach(function(e){ if (e.taken >= 0) { totalPct += Math.min(100, Math.round((e.taken/STACK.length)*100)); count++; } });
+  var avgAdh = count ? Math.round(totalPct/count) : 0;
+  if (subEl) subEl.textContent = 'Средний показатель: ' + avgAdh + '% — ' + (avgAdh>=80?'отличная дисциплина 🎯':avgAdh>=50?'есть над чем поработать':'нужно больше стабильности');
+
+  var dpr = window.devicePixelRatio || 1;
+  var W = canvas.parentElement.offsetWidth || 340, H = 120;
+  canvas.width = W*dpr; canvas.height = H*dpr;
+  var ctx = canvas.getContext('2d'); ctx.scale(dpr,dpr);
+  var dark = !document.body.classList.contains('light');
+  ctx.fillStyle = dark ? '#2b2b2b' : '#ffffff'; ctx.fillRect(0,0,W,H);
+
+  var data = entries.slice().reverse();
+  var pad = {l:6, r:6, t:10, b:24};
+  var bW = (W-pad.l-pad.r)/data.length;
+  var gH = H-pad.t-pad.b;
+
+  data.forEach(function(e, i) {
+    var pct = STACK.length ? Math.min(1, e.taken/STACK.length) : 0;
+    var bH = Math.max(2, gH * pct);
+    var x = pad.l + i*bW + bW*0.1;
+    var bwActual = bW*0.8;
+    var color = pct >= 0.9 ? '#4CAF50' : pct >= 0.5 ? '#2AABEE' : '#FF9800';
+    ctx.fillStyle = color + '33';
+    ctx.fillRect(x, pad.t, bwActual, gH);
+    ctx.fillStyle = color;
+    ctx.fillRect(x, pad.t + gH - bH, bwActual, bH);
+    // Date label every N bars
+    if (data.length <= 14 || i % 2 === 0) {
+      ctx.fillStyle = dark ? '#666' : '#999';
+      ctx.font = '8px -apple-system,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(e.date.slice(0,5), x + bwActual/2, H-4);
+    }
+  });
+}
+
+function renderStatsInsights(entries) {
+  var el = $('stats-insights-body'); if (!el) return;
+  var insights = [];
+
+  // Best metric day
+  var ELB = ['','😴 низкая','⚡ норм','🚀 высокая'];
+  var SLB = ['','😫 плохой','😐 средний','😴 хороший'];
+
+  // Correlation: full adherence → better energy
+  var fullDays  = entries.filter(function(e){ return e.taken >= STACK.length && e.energy > 0; });
+  var partDays  = entries.filter(function(e){ return e.taken < STACK.length  && e.energy > 0; });
+  if (fullDays.length >= 2 && partDays.length >= 2) {
+    var avgFull = fullDays.reduce(function(a,e){return a+e.energy;},0)/fullDays.length;
+    var avgPart = partDays.reduce(function(a,e){return a+e.energy;},0)/partDays.length;
+    if (avgFull - avgPart >= 0.4) {
+      var diff = Math.round((avgFull-avgPart)/2*100);
+      insights.push({ico:'⚡', txt:'В дни полного приёма стека энергия выше на '+diff+'%', type:'good'});
+    }
+  }
+
+  // Sleep trend
+  var sVals = entries.filter(function(e){return e.sleep>0;});
+  if (sVals.length >= 4) {
+    var first = sVals.slice(Math.floor(sVals.length/2));
+    var last  = sVals.slice(0, Math.floor(sVals.length/2));
+    var avgF  = first.reduce(function(a,e){return a+e.sleep;},0)/first.length;
+    var avgL  = last.reduce(function(a,e){return a+e.sleep;},0)/last.length;
+    if (avgL - avgF >= 0.3) insights.push({ico:'😴', txt:'Сон улучшился за период наблюдения', type:'good'});
+    else if (avgF - avgL >= 0.3) insights.push({ico:'⚠️', txt:'Качество сна снизилось — проверьте вечерний ритуал', type:'warn'});
+  }
+
+  // Most consistent day of week
+  var byDay = [0,1,2,3,4,5,6].map(function(){return [];});
+  entries.forEach(function(e){
+    var d = new Date(e.ts).getDay();
+    if (e.energy > 0) byDay[d].push(e.energy);
+  });
+  var bestDay = -1, bestAvg = 0;
+  byDay.forEach(function(arr, d) {
+    if (arr.length < 2) return;
+    var avg = arr.reduce(function(a,b){return a+b;},0)/arr.length;
+    if (avg > bestAvg) { bestAvg = avg; bestDay = d; }
+  });
+  if (bestDay >= 0) {
+    var DN = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+    insights.push({ico:'📅', txt:'Лучший день по энергии — '+DN[bestDay], type:'info'});
+  }
+
+  // Workout correlation
+  var wtDays  = entries.filter(function(e){ return e.workout > 0 && e.energy > 0; });
+  var noWtDays= entries.filter(function(e){ return e.workout === 0 && e.energy > 0; });
+  if (wtDays.length >= 2 && noWtDays.length >= 2) {
+    var avgWt   = wtDays.reduce(function(a,e){return a+e.energy;},0)/wtDays.length;
+    var avgNoWt = noWtDays.reduce(function(a,e){return a+e.energy;},0)/noWtDays.length;
+    if (avgWt - avgNoWt >= 0.3) insights.push({ico:'💪', txt:'Тренировки повышают вашу энергию', type:'good'});
+  }
+
+  if (!insights.length) {
+    el.innerHTML = '<div style="color:var(--t3);font-size:13px;text-align:center;padding:8px">Нужно больше данных — заполняйте дневник каждый день</div>';
+    return;
+  }
+
+  el.innerHTML = insights.map(function(ins) {
+    var bg = ins.type==='good' ? 'var(--green)15' : ins.type==='warn' ? 'var(--orange)15' : 'var(--bg3)';
+    var ic = ins.type==='good' ? '#81C784' : ins.type==='warn' ? '#FFB74D' : 'var(--t2)';
+    return '<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)">' +
+      '<span style="font-size:18px">' + ins.ico + '</span>' +
+      '<span style="font-size:13px;color:var(--t1);line-height:1.5">' + ins.txt + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+function renderBestWorst(entries) {
+  var el = $('stats-bestworst'); if (!el) return;
+  var scored = entries.filter(function(e){ return e.energy>0 && e.sleep>0; })
+    .map(function(e){ return {e:e, score: e.energy + e.sleep + (e.mood||0) + (e.workout?1:0)}; })
+    .sort(function(a,b){ return b.score - a.score; });
+  if (scored.length < 2) { el.innerHTML = '<div style="color:var(--t3);font-size:13px">Нужно больше записей</div>'; return; }
+
+  var best  = scored[0].e;
+  var worst = scored[scored.length-1].e;
+  var EE = ['','😴','⚡','🚀'], SE = ['','😫','😐','😴'], ME = ['','😞','😊','😄'];
+
+  el.innerHTML =
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+      '<div style="background:var(--green)12;border-radius:10px;padding:12px">' +
+        '<div style="font-size:11px;color:var(--green);font-weight:600;margin-bottom:6px">🌟 ЛУЧШИЙ ДЕНЬ</div>' +
+        '<div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px">' + best.date + '</div>' +
+        '<div style="font-size:18px">' + (EE[best.energy]||'') + ' ' + (SE[best.sleep]||'') + ' ' + (ME[best.mood]||'') + '</div>' +
+        (best.note ? '<div style="font-size:11px;color:var(--t2);margin-top:4px;line-height:1.4">' + best.note.slice(0,50) + '</div>' : '') +
+      '</div>' +
+      '<div style="background:var(--red)12;border-radius:10px;padding:12px">' +
+        '<div style="font-size:11px;color:var(--red);font-weight:600;margin-bottom:6px">📉 ТРУДНЫЙ ДЕНЬ</div>' +
+        '<div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:4px">' + worst.date + '</div>' +
+        '<div style="font-size:18px">' + (EE[worst.energy]||'') + ' ' + (SE[worst.sleep]||'') + ' ' + (ME[worst.mood]||'') + '</div>' +
+        (worst.note ? '<div style="font-size:11px;color:var(--t2);margin-top:4px;line-height:1.4">' + worst.note.slice(0,50) + '</div>' : '') +
+      '</div>' +
+    '</div>';
+}
+
+
 function dailyReset(){var today=fmt(new Date());if(localStorage.getItem('last_d')!==today){S.taken.clear();sv('taken_v2',[]);localStorage.setItem('last_d',today);}}
 
 dailyReset();
 updateGreeting();
 renderToday();
 checkOnboarding();
+initPWA();
 updateDLbl();
 // ai-today-lbl removed
 function openAddBad() {
