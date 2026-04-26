@@ -488,10 +488,9 @@ canvas{display:block;width:100%!important}
 
     <!-- ══ TODAY ══ -->
     <div class="page cur" id="p-today">
-      <div class="scroll" id="s-today">
-
-        <!-- Ring + greeting -->
-        <div style="display:flex;align-items:center;gap:16px;padding:16px 16px 8px">
+      <!-- Fixed header -->
+      <div style="flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--line)">
+        <div style="display:flex;align-items:center;gap:16px;padding:12px 16px 10px">
           <div class="ring-wrap">
             <svg width="86" height="86" style="transform:rotate(-90deg)">
               <circle cx="43" cy="43" r="36" fill="none" stroke="#333" stroke-width="7"/>
@@ -511,7 +510,8 @@ canvas{display:block;width:100%!important}
             <div style="margin-top:4px" id="age-badge"></div>
           </div>
         </div>
-
+      </div><!-- /fixed-header -->
+      <div class="scroll" id="s-today">
         <!-- Morning context line -->
         <div id="morning-ctx"></div>
 
@@ -690,6 +690,7 @@ canvas{display:block;width:100%!important}
             <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Пресс (повт)</div><input class="inp" id="bab" type="number" placeholder="40"></div>
             <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Планка (сек)</div><input class="inp" id="bpk" type="number" placeholder="60"></div>
             <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Кольца ТРХ</div><input class="inp" id="bri" type="number" placeholder="15"></div>
+          <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Шаги за день 👟</div><input class="inp" id="bsteps" type="number" placeholder="8000"></div>
           </div>
           <button class="btn btn-blue" onclick="saveBody()">Сохранить замеры</button>
         </div>
@@ -875,9 +876,9 @@ canvas{display:block;width:100%!important}
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
       <span>Тело</span>
     </button>
-    <button class="nt" onclick="go('base',this)" id="nt-base">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 6h-2.18c.07-.44.18-.86.18-1.3C18 2.57 15.43 1 12.99 1c-1.4 0-2.71.57-3.66 1.56L8 4H5c-1.66 0-3 1.34-3 3v11c0 1.66 1.34 3 3 3h14c1.66 0 3-1.34 3-3V9c0-1.66-1.34-3-3-3zM9.73 6l1.68-1.69C11.97 3.74 12.48 3.5 13 3.5c1.06 0 1.96.65 1.96 1.2 0 .44-.21.9-.5 1.3H9.73zM20 18H5V7h14v11z"/></svg>
-      <span>База</span>
+    <button class="nt" onclick="openProfileScreen(this)" id="nt-profile">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+      <span>Профиль</span>
     </button>
     <button class="nt" onclick="go('ai',this)" id="nt-ai">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/></svg>
@@ -1026,6 +1027,7 @@ const HD_CFG = {
   body:   {title:'Тело',     sub:'замеры',        ava:'📊', bg:'#1a4a3a'},
   base:   {title:'База БАД', sub:'синергии',      ava:'🗄', bg:'#2d1b69'},
   ai:     {title:'ИИ-анализ',sub:'Claude',        ava:'🤖', bg:'#1a2a4a'},
+  profile: {title:'Профиль',   sub:'настройки',    ava:'👤', bg:'#2d1b69'},
 };
 
 function go(name, btn) {
@@ -1649,11 +1651,11 @@ function openDI(idx) {
 // ─── BODY ─────────────────────────────────────────
 function saveBody() {
   var g=function(id){var v=parseFloat($(id).value);return isNaN(v)?null:v;};
-  var e={date:fmt(new Date()),ts:Date.now(),weight:g('bw'),fat:g('bf'),height:g('bh'),waist:g('bwa'),chest:g('bch'),bicep:g('bbi'),pushup:g('bpu'),pullup:g('bpl'),abs:g('bab'),plank:g('bpk'),rings:g('bri')};
+  var e={date:fmt(new Date()),ts:Date.now(),weight:g('bw'),fat:g('bf'),height:g('bh'),waist:g('bwa'),chest:g('bch'),bicep:g('bbi'),pushup:g('bpu'),pullup:g('bpl'),abs:g('bab'),plank:g('bpk'),rings:g('bri'),steps:g('bsteps')};
   var i=S.body.findIndex(function(b){return b.date===e.date;});
   if(i>=0)S.body[i]=e;else S.body.unshift(e);
   S.body.sort(function(a,b){return b.ts-a.ts;});sv('body_v4',S.body);
-  ['bw','bf','bh','bwa','bch','bbi','bpu','bpl','bab','bpk','bri'].forEach(function(id){$(id).value='';});
+  ['bw','bf','bh','bwa','bch','bbi','bpu','bpl','bab','bpk','bri','bsteps'].forEach(function(id){$(id).value='';});
   renderBody();toast('Замеры сохранены!');
 }
 
@@ -1871,6 +1873,7 @@ function buildPrompt() {
       lat.abs    ? 'Пресс: '+lat.abs+' повт'          : '',
       lat.plank  ? 'Планка: '+lat.plank+' с'           : '',
       lat.rings  ? 'Кольца ТРХ: '+lat.rings+' повт'   : '',
+      lat.steps  ? 'Шаги: '+lat.steps+' шаг'          : '',
     ].filter(Boolean).join(', ') || 'нет данных';
   }
 
@@ -2202,20 +2205,22 @@ function obRenderStackList() {
   var selected = new Set(STACK.map(function(s){ return s.id; }));
   el.innerHTML = S.bad.map(function(b) {
     var checked = selected.has(b.id);
-    return '<div style="display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)">' +
+    return '<div style="display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer" data-ob-id="' + b.id + '">' +
       '<span style="font-size:22px;margin-right:12px">' + b.e + '</span>' +
       '<div style="flex:1">' +
         '<div style="font-size:14px;font-weight:500;color:var(--t1)">' + b.name + '</div>' +
         '<div style="font-size:12px;color:var(--t2)">' + b.dose + ' · ' + b.time + '</div>' +
       '</div>' +
-      '<div class="cell-switch ' + (checked ? 'on' : '') + '" data-ob-id="' + b.id + '"></div>' +
+      '<div class="cell-switch ' + (checked ? 'on' : '') + '" id="obs-sw-' + b.id + '" style="pointer-events:none;flex-shrink:0"></div>' +
     '</div>';
   }).join('');
   el.onclick = function(e) {
-    var sw = e.target.closest('[data-ob-id]');
+    var row = e.target.closest('[data-ob-id]');
+    if (!row) return;
+    var id = row.dataset.obId;
+    var sw = document.getElementById('obs-sw-'+id);
     if (!sw) return;
     sw.classList.toggle('on');
-    var id = sw.dataset.obId;
     var inStack = STACK.findIndex(function(s){ return s.id === id; });
     if (sw.classList.contains('on')) {
       if (inStack < 0) {
@@ -2851,6 +2856,70 @@ function renderBestWorst(entries) {
         (worst.note ? '<div style="font-size:11px;color:var(--t2);margin-top:4px;line-height:1.4">' + worst.note.slice(0,50) + '</div>' : '') +
       '</div>' +
     '</div>';
+}
+
+
+
+function openProfileScreen(btn) {
+  // Open profile as a bottom sheet with sections
+  var p = getProfile();
+  var age = p.dob ? getAge(p.dob) : null;
+  var dob = p.dob ? new Date(p.dob) : null;
+  var bdStr = dob ? dob.toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'}) : '';
+
+  openSheet('👤 Профиль и настройки',
+    '<div style="padding:0 0 16px">' +
+
+    // Profile card
+    '<div style="display:flex;align-items:center;gap:14px;padding:14px 16px 12px;border-bottom:1px solid var(--line)">' +
+      '<div style="width:56px;height:56px;border-radius:50%;background:#2d1b69;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;flex-shrink:0">' +
+        (p.name ? p.name.charAt(0).toUpperCase() : '👤') +
+      '</div>' +
+      '<div style="flex:1">' +
+        '<div style="font-size:18px;font-weight:700;color:var(--t1)">' + (p.name || 'Не указано') + '</div>' +
+        (age ? '<div style="font-size:13px;color:var(--t2)">' + age + ' лет · ' + bdStr + '</div>' : '<div style="font-size:13px;color:var(--t3)">Дата рождения не указана</div>') +
+      '</div>' +
+      '<button onclick="openProfile()" style="background:var(--bg3);border:none;border-radius:8px;padding:8px 12px;color:var(--blue);cursor:pointer;font-size:13px">✏️ Изменить</button>' +
+    '</div>' +
+
+    // Sections
+    '<div class="cells" style="margin:10px 0 0">' +
+      '<div class="cell" onclick="go(\'base\',null);closeSheet()">' +
+        '<div class="cell-ico" style="background:#2d1b6920;font-size:16px">🗄</div>' +
+        '<div class="cell-lbl">База БАД</div><span class="cell-arr">›</span>' +
+      '</div>' +
+      '<div class="cell" onclick="openAddSynRule();closeSheet()">' +
+        '<div class="cell-ico" style="background:#2AABEE20;font-size:16px">🔗</div>' +
+        '<div class="cell-lbl">Добавить правило синергии</div><span class="cell-arr">›</span>' +
+      '</div>' +
+      '<div class="cell" onclick="openNotifSettings()">' +
+        '<div class="cell-ico" style="background:#4CAF5020;font-size:16px">🔔</div>' +
+        '<div class="cell-lbl">Уведомления</div><span class="cell-arr">›</span>' +
+      '</div>' +
+      '<div class="cell" onclick="installPWA()">' +
+        '<div class="cell-ico" style="background:#FF980020;font-size:16px">📲</div>' +
+        '<div class="cell-lbl">Установить на экран</div><span class="cell-arr">›</span>' +
+      '</div>' +
+      '<div class="cell" onclick="exportAll();closeSheet()">' +
+        '<div class="cell-ico" style="background:#66666620;font-size:16px">↓</div>' +
+        '<div class="cell-lbl">Экспорт данных (JSON)</div><span class="cell-arr">›</span>' +
+      '</div>' +
+      '<div class="cell" onclick="exportBase();closeSheet()">' +
+        '<div class="cell-ico" style="background:#66666620;font-size:16px">↓</div>' +
+        '<div class="cell-lbl">Экспорт базы БАД</div><span class="cell-arr">›</span>' +
+      '</div>' +
+    '</div>' +
+
+    '<div style="padding:0 16px;margin-top:10px">' +
+      '<label class="btn btn-ghost" style="cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">↑ Импорт данных<input type="file" accept=".json" onchange="importAll(event)" style="display:none"></label>' +
+    '</div>' +
+
+    '<div style="padding:12px 16px 0;display:flex;gap:8px">' +
+      '<button class="btn btn-ghost" onclick="resetOnboarding();closeSheet()" style="flex:1;font-size:13px;color:var(--t3)">🔁 Знакомство заново</button>' +
+    '</div>' +
+
+    '</div>'
+  );
 }
 
 
