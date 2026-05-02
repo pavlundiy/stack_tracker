@@ -356,22 +356,6 @@ canvas{display:block;width:100%!important}
 .confetti-piece{position:absolute;width:8px;height:8px;border-radius:2px;animation:confetti-fall 1.2s ease-in forwards}
 @keyframes confetti-fall{0%{opacity:1;transform:translateY(-20px) rotate(0deg)}100%{opacity:0;transform:translateY(110vh) rotate(720deg)}}
 
-/* ── CELL SWITCH ── */
-.cell-switch{
-  width:44px;height:26px;border-radius:13px;
-  background:var(--bg3);position:relative;
-  transition:background .2s;flex-shrink:0;
-}
-.cell-switch::after{
-  content:'';position:absolute;
-  width:20px;height:20px;border-radius:50%;
-  background:#fff;top:3px;left:3px;
-  transition:transform .2s;
-  box-shadow:0 1px 3px #0004;
-}
-.cell-switch.on{background:var(--green)}
-.cell-switch.on::after{transform:translateX(18px)}
-
 /* ── DAILY QUESTION ── */
 .dq-card{background:linear-gradient(135deg,#1a3a5c,#2b5278);border-radius:12px;padding:16px;margin:4px 12px}
 .dq-title{font-size:14px;font-weight:600;color:#90caf9;margin-bottom:10px}
@@ -391,56 +375,53 @@ canvas{display:block;width:100%!important}
 <body>
 
 <!-- ONBOARDING OVERLAY -->
-<div id="ob-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;display:flex;flex-direction:column;max-width:430px;margin:0 auto;overflow:hidden">
+<div id="ob-overlay" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:500;flex-direction:column;max-width:430px;margin:0 auto;overflow:hidden">
 
   <!-- Progress dots -->
-  <div style="display:flex;justify-content:center;gap:8px;padding:20px 0 0" id="ob-dots">
+  <div style="display:flex;justify-content:center;gap:8px;padding:20px 0 0;flex-shrink:0" id="ob-dots">
     <div class="ob-dot ob-dot-active" id="od-0"></div>
     <div class="ob-dot" id="od-1"></div>
     <div class="ob-dot" id="od-2"></div>
   </div>
 
-  <!-- Steps container -->
-  <div style="flex:1;overflow:hidden;position:relative">
+  <!-- Slider track — flex row, no absolute positioning -->
+  <div style="flex:1;overflow:hidden;position:relative" id="ob-track-wrap">
+    <div id="ob-track" style="display:flex;width:300%;height:100%;transition:transform .3s cubic-bezier(.4,0,.2,1)">
 
-    <!-- STEP 0: Welcome + Name + DOB -->
-    <div class="ob-step" id="ob-step-0">
-      <div style="text-align:center;padding:32px 32px 0">
-        <div style="font-size:64px;margin-bottom:16px">💊</div>
-        <div style="font-size:26px;font-weight:700;color:var(--t1);margin-bottom:8px">Добро пожаловать<br>в СтекАп</div>
-        <div style="font-size:15px;color:var(--t2);line-height:1.6;margin-bottom:32px">Персональный трекер БАД, дневник самочувствия и ИИ-анализ вашего стека</div>
-      </div>
-      <div style="padding:0 24px">
+      <!-- STEP 0: Name + DOB -->
+      <div style="width:33.333%;flex-shrink:0;overflow-y:auto;padding:24px 24px 0">
+        <div style="text-align:center;margin-bottom:28px">
+          <div style="font-size:56px;margin-bottom:12px">💊</div>
+          <div style="font-size:24px;font-weight:700;color:var(--t1);margin-bottom:8px">Добро пожаловать<br>в СтекАп</div>
+          <div style="font-size:14px;color:var(--t2);line-height:1.6">Персональный трекер БАД, дневник самочувствия и ИИ-анализ</div>
+        </div>
         <div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Как вас зовут?</div>
         <input id="ob-name" class="inp" placeholder="Введите имя" style="font-size:16px;margin-bottom:16px" oninput="obCheckStep0()">
         <div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Дата рождения <span style="color:var(--t3);font-weight:400;text-transform:none">(необязательно)</span></div>
         <input id="ob-dob" class="inp" type="date" style="font-size:16px;margin-bottom:24px">
-        <button class="btn btn-blue" id="ob-btn-0" onclick="obNext(1)" style="opacity:.4;pointer-events:none">Продолжить →</button>
+        <button class="btn btn-blue" id="ob-btn-0" onclick="obNext(1)" style="opacity:.4;pointer-events:none;margin-bottom:8px">Продолжить →</button>
       </div>
-    </div>
 
-    <!-- STEP 1: Choose stack -->
-    <div class="ob-step" id="ob-step-1" style="display:none">
-      <div style="padding:28px 24px 0">
-        <div style="font-size:22px;font-weight:700;color:var(--t1);margin-bottom:6px">Ваши добавки</div>
-        <div style="font-size:14px;color:var(--t2);line-height:1.5;margin-bottom:16px">Отметьте что принимаете — это станет вашим расписанием. Можно изменить позже.</div>
-        <div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">Выберите добавки</div>
-        <div id="ob-stack-list" style="max-height:340px;overflow-y:auto;border-radius:10px;background:var(--bg2)"></div>
-        <div style="margin-top:16px">
-          <button class="btn btn-blue" onclick="obSaveStack()">Сохранить и продолжить →</button>
-          <button class="btn btn-ghost" onclick="obNext(2)" style="margin-top:8px;font-size:13px;color:var(--t2)">Пропустить, настрою позже</button>
+      <!-- STEP 1: Choose stack -->
+      <div style="width:33.333%;flex-shrink:0;overflow-y:auto;padding:24px 24px 0" id="ob-step-1-inner">
+        <div style="font-size:22px;font-weight:700;color:var(--t1);margin-bottom:6px">Выберите свои БАДы</div>
+        <div style="font-size:14px;color:var(--t2);line-height:1.5;margin-bottom:12px">Используйте стандартный список и включайте тумблером то, что уже принимаете. Это сразу станет вашим стеком.</div>
+        <div style="background:#2b5278;border-radius:10px;padding:10px 12px;font-size:12px;color:#90caf9;line-height:1.5;margin-bottom:12px">
+          <b style="color:#fff">Стандартная база.</b> Сначала идут встроенные БАДы, ниже — ваши добавленные позиции.
         </div>
+        <input id="ob-bad-search" class="inp" placeholder="Поиск по БАДам" style="font-size:15px;margin-bottom:12px" oninput="obRenderStackList()">
+        <div id="ob-stack-meta" style="font-size:12px;color:var(--t3);margin-bottom:10px"></div>
+        <div id="ob-stack-list" style="border-radius:10px;background:var(--bg2);margin-bottom:16px"></div>
+        <button class="btn btn-blue" onclick="obSaveStack()" style="margin-bottom:8px">Сохранить и продолжить →</button>
+        <button class="btn btn-ghost" onclick="obNext(2)" style="margin-bottom:16px;font-size:13px;color:var(--t2)">Пропустить, настрою позже</button>
       </div>
-    </div>
 
-    <!-- STEP 2: First diary entry -->
-    <div class="ob-step" id="ob-step-2" style="display:none">
-      <div style="padding:28px 24px 0">
-        <div style="font-size:22px;font-weight:700;color:var(--t1);margin-bottom:6px">Как вы себя чувствуете?</div>
-        <div style="font-size:14px;color:var(--t2);line-height:1.5;margin-bottom:20px">Первая запись в дневнике — точка отсчёта для отслеживания прогресса.</div>
-
+      <!-- STEP 2: First diary entry -->
+      <div style="width:33.333%;flex-shrink:0;overflow-y:auto;padding:24px 24px 0">
+        <div style="font-size:22px;font-weight:700;color:var(--t1);margin-bottom:6px">Как себя чувствуете?</div>
+        <div style="font-size:14px;color:var(--t2);line-height:1.5;margin-bottom:20px">Первая запись — точка отсчёта</div>
         <div style="margin-bottom:14px">
-          <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:8px">ЭНЕРГИЯ СЕЙЧАС</div>
+          <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:8px">ЭНЕРГИЯ</div>
           <div style="display:flex;gap:8px" id="ob-c-energy">
             <button class="chip" onclick="obChip('energy',1,this)">😴 Низкая</button>
             <button class="chip" onclick="obChip('energy',2,this)">⚡ Норм</button>
@@ -448,7 +429,7 @@ canvas{display:block;width:100%!important}
           </div>
         </div>
         <div style="margin-bottom:14px">
-          <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:8px">СОН ПРОШЛОЙ НОЧЬЮ</div>
+          <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:8px">СОН</div>
           <div style="display:flex;gap:8px" id="ob-c-sleep">
             <button class="chip" onclick="obChip('sleep',1,this)">😫 Плохой</button>
             <button class="chip" onclick="obChip('sleep',2,this)">😐 Средний</button>
@@ -456,23 +437,38 @@ canvas{display:block;width:100%!important}
           </div>
         </div>
         <div style="margin-bottom:20px">
-          <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:6px">ЗАМЕТКИ (необязательно)</div>
-          <textarea id="ob-note" class="inp" rows="2" placeholder="Что хотите улучшить с помощью БАД?" style="resize:none"></textarea>
+          <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:6px">ЗАМЕТКИ</div>
+          <textarea id="ob-note" class="inp" rows="2" placeholder="Что хотите улучшить?" style="resize:none"></textarea>
         </div>
-        <button class="btn btn-blue" onclick="obFinish()">Начать пользоваться 🚀</button>
-        <button class="btn btn-ghost" onclick="obFinish()" style="margin-top:8px;font-size:13px;color:var(--t2)">Пропустить</button>
+        <button class="btn btn-blue" onclick="obFinish()" style="margin-bottom:8px">Начать пользоваться 🚀</button>
+        <button class="btn btn-ghost" onclick="obFinish()" style="margin-bottom:16px;font-size:13px;color:var(--t2)">Пропустить</button>
       </div>
-    </div>
 
-  </div>
-</div>
+    </div><!-- /ob-track -->
+  </div><!-- /ob-track-wrap -->
+</div><!-- /ob-overlay -->
 
 <style>
-.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--bg3);transition:all .3s}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:var(--bg3);transition:all .3s;flex-shrink:0}
 .ob-dot-active{background:var(--blue);width:24px;border-radius:4px}
-.ob-step{position:absolute;inset:0;overflow-y:auto;transition:transform .3s cubic-bezier(.4,0,.2,1)}
-.ob-step::-webkit-scrollbar{display:none}
+/* Toggle switch for onboarding */
+.ob-toggle{
+  width:52px;height:30px;border-radius:15px;
+  background:var(--bg3);position:relative;
+  transition:background .2s;flex-shrink:0;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.ob-toggle.on{background:var(--green)}
+.ob-toggle::after{
+  content:'';position:absolute;
+  width:26px;height:26px;border-radius:50%;
+  background:#fff;top:2px;left:2px;
+  transition:transform .2s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 2px 4px rgba(0,0,0,.3);
+}
+.ob-toggle.on::after{transform:translateX(22px)}
 </style>
+
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -801,6 +797,10 @@ canvas{display:block;width:100%!important}
           </label>
         </div>
 
+        <div style="padding:0 12px 8px">
+          <button class="btn btn-ghost btn-sm" onclick="openEmojiLab()" style="width:100%;font-size:13px">Тест экрана эмодзи</button>
+        </div>
+
         <!-- Synergy checker -->
         <div class="card">
           <div class="card-t">🔬 Проверка совместимости</div>
@@ -830,6 +830,28 @@ canvas{display:block;width:100%!important}
     </div>
 
     <!-- ══ AI ══ -->
+    <div class="page" id="p-emoji">
+      <div class="scroll" id="s-emoji">
+        <div class="card" style="margin-top:8px">
+          <div class="card-t">Тест выбора эмодзи</div>
+          <div style="font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:12px">
+            Отдельный экран без popup-окон. Здесь проверяем, работает ли выбор эмодзи на обычной странице.
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm" onclick="setEmojiLabMode('add',this)" id="emoji-lab-add-btn" style="flex:1">Добавить</button>
+            <button class="btn btn-ghost btn-sm" onclick="setEmojiLabMode('edit',this)" id="emoji-lab-edit-btn" style="flex:1">Редактировать</button>
+          </div>
+        </div>
+        <div class="card">
+          <div id="emoji-lab-form"></div>
+        </div>
+        <div style="padding:0 12px 16px">
+          <button class="btn btn-ghost" onclick="go('base',null)">← Назад в Базу БАД</button>
+        </div>
+        <div class="gap" style="height:80px"></div>
+      </div>
+    </div>
+
     <div class="page" id="p-ai">
       <div class="scroll" id="s-ai">
 
@@ -842,6 +864,29 @@ canvas{display:block;width:100%!important}
           </div>
           <div style="background:var(--bg3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--t3);max-height:80px;overflow:hidden;margin-bottom:10px;line-height:1.5" id="ai-prompt-preview">Нажмите кнопку для генерации промта...</div>
           <button class="btn btn-blue" onclick="copyPrompt()" id="ai-copy-btn">📋 Скопировать промт</button>
+        </div>
+
+        <div class="card">
+          <div class="card-t">🧬 База БАД → ИИ</div>
+          <div style="font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:12px">
+            Выгрузите базу БАД, синергии, конфликты, цикл приёма и параметры профиля в JSON для ИИ. Затем импортируйте обратно только структурированный JSON-ответ ИИ с предпросмотром изменений.
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:10px">
+            <button class="btn btn-ghost" style="flex:1" onclick="exportBadAiPackage()">↓ Экспорт для ИИ</button>
+            <button class="btn btn-blue" style="flex:1" onclick="copyBadAiPrompt()">📋 Промт JSON</button>
+          </div>
+          <div style="font-size:12px;color:var(--t3);margin-bottom:6px">Ответ ИИ в JSON</div>
+          <textarea id="ai-bad-json-input" class="inp" rows="8" placeholder='Вставьте сюда JSON-ответ ИИ по схеме импорта БАД...' style="margin-bottom:10px;resize:none"></textarea>
+          <button class="btn btn-ghost" type="button" style="width:100%;margin-bottom:10px" onclick="pasteAiBadJsonFromClipboard()">📥 Вставить из буфера</button>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost" type="button" style="flex:1" onclick="triggerAiBadJsonFilePicker()">↑ Импорт JSON</button>
+            <input id="ai-bad-json-file" type="file" accept=".json,application/json" onchange="loadAiBadJsonFile(event)" style="display:none">
+            <button class="btn btn-blue" style="flex:1" onclick="previewAiBadImport()">Предпросмотр</button>
+          </div>
+          <div style="margin-top:10px">
+            <div style="font-size:12px;color:var(--t3);margin-bottom:6px">Если кнопка не сработала, выберите файл напрямую</div>
+            <input id="ai-bad-json-file-direct" type="file" accept=".json,application/json" onchange="loadAiBadJsonFile(event)" class="inp" style="padding:10px 12px;height:auto">
+          </div>
         </div>
 
         <!-- PASTE ANSWER BLOCK -->
@@ -1042,6 +1087,7 @@ const HD_CFG = {
   stats:  {title:'Статистика', sub:'прогресс и инсайты', ava:'📈', bg:'#1a3050'},
   body:   {title:'Тело',     sub:'замеры',        ava:'📊', bg:'#1a4a3a'},
   base:   {title:'База БАД', sub:'синергии',      ava:'🗄', bg:'#2d1b69'},
+  emoji:  {title:'Тест эмодзи', sub:'отдельный экран', ava:'🧪', bg:'#2d1b69'},
   ai:     {title:'ИИ-анализ',sub:'Claude',        ava:'🤖', bg:'#1a2a4a'},
   profile: {title:'Профиль',   sub:'настройки',    ava:'👤', bg:'#2d1b69'},
 };
@@ -1062,6 +1108,7 @@ function go(name, btn) {
   if (name==='stats') renderStats();
   if (name==='body')  renderBody();
   if (name==='base')  renderBase();
+  if (name==='emoji') renderEmojiLab();
   if (name==='ai')    initAiScreen();
 }
 
@@ -1339,10 +1386,8 @@ function showBad(id) {
     html += '</div>';
   }
 
-  if (b.custom) {
-    html += '<button class="btn btn-ghost" onclick="editBad(\''+b.id+'\');closeSheet()" style="margin-bottom:8px">✏️ Редактировать</button>';
-    html += '<button class="btn btn-ghost" style="color:var(--red)" onclick="deleteBad(\''+b.id+'\');closeSheet()">🗑 Удалить</button>';
-  }
+  html += '<button class="btn btn-ghost" onclick="editBad(\''+b.id+'\')" style="margin-bottom:8px">✏️ Редактировать</button>';
+  html += '<button class="btn btn-ghost" style="color:var(--red)" onclick="confirmDeleteBad(\''+b.id+'\')">🗑 Удалить</button>';
 
   html += '<div style="margin-top:12px;font-size:11px;color:var(--t3);line-height:1.5;text-align:center">'+
     'Данные справочные. Консультируйтесь с врачом перед изменением стека.'+
@@ -1351,39 +1396,116 @@ function showBad(id) {
   openSheet(b.e+' '+b.name, html);
 }
 
+function getBadFormRelationIds(type) {
+  var root = $(type+'-add-hidden');
+  var els = root && root.querySelectorAll ? root.querySelectorAll('[data-id]') : [];
+  return [].map.call(els, function(el){ return el.value; });
+}
+
+function syncBadRules(bad) {
+  var rules = ld('syn_db_v1', []).filter(function(rule) {
+    return rule.id1 !== bad.id && rule.id2 !== bad.id;
+  });
+
+  (bad.syn || []).forEach(function(otherId) {
+    rules.push({
+      id1: bad.id,
+      id2: otherId,
+      t: 'good',
+      txt: bad.name+' + '+((S.bad.find(function(x){return x.id===otherId;})||{}).name||otherId)+': синергия (задано вами)',
+      custom: true
+    });
+  });
+
+  (bad.con || []).forEach(function(otherId) {
+    rules.push({
+      id1: bad.id,
+      id2: otherId,
+      t: 'bad',
+      txt: bad.name+' + '+((S.bad.find(function(x){return x.id===otherId;})||{}).name||otherId)+': конфликт (задано вами)',
+      custom: true
+    });
+  });
+
+  sv('syn_db_v1', rules);
+}
+
+function confirmDeleteBad(id) {
+  var b = S.bad.find(function(x){ return x.id===id; });
+  if (!b) return;
+  if (confirm('Удалить БАД "'+b.name+'"?')) deleteBad(id);
+}
+
 function deleteBad(id) {
-  S.bad = S.bad.filter(function(b){return b.id!==id;});
+  S.bad = S.bad
+    .filter(function(b){ return b.id!==id; })
+    .map(function(b) {
+      b.syn = (b.syn || []).filter(function(x){ return x !== id; });
+      b.con = (b.con || []).filter(function(x){ return x !== id; });
+      return b;
+    });
+
+  STACK = STACK.filter(function(item){ return item.id !== id; });
+  saveStack();
+
+  S.taken.delete(id);
+  sv('taken_v2', Array.from(S.taken));
+
+  var cycles = ld('cycles_v1', {});
+  delete cycles[id];
+  sv('cycles_v1', cycles);
+
+  var rules = ld('syn_db_v1', []).filter(function(rule) {
+    return rule.id1 !== id && rule.id2 !== id;
+  });
+  sv('syn_db_v1', rules);
+
   sv('bad_v2', S.bad);
-  renderBase(); toast('БАД удалён');
+  renderBase();
+  renderToday();
+  renderCycleAlerts();
+  toast('БАД удалён');
 }
 
 function editBad(id) {
   var b = S.bad.find(function(x){return x.id===id;}); if(!b) return;
-  // Open edit sheet (reuse add sheet with prefill)
-  openAddBad();
-  setTimeout(function() {
-    if($('an')) $('an').value = b.name||'';
-    if($('ae')) $('ae').value = b.e||'💊';
-    if($('ac')) $('ac').value = b.cat||'vitamins';
-    if($('ad')) $('ad').value = b.dose||'';
-    if($('at')) $('at').value = b.time||'';
-    if($('ano')) $('ano').value = b.note||'';
-    // Change save button to update
-    var btn = $('sh-body').querySelector('.btn-blue');
-    if (btn) { btn.textContent = 'Сохранить изменения'; btn.onclick = function(){updateBad(id);}; }
-  }, 150);
+  renderBadFormStable({
+    mode: 'edit',
+    editId: id,
+    name: b.name || '',
+    e: b.e || '💊',
+    cat: b.cat || 'vitamins',
+    dose: b.dose || '',
+    time: b.time || '',
+    note: b.note || '',
+    cycleWeeks: b.cycleWeeks || '',
+    breakWeeks: b.breakWeeks || '',
+    syn: (b.syn || []).slice(),
+    con: (b.con || []).slice()
+  });
 }
 
 function updateBad(id) {
   var b = S.bad.find(function(x){return x.id===id;}); if(!b) return;
+  var synIds = getBadFormRelationIds('syn');
+  var conIds = getBadFormRelationIds('con');
   b.name = ($('an')||{}).value||""||b.name;
   b.e    = ($('ae')||{}).value||""||b.e;
   b.cat  = ($('ac')||{}).value||b.cat;
   b.dose = ($('ad')||{}).value||""||b.dose;
   b.time = ($('at')||{}).value||""||b.time;
   b.note = ($('ano')||{}).value||""||b.note;
+  b.syn  = synIds;
+  b.con  = conIds;
+  b.cycleWeeks = parseInt(($('acw')||{}).value||'')||null;
+  b.breakWeeks = parseInt(($('abw')||{}).value||'')||null;
+  syncBadRules(b);
   sv('bad_v2', S.bad);
-  closeSheet(); renderBase(); toast('Обновлено: '+b.name);
+  closeSheet();
+  renderBase();
+  renderToday();
+  renderCycleAlerts();
+  toast('Обновлено: '+b.name);
 }
 
 function baseCat(cat, btn) {
@@ -1394,6 +1516,7 @@ function baseCat(cat, btn) {
 }
 
 function renderBase() {
+  ensureBadFormTestBlock();
   var q = ($('base-q')||{}).value&&($('base-q')||{}).value.toLowerCase()||'';
   var list = S.bad.filter(function(b) {
     if (S.bcat!=='all' && b.cat!==S.bcat) return false;
@@ -1422,6 +1545,11 @@ function renderBase() {
     var badge = inStack ? '<span style="position:absolute;bottom:0;right:0;width:14px;height:14px;border-radius:50%;background:var(--green);border:2px solid var(--bg);font-size:8px;display:flex;align-items:center;justify-content:center">✓</span>' : '';
     var counters = (mySynergies ? '<span style="color:var(--green);font-size:12px">✦'+mySynergies+'</span> ' : '') +
                    (myConflicts ? '<span style="color:var(--red);font-size:12px">⛔'+myConflicts+'</span>' : '');
+    var actions = '<div style="display:flex;align-items:center;gap:6px;margin-left:8px">'+
+      '<button type="button" data-bad-action="edit" data-bad-id="'+b.id+'" title="Редактировать" style="width:30px;height:30px;border:none;border-radius:8px;background:var(--bg3);color:var(--t2);font-size:14px;cursor:pointer">✏️</button>'+
+      '<button type="button" data-bad-action="delete" data-bad-id="'+b.id+'" title="Удалить" style="width:30px;height:30px;border:none;border-radius:8px;background:var(--bg3);color:var(--red);font-size:14px;cursor:pointer">🗑</button>'+
+      '<span style="color:var(--t3);font-size:18px">›</span>'+
+    '</div>';
     return '<div class="row" data-bad-id="'+b.id+'">' +
       '<div class="row-ava" style="background:'+col+'22;border:2px solid '+col+'44;font-size:24px;position:relative">'+b.e+badge+'</div>' +
       '<div class="row-body">' +
@@ -1429,12 +1557,19 @@ function renderBase() {
         '<span class="row-time">'+counters+'</span></div>' +
         '<div class="row-sub">'+b.dose+' · '+b.time+'</div>' +
       '</div>' +
-      '<span style="color:var(--t3);font-size:18px">›</span>' +
+      actions +
     '</div>';
   }).join('');
 
   // Wire click via delegation
   el.onclick = function(e) {
+    var actionBtn = e.target.closest('[data-bad-action]');
+    if (actionBtn) {
+      var badId = actionBtn.dataset.badId;
+      if (actionBtn.dataset.badAction === 'edit') editBad(badId);
+      if (actionBtn.dataset.badAction === 'delete') confirmDeleteBad(badId);
+      return;
+    }
     var row = e.target.closest('[data-bad-id]');
     if (row) showBad(row.dataset.badId);
   };
@@ -1503,11 +1638,38 @@ function checkMySyn() {
 }
 
 function exportBase() {
-  var data={bad:S.bad.filter(function(b){return b.custom;}),synRules:ld('syn_db_v1',[]),exportedAt:new Date().toISOString(),version:2};
+  var customBadIds = S.bad.filter(function(b){ return b.custom; }).map(function(b){ return b.id; });
+  var customRules = ld('syn_db_v1', []).filter(function(rule) {
+    return customBadIds.includes(rule.id1) || customBadIds.includes(rule.id2);
+  });
+  var data={
+    bad:S.bad.filter(function(b){ return b.custom; }),
+    synRules:customRules,
+    exportedAt:new Date().toISOString(),
+    version:3
+  };
   var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download='stackup_base_'+fmt(new Date()).replace(/\./g,'-')+'.json';a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
   toast('База экспортирована');
+}
+
+function normalizeImportedBad(rawBad) {
+  return {
+    id: rawBad.id || ('c_' + Date.now()),
+    name: rawBad.name || 'Без названия',
+    e: rawBad.e || '💊',
+    cat: rawBad.cat || 'vitamins',
+    dose: rawBad.dose || '—',
+    time: rawBad.time || '—',
+    syn: Array.isArray(rawBad.syn) ? rawBad.syn.filter(Boolean) : [],
+    con: Array.isArray(rawBad.con) ? rawBad.con.filter(Boolean) : [],
+    note: rawBad.note || '',
+    custom: true,
+    cycleWeeks: rawBad.cycleWeeks || null,
+    breakWeeks: rawBad.breakWeeks || null
+  };
 }
 
 function importBase(e) {
@@ -1516,21 +1678,49 @@ function importBase(e) {
   r.onload=function(ev){
     try{
       var d=JSON.parse(ev.target.result);
-      var imported=0;
+      var imported=0, updated=0;
       if(d.bad&&Array.isArray(d.bad)){
-        d.bad.forEach(function(b){b.custom=true;if(!S.bad.find(function(x){return x.id===b.id;})){S.bad.push(b);imported++;}});
+        d.bad.forEach(function(rawBad){
+          var bad = normalizeImportedBad(rawBad);
+          var exists = S.bad.find(function(x){ return x.id===bad.id; });
+          if (!exists) {
+            S.bad.push(bad);
+            imported++;
+            return;
+          }
+          if (exists.custom) {
+            exists.name = bad.name;
+            exists.e = bad.e;
+            exists.cat = bad.cat;
+            exists.dose = bad.dose;
+            exists.time = bad.time;
+            exists.syn = bad.syn;
+            exists.con = bad.con;
+            exists.note = bad.note;
+            exists.cycleWeeks = bad.cycleWeeks;
+            exists.breakWeeks = bad.breakWeeks;
+            exists.custom = true;
+            updated++;
+          }
+        });
         sv('bad_v2',S.bad);
       }
-      var customRules=ld('syn_db_v1',[]);var synImported=0;
+      var customRules=ld('syn_db_v1',[]);var synImported=0, synUpdated=0;
       if(d.synRules&&Array.isArray(d.synRules)){
-        d.synRules.forEach(function(r){
-          var exists=customRules.findIndex(function(x){return (x.id1===r.id1&&x.id2===r.id2)||(x.id1===r.id2&&x.id2===r.id1);});
-          if(exists>=0)customRules[exists]=r;else{customRules.push(r);synImported++;}
+        d.synRules.forEach(function(rule){
+          if (!rule || !rule.id1 || !rule.id2 || !rule.t || !rule.txt) return;
+          rule.custom = true;
+          var exists=customRules.findIndex(function(x){return (x.id1===rule.id1&&x.id2===rule.id2)||(x.id1===rule.id2&&x.id2===rule.id1);});
+          if(exists>=0){customRules[exists]=rule;synUpdated++;}else{customRules.push(rule);synImported++;}
         });
         sv('syn_db_v1',customRules);
       }
-      renderBase();toast('Импорт: '+imported+' БАД, '+synImported+' правил');
+      renderBase();
+      renderToday();
+      renderCycleAlerts();
+      toast('Импорт: +' + imported + ', обновлено ' + updated + ', правил +' + synImported + '/' + synUpdated);
     }catch(err){toast('Ошибка: '+err.message);}
+    if (e && e.target) e.target.value = '';
   };
   r.readAsText(f);
 }
@@ -1792,7 +1982,7 @@ function renderWorkouts() {
   if(S.workouts.length>1){cc.style.display='';setTimeout(function(){drawWtChart(S.wcField);},50);}else if(cc) cc.style.display='none';
   var el=$('wt-hist');if(!el) return;
   if(!S.workouts.length){el.innerHTML='<div class="empty"><div class="empty-ico">🏋️</div><div class="empty-t">Тренировок нет</div><div class="empty-s">Добавьте первую</div></div>';return;}
-  var II={низкая:'🟢',средняя:'🟡',высокая:'🔴'};
+  var II={'низкая':'🟢','средняя':'🟡','высокая':'🔴'};
   el.innerHTML=S.workouts.slice(0,15).map(function(w,i){
     return '<div class="row" data-wt="'+i+'">'+
       '<div class="row-ava" style="background:var(--bg3);font-size:22px">🏋️</div>'+
@@ -1806,7 +1996,7 @@ function renderWorkouts() {
 
 function openWT(i) {
   var w=S.workouts[parseInt(i)];if(!w) return;
-  var II={низкая:'🟢',средняя:'🟡',высокая:'🔴'};
+  var II={'низкая':'🟢','средняя':'🟡','высокая':'🔴'};
   var html='<div style="padding:0 16px 16px"><div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px">';
   if(w.dur) html+='<span class="tag tb">⏱ '+w.dur+' мин</span>';
   if(w.cal) html+='<span class="tag tg">🔥 '+w.cal+' ккал</span>';
@@ -1853,6 +2043,527 @@ function drawWtChart(field) {
 // ─── AI ───────────────────────────────────────────
 var promptTxt = '';
 var aiSource = 'Claude';
+var aiBadPromptTxt = '';
+var AI_BAD_IMPORT_PREVIEW = null;
+
+function getLatestBodyForAi() {
+  return S.body[0] || null;
+}
+
+function getBadAiResponseTemplate() {
+  return {
+    format: 'stackup_bad_ai_response_v1',
+    analysis: {
+      summary: 'Краткий итог по базе БАД и стеку.',
+      warnings: ['Ключевые риски и ограничения.'],
+      bodyNotes: ['Что важно учесть относительно возраста, пола и параметров тела.']
+    },
+    bad_updates: [
+      {
+        id: 'zinc',
+        dose: '15 мг',
+        time: 'утром с едой',
+        note: 'Уточнение логики приема.',
+        cycleWeeks: null,
+        breakWeeks: null,
+        synergyRefs: ['vitc'],
+        conflictRefs: ['iron']
+      }
+    ],
+    new_bad: [
+      {
+        key: 'berberine',
+        name: 'Берберин',
+        emoji: '🌿',
+        category: 'adapto',
+        dose: '500 мг',
+        time: 'вечером с едой',
+        note: 'Пример новой добавки.',
+        cycleWeeks: 8,
+        breakWeeks: 4,
+        synergyRefs: [],
+        conflictRefs: []
+      }
+    ],
+    rule_updates: [
+      {
+        ref1: 'zinc',
+        ref2: 'iron',
+        t: 'bad',
+        txt: 'Цинк и железо лучше разносить по времени приема.'
+      }
+    ]
+  };
+}
+
+function buildBadAiPackage() {
+  var p = getProfile();
+  var age = p.dob ? getAge(p.dob) : null;
+  var lat = getLatestBodyForAi();
+  var customBad = S.bad.filter(function(b){ return b.custom; });
+  var baseIds = customBad.map(function(b){ return b.id; });
+  var stackIds = STACK.map(function(s){ return s.id; });
+  var relatedIds = [];
+  customBad.forEach(function(b) {
+    (b.syn || []).forEach(function(id){ if (!relatedIds.includes(id)) relatedIds.push(id); });
+    (b.con || []).forEach(function(id){ if (!relatedIds.includes(id)) relatedIds.push(id); });
+  });
+  var relevantIds = Array.from(new Set(baseIds.concat(stackIds).concat(relatedIds)));
+  var relevantRules = getSynRules().filter(function(rule) {
+    return relevantIds.includes(rule.id1) || relevantIds.includes(rule.id2);
+  });
+
+  return {
+    format: 'stackup_bad_ai_export_v1',
+    exportedAt: new Date().toISOString(),
+    app: { name: 'StackUp', version: 1 },
+    profile: {
+      name: p.name || null,
+      sex: p.sex || null,
+      dob: p.dob || null,
+      age: age,
+    },
+    latestBody: lat ? {
+      weight: lat.weight || null,
+      fat: lat.fat || null,
+      height: lat.height || null,
+      waist: lat.waist || null,
+      chest: lat.chest || null,
+      bicep: lat.bicep || null,
+      pushup: lat.pushup || null,
+      pullup: lat.pullup || null,
+      abs: lat.abs || null,
+      plank: lat.plank || null,
+      rings: lat.rings || null,
+      steps: lat.steps || null
+    } : null,
+    activeStack: STACK.map(function(item) {
+      var b = S.bad.find(function(x){ return x.id === item.id; }) || { id: item.id, name: item.id, e: '💊' };
+      return {
+        id: b.id,
+        name: b.name,
+        emoji: b.e,
+        category: b.cat || null,
+        baseDose: b.dose || null,
+        baseTime: b.time || null,
+        stackDose: item.dose || null,
+        stackSlot: item.slot || null,
+        stackNote: item.note || null
+      };
+    }),
+    badBase: customBad.map(function(b) {
+      return {
+        id: b.id,
+        name: b.name,
+        emoji: b.e || '💊',
+        category: b.cat || 'vitamins',
+        dose: b.dose || '',
+        time: b.time || '',
+        note: b.note || '',
+        cycleWeeks: b.cycleWeeks || null,
+        breakWeeks: b.breakWeeks || null,
+        synergyRefs: (b.syn || []).slice(),
+        conflictRefs: (b.con || []).slice()
+      };
+    }),
+    rules: relevantRules,
+    responseTemplate: getBadAiResponseTemplate()
+  };
+}
+
+function buildBadAiPrompt() {
+  aiBadPromptTxt =
+    'Ты анализируешь JSON-файл StackUp с пользовательской базой БАД. ' +
+    'Нужно учесть пол, возраст, параметры тела, текущий стек, синергии, конфликты, время приема, дозировки и длительность курсов.\n\n' +
+    'Правила ответа:\n' +
+    '1. Верни только JSON без markdown и пояснений.\n' +
+    '2. Формат ответа должен быть строго stackup_bad_ai_response_v1.\n' +
+    '3. Для существующих БАД используй их текущие id из файла.\n' +
+    '4. Для новых БАД заполняй new_bad[].key латиницей без пробелов.\n' +
+    '5. Если меняешь длительность приема, заполняй cycleWeeks и breakWeeks.\n' +
+    '6. Если видишь синергию или конфликт, отрази это и в bad_updates/new_bad, и в rule_updates.\n' +
+    '7. Не пиши медицинских диагнозов и не выдумывай отсутствующие данные.\n\n' +
+    'Ожидаемая схема ответа:\n' +
+    JSON.stringify(getBadAiResponseTemplate(), null, 2);
+  return aiBadPromptTxt;
+}
+
+function exportBadAiPackage() {
+  var data = buildBadAiPackage();
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'stackup_ai_bad_export_' + fmt(new Date()).replace(/\./g,'-') + '.json';
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  toast('JSON для ИИ экспортирован');
+}
+
+function copyBadAiPrompt() {
+  var text = buildBadAiPrompt();
+  var copy = function() {
+    var t = document.createElement('textarea');
+    t.value = text;
+    document.body.appendChild(t);
+    t.select();
+    document.execCommand('copy');
+    t.remove();
+    toast('Промт JSON скопирован');
+  };
+  if (navigator.clipboard) navigator.clipboard.writeText(text).then(function(){toast('Промт JSON скопирован');}).catch(copy);
+  else copy();
+}
+
+function loadAiBadJsonFile(e) {
+  var f = e.target.files[0]; if (!f) return;
+  var r = new FileReader();
+  r.onload = function(ev) {
+    if ($('ai-bad-json-input')) $('ai-bad-json-input').value = ev.target.result || '';
+    toast('JSON ответа загружен');
+    e.target.value = '';
+  };
+  r.readAsText(f);
+}
+
+function triggerAiBadJsonFilePicker() {
+  var inp = $('ai-bad-json-file');
+  if (inp) inp.click();
+}
+
+function pasteAiBadJsonFromClipboard() {
+  var ta = $('ai-bad-json-input');
+  if (!ta) return;
+
+  var fail = function(msg) {
+    ta.focus();
+    toast(msg || 'Не удалось прочитать буфер. Вставьте JSON вручную');
+  };
+
+  if (!navigator.clipboard || !navigator.clipboard.readText) {
+    fail('Буфер обмена недоступен. Вставьте JSON вручную');
+    return;
+  }
+
+  navigator.clipboard.readText().then(function(text) {
+    var raw = (text || '').trim();
+    if (!raw) {
+      fail('Буфер обмена пуст');
+      return;
+    }
+    ta.value = raw;
+    ta.focus();
+    toast('JSON вставлен из буфера');
+  }).catch(function() {
+    fail('Нет доступа к буферу. Вставьте JSON вручную');
+  });
+}
+
+function extractJsonPayload(text) {
+  var raw = (text || '').trim();
+  if (!raw) return '';
+  if (raw.indexOf('```') === 0) {
+    raw = raw.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/, '');
+  }
+  return raw.trim();
+}
+
+function toNullableInt(v) {
+  if (v === undefined || v === null || v === '') return null;
+  var n = parseInt(v, 10);
+  return Number.isFinite(n) ? n : null;
+}
+
+function makeAiBadKey(name, idx) {
+  var base = String(name || '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  return base || ('new_bad_' + idx);
+}
+
+function normalizeRefsField(value) {
+  if (value == null) return null;
+  if (!Array.isArray(value)) return [];
+  return value.map(function(x){ return String(x || '').trim(); }).filter(Boolean);
+}
+
+function normalizeAiBadPayload(obj) {
+  var updates = Array.isArray(obj.bad_updates) ? obj.bad_updates : [];
+  var newBad = Array.isArray(obj.new_bad) ? obj.new_bad : [];
+  var rules = Array.isArray(obj.rule_updates) ? obj.rule_updates : [];
+
+  return {
+    format: obj.format || null,
+    analysis: {
+      summary: obj.analysis && obj.analysis.summary ? String(obj.analysis.summary) : '',
+      warnings: obj.analysis && Array.isArray(obj.analysis.warnings) ? obj.analysis.warnings.map(String) : [],
+      bodyNotes: obj.analysis && Array.isArray(obj.analysis.bodyNotes) ? obj.analysis.bodyNotes.map(String) : []
+    },
+    badUpdates: updates
+      .filter(function(item){ return item && item.id; })
+      .map(function(item) {
+        return {
+          id: String(item.id),
+          name: item.name != null ? String(item.name) : null,
+          emoji: item.emoji != null ? String(item.emoji) : (item.e != null ? String(item.e) : null),
+          cat: item.category != null ? String(item.category) : (item.cat != null ? String(item.cat) : null),
+          dose: item.dose != null ? String(item.dose) : null,
+          time: item.time != null ? String(item.time) : null,
+          note: item.note != null ? String(item.note) : null,
+          cycleWeeks: toNullableInt(item.cycleWeeks != null ? item.cycleWeeks : item.cycle_weeks),
+          breakWeeks: toNullableInt(item.breakWeeks != null ? item.breakWeeks : item.break_weeks),
+          synergyRefs: normalizeRefsField(item.synergyRefs != null ? item.synergyRefs : item.synergy_refs),
+          conflictRefs: normalizeRefsField(item.conflictRefs != null ? item.conflictRefs : item.conflict_refs)
+        };
+      }),
+    newBad: newBad
+      .filter(function(item){ return item && (item.name || item.key); })
+      .map(function(item, idx) {
+        return {
+          key: String(item.key || makeAiBadKey(item.name, idx)),
+          name: String(item.name || ('Новый БАД ' + (idx + 1))),
+          emoji: item.emoji != null ? String(item.emoji) : (item.e != null ? String(item.e) : '💊'),
+          cat: item.category != null ? String(item.category) : (item.cat != null ? String(item.cat) : 'vitamins'),
+          dose: item.dose != null ? String(item.dose) : '—',
+          time: item.time != null ? String(item.time) : '—',
+          note: item.note != null ? String(item.note) : '',
+          cycleWeeks: toNullableInt(item.cycleWeeks != null ? item.cycleWeeks : item.cycle_weeks),
+          breakWeeks: toNullableInt(item.breakWeeks != null ? item.breakWeeks : item.break_weeks),
+          synergyRefs: normalizeRefsField(item.synergyRefs != null ? item.synergyRefs : item.synergy_refs) || [],
+          conflictRefs: normalizeRefsField(item.conflictRefs != null ? item.conflictRefs : item.conflict_refs) || []
+        };
+      }),
+    ruleUpdates: rules
+      .filter(function(item){ return item && item.ref1 && item.ref2 && item.t && item.txt; })
+      .map(function(item) {
+        return {
+          ref1: String(item.ref1),
+          ref2: String(item.ref2),
+          t: String(item.t),
+          txt: String(item.txt)
+        };
+      })
+  };
+}
+
+function resolveAiBadRef(ref, newMap) {
+  var key = String(ref || '').trim();
+  if (!key) return null;
+  if (newMap[key]) return newMap[key];
+  if (key.indexOf('new:') === 0 && newMap[key.slice(4)]) return newMap[key.slice(4)];
+  if (S.bad.find(function(b){ return b.id === key; })) return key;
+  var byName = S.bad.find(function(b){ return b.name === key; });
+  return byName ? byName.id : null;
+}
+
+function collectAiBadImportIssues(payload) {
+  var newMap = {};
+  payload.newBad.forEach(function(item) { newMap[item.key] = 'preview:' + item.key; });
+  var issues = [];
+
+  payload.badUpdates.forEach(function(item) {
+    if (!S.bad.find(function(b){ return b.id === item.id; })) {
+      issues.push('Не найден существующий БАД для обновления: ' + item.id);
+    }
+  });
+
+  payload.badUpdates.concat(payload.newBad).forEach(function(item) {
+    (item.synergyRefs || []).forEach(function(ref) {
+      if (!resolveAiBadRef(ref, newMap)) issues.push('Не удалось распознать synergy ref: ' + ref);
+    });
+    (item.conflictRefs || []).forEach(function(ref) {
+      if (!resolveAiBadRef(ref, newMap)) issues.push('Не удалось распознать conflict ref: ' + ref);
+    });
+  });
+
+  payload.ruleUpdates.forEach(function(rule) {
+    if (!resolveAiBadRef(rule.ref1, newMap)) issues.push('Не удалось распознать ref1: ' + rule.ref1);
+    if (!resolveAiBadRef(rule.ref2, newMap)) issues.push('Не удалось распознать ref2: ' + rule.ref2);
+  });
+
+  return Array.from(new Set(issues));
+}
+
+function previewAiBadImport() {
+  var raw = extractJsonPayload((($('ai-bad-json-input') || {}).value || ''));
+  if (!raw) { toast('Вставьте JSON ответа ИИ'); return; }
+  var parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch (err) {
+    toast('JSON не распознан: ' + err.message);
+    return;
+  }
+
+  var payload = normalizeAiBadPayload(parsed);
+  payload.issues = collectAiBadImportIssues(payload);
+  AI_BAD_IMPORT_PREVIEW = payload;
+
+  var html = '<div style="padding:0 16px 16px">';
+  html += '<div style="background:#2b5278;border-radius:8px;padding:10px 12px;font-size:12px;color:#90caf9;line-height:1.5;margin-bottom:12px">Импорт не применяется сразу. Сначала проверьте изменения, потом подтвердите.</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">';
+  html += '<div class="wr-box"><div class="wr-val">' + payload.badUpdates.length + '</div><div class="wr-lbl">обновить</div></div>';
+  html += '<div class="wr-box"><div class="wr-val">' + payload.newBad.length + '</div><div class="wr-lbl">добавить</div></div>';
+  html += '<div class="wr-box"><div class="wr-val">' + payload.ruleUpdates.length + '</div><div class="wr-lbl">правил</div></div>';
+  html += '</div>';
+
+  if (payload.analysis.summary) {
+    html += '<div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Сводка ИИ</div>';
+    html += '<div style="background:var(--bg3);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.6;margin-bottom:12px">' + payload.analysis.summary + '</div>';
+  }
+
+  if (payload.analysis.warnings.length) {
+    html += '<div style="font-size:12px;color:var(--red);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Предупреждения</div>';
+    html += payload.analysis.warnings.map(function(item){ return '<div class="alert alert-r" style="margin:4px 0"><span class="alert-ico">⛔</span><span class="alert-txt">' + item + '</span></div>'; }).join('');
+  }
+
+  if (payload.badUpdates.length) {
+    html += '<div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin:12px 0 6px">Обновить БАДы</div>';
+    html += payload.badUpdates.map(function(item){
+      return '<div style="background:var(--bg3);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:13px;line-height:1.5"><b>' + item.id + '</b>' +
+        (item.dose ? '<div>Доза: ' + item.dose + '</div>' : '') +
+        (item.time ? '<div>Время: ' + item.time + '</div>' : '') +
+        (item.cycleWeeks != null || item.breakWeeks != null ? '<div>Цикл: ' + (item.cycleWeeks != null ? item.cycleWeeks + ' нед' : '—') + ' / перерыв ' + (item.breakWeeks != null ? item.breakWeeks + ' нед' : '—') + '</div>' : '') +
+        (item.note ? '<div>Заметка: ' + item.note + '</div>' : '') +
+      '</div>';
+    }).join('');
+  }
+
+  if (payload.newBad.length) {
+    html += '<div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin:12px 0 6px">Новые БАДы</div>';
+    html += payload.newBad.map(function(item){
+      return '<div style="background:var(--bg3);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:13px;line-height:1.5"><b>' + item.emoji + ' ' + item.name + '</b>' +
+        '<div>Категория: ' + item.cat + '</div>' +
+        '<div>Доза: ' + item.dose + '</div>' +
+        '<div>Время: ' + item.time + '</div>' +
+        (item.cycleWeeks != null || item.breakWeeks != null ? '<div>Цикл: ' + (item.cycleWeeks != null ? item.cycleWeeks + ' нед' : '—') + ' / перерыв ' + (item.breakWeeks != null ? item.breakWeeks + ' нед' : '—') + '</div>' : '') +
+      '</div>';
+    }).join('');
+  }
+
+  if (payload.issues.length) {
+    html += '<div style="font-size:12px;color:var(--orange);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin:12px 0 6px">Проблемы для проверки</div>';
+    html += payload.issues.map(function(item){ return '<div class="alert alert-o" style="margin:4px 0"><span class="alert-ico">⚠️</span><span class="alert-txt">' + item + '</span></div>'; }).join('');
+  }
+
+  html += '<div style="display:flex;gap:8px;margin-top:12px">';
+  html += '<button class="btn btn-ghost" style="flex:1" onclick="closeSheet()">Отмена</button>';
+  html += '<button class="btn btn-blue" style="flex:1" onclick="applyAiBadImport()">Применить</button>';
+  html += '</div></div>';
+
+  openSheet('Импорт ответа ИИ', html);
+}
+
+function upsertAiRule(rules, rule) {
+  var idx = rules.findIndex(function(x) {
+    return (x.id1 === rule.id1 && x.id2 === rule.id2) || (x.id1 === rule.id2 && x.id2 === rule.id1);
+  });
+  if (idx >= 0) rules[idx] = rule; else rules.push(rule);
+}
+
+function applyAiBadImport() {
+  if (!AI_BAD_IMPORT_PREVIEW) { toast('Нет подготовленного импорта'); return; }
+  var payload = AI_BAD_IMPORT_PREVIEW;
+  var newMap = {};
+  var touchedIds = [];
+
+  payload.newBad.forEach(function(item, idx) {
+    var newId = 'ai_' + item.key + '_' + (Date.now() + idx);
+    newMap[item.key] = newId;
+    var bad = {
+      id: newId,
+      name: item.name,
+      e: item.emoji || '💊',
+      cat: item.cat || 'vitamins',
+      dose: item.dose || '—',
+      time: item.time || '—',
+      syn: [],
+      con: [],
+      note: item.note || '',
+      custom: true,
+      cycleWeeks: item.cycleWeeks,
+      breakWeeks: item.breakWeeks
+    };
+    S.bad.push(bad);
+    touchedIds.push(newId);
+  });
+
+  payload.badUpdates.forEach(function(item) {
+    var bad = S.bad.find(function(x){ return x.id === item.id; });
+    if (!bad) return;
+    if (item.name) bad.name = item.name;
+    if (item.emoji) bad.e = item.emoji;
+    if (item.cat) bad.cat = item.cat;
+    if (item.dose) bad.dose = item.dose;
+    if (item.time) bad.time = item.time;
+    if (item.note != null) bad.note = item.note;
+    if (item.cycleWeeks !== null) bad.cycleWeeks = item.cycleWeeks;
+    if (item.breakWeeks !== null) bad.breakWeeks = item.breakWeeks;
+    touchedIds.push(bad.id);
+  });
+
+  payload.newBad.forEach(function(item) {
+    var bad = S.bad.find(function(x){ return x.id === newMap[item.key]; });
+    if (!bad) return;
+    bad.syn = (item.synergyRefs || []).map(function(ref){ return resolveAiBadRef(ref, newMap); }).filter(Boolean);
+    bad.con = (item.conflictRefs || []).map(function(ref){ return resolveAiBadRef(ref, newMap); }).filter(Boolean);
+  });
+
+  payload.badUpdates.forEach(function(item) {
+    var bad = S.bad.find(function(x){ return x.id === item.id; });
+    if (!bad) return;
+    if (item.synergyRefs !== null) bad.syn = item.synergyRefs.map(function(ref){ return resolveAiBadRef(ref, newMap); }).filter(Boolean);
+    if (item.conflictRefs !== null) bad.con = item.conflictRefs.map(function(ref){ return resolveAiBadRef(ref, newMap); }).filter(Boolean);
+  });
+
+  var touchedSet = Array.from(new Set(touchedIds));
+  var rules = ld('syn_db_v1', []).filter(function(rule) {
+    return !touchedSet.includes(rule.id1) && !touchedSet.includes(rule.id2);
+  });
+
+  touchedSet.forEach(function(id) {
+    var bad = S.bad.find(function(x){ return x.id === id; });
+    if (!bad) return;
+    (bad.syn || []).forEach(function(otherId) {
+      upsertAiRule(rules, {
+        id1: bad.id,
+        id2: otherId,
+        t: 'good',
+        txt: bad.name + ' + ' + ((S.bad.find(function(x){ return x.id === otherId; }) || {}).name || otherId) + ': синергия (импорт ИИ)',
+        custom: true
+      });
+    });
+    (bad.con || []).forEach(function(otherId) {
+      upsertAiRule(rules, {
+        id1: bad.id,
+        id2: otherId,
+        t: 'bad',
+        txt: bad.name + ' + ' + ((S.bad.find(function(x){ return x.id === otherId; }) || {}).name || otherId) + ': конфликт (импорт ИИ)',
+        custom: true
+      });
+    });
+  });
+
+  payload.ruleUpdates.forEach(function(rule) {
+    var id1 = resolveAiBadRef(rule.ref1, newMap);
+    var id2 = resolveAiBadRef(rule.ref2, newMap);
+    if (!id1 || !id2 || id1 === id2) return;
+    upsertAiRule(rules, {
+      id1: id1,
+      id2: id2,
+      t: rule.t,
+      txt: rule.txt,
+      custom: true
+    });
+  });
+
+  sv('bad_v2', S.bad);
+  sv('syn_db_v1', rules);
+  renderBase();
+  renderToday();
+  renderCycleAlerts();
+  AI_BAD_IMPORT_PREVIEW = null;
+  if ($('ai-bad-json-input')) $('ai-bad-json-input').value = '';
+  closeSheet();
+  toast('Импорт ответа ИИ применён');
+}
 
 function selAiSource(src, btn) {
   aiSource = src;
@@ -1998,7 +2709,7 @@ function renderAiReviews() {
       '<div class="empty-s">Скопируйте промт, получите ответ от ИИ и сохраните его здесь</div></div>';
     return;
   }
-  var SRC_ICO = {Claude:'🔵', ChatGPT:'🟢', Gemini:'🟡', Другой:'⚪'};
+  var SRC_ICO = {Claude:'🔵', ChatGPT:'🟢', Gemini:'🟡', 'Другой':'⚪'};
   el.innerHTML = reviews.map(function(r, i) {
     var ico = SRC_ICO[r.source] || '⚪';
     var shortAnswer = r.answer.slice(0, 90) + (r.answer.length > 90 ? '…' : '');
@@ -2126,11 +2837,12 @@ function importAll(e){
 }
 
 // ─── PROFILE ──────────────────────────────────────
-function getProfile(){return ld('profile_v1',{name:'',dob:''});}
+function getProfile(){var p=ld('profile_v1',{name:'',dob:'',sex:''})||{};return {name:p.name||'',dob:p.dob||'',sex:p.sex||''};}
 function saveProfile(){
   var name=($('prof-name')||{}).value||""||'';
   var dob=($('prof-dob')||{}).value||'';
-  sv('profile_v1',{name,dob});updateGreeting();closeSheet();toast('Профиль сохранён');
+  var sex=($('prof-sex')||{}).value||'';
+  sv('profile_v1',{name,dob,sex});updateGreeting();closeSheet();toast('Профиль сохранён');
 }
 function getAge(dob){if(!dob) return null;var b=new Date(dob),now=new Date();var age=now.getFullYear()-b.getFullYear();if(now.getMonth()-b.getMonth()<0||(now.getMonth()===b.getMonth()&&now.getDate()<b.getDate())) age--;return age;}
 function getDaysToB(dob){if(!dob) return null;var now=new Date(),b=new Date(dob),next=new Date(now.getFullYear(),b.getMonth(),b.getDate());if(next<now)next.setFullYear(now.getFullYear()+1);return Math.ceil((next-now)/86400000);}
@@ -2152,6 +2864,7 @@ function openProfile(){
       (days!==null&&days<=30?'<div style="font-size:12px;color:var(--orange);margin-top:2px">'+(days===0?'🎉 Сегодня день рождения!':'🎂 До дня рождения: '+days+' дн.')+'</div>':'<div style="font-size:12px;color:var(--t3);margin-top:2px">До ДР: '+days+' дн.</div>')+
     '</div></div>':'')+
     '<div><div style="font-size:12px;color:var(--t3);margin-bottom:5px;font-weight:600;text-transform:uppercase">Имя</div><input id="prof-name" class="inp" placeholder="Введите имя" value="'+p.name+'"></div>'+
+    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:5px;font-weight:600;text-transform:uppercase">Пол</div><select id="prof-sex" class="inp"><option value="">Не указан</option><option value="female"'+(p.sex==='female'?' selected':'')+'>Женский</option><option value="male"'+(p.sex==='male'?' selected':'')+'>Мужской</option></select></div>'+
     '<div><div style="font-size:12px;color:var(--t3);margin-bottom:5px;font-weight:600;text-transform:uppercase">Дата рождения</div><input id="prof-dob" class="inp" type="date" value="'+p.dob+'"></div>'+
     '<button class="btn btn-blue" onclick="saveProfile()">Сохранить</button></div>'
   );
@@ -2195,64 +2908,139 @@ function obNext(step) {
     var dob = ($('ob-dob')||{}).value || '';
     sv('profile_v1', {name: name, dob: dob});
     updateGreeting();
-    // Populate stack picker
     obRenderStackList();
   }
-
-  // Slide transition
-  var steps = [0,1,2];
-  steps.forEach(function(i) {
-    var el = $('ob-step-'+i);
-    if (!el) return;
-    if (i === step) {
-      el.style.display = 'block';
-      el.style.transform = 'translateX(100%)';
-      setTimeout(function(){ el.style.transform = 'translateX(0)'; }, 10);
-    } else if (i < step) {
-      el.style.transform = 'translateX(-100%)';
-      setTimeout(function(){ el.style.display = 'none'; }, 310);
-    }
-  });
+  // Move track: translate -33.333% per step
+  var track = $('ob-track');
+  if (track) track.style.transform = 'translateX(-' + (step * 33.333) + '%)';
   obSetDot(step);
+}
+
+function obDefaultBadIds() {
+  return defaultBad().map(function(b){ return b.id; });
+}
+
+function obGetStandardBadList() {
+  return defaultBad().map(function(def) {
+    var existing = S.bad.find(function(b){ return b.id === def.id; });
+    return existing || Object.assign({}, def);
+  });
+}
+
+function obGuessStackSlot(timeText) {
+  var time = String(timeText || '').toLowerCase();
+  if (time.indexOf('вечер') >= 0 || time.indexOf('сном') >= 0) return 'evening';
+  if (time.indexOf('после') >= 0 || time.indexOf('трен') >= 0) return 'after';
+  if (time.indexOf('день') >= 0 || time.indexOf('обед') >= 0) return 'day';
+  return 'morning';
+}
+
+function obMakeBadRow(b, selected) {
+  var isOn = selected.has(b.id);
+  var row = document.createElement('div');
+  row.style.cssText = 'display:flex;align-items:center;padding:13px 14px;border-bottom:1px solid var(--line)';
+
+  var icon = document.createElement('span');
+  icon.style.cssText = 'font-size:22px;margin-right:12px;flex-shrink:0';
+  icon.textContent = b.e;
+
+  var info = document.createElement('div');
+  info.style.cssText = 'flex:1;min-width:0;margin-right:12px';
+  info.innerHTML =
+    '<div style="font-size:14px;font-weight:500;color:var(--t1)">' + b.name + '</div>' +
+    '<div style="font-size:12px;color:var(--t2);margin-top:2px">' + b.dose + '</div>';
+
+  var toggle = document.createElement('div');
+  toggle.className = 'ob-toggle' + (isOn ? ' on' : '');
+
+  toggle.addEventListener('click', function(e) {
+    e.stopPropagation();
+    toggle.classList.toggle('on');
+    var nowOn = toggle.classList.contains('on');
+    var inStack = STACK.findIndex(function(s){ return s.id === b.id; });
+    if (nowOn && inStack < 0) {
+      if (!S.bad.find(function(x){ return x.id === b.id; })) {
+        S.bad.push(Object.assign({}, b));
+      }
+      STACK.push({id: b.id, slot: obGuessStackSlot(b.time), dose: b.dose, note: b.time});
+    } else if (!nowOn && inStack >= 0) {
+      STACK.splice(inStack, 1);
+    }
+    var meta = $('ob-stack-meta');
+    if (meta) meta.textContent = 'Выбрано: ' + STACK.length;
+  });
+
+  row.style.cursor = 'pointer';
+  row.addEventListener('click', function() {
+    toggle.click();
+  });
+
+  row.appendChild(icon);
+  row.appendChild(info);
+  row.appendChild(toggle);
+  return row;
+}
+
+function obAppendBadSection(root, title, list, selected, emptyText) {
+  var section = document.createElement('div');
+
+  var head = document.createElement('div');
+  head.style.cssText = 'padding:12px 14px 8px;font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em';
+  head.textContent = title + ' · ' + list.length;
+  section.appendChild(head);
+
+  if (!list.length) {
+    var empty = document.createElement('div');
+    empty.style.cssText = 'padding:0 14px 14px;font-size:13px;color:var(--t3);line-height:1.5';
+    empty.textContent = emptyText;
+    section.appendChild(empty);
+    root.appendChild(section);
+    return;
+  }
+
+  list.forEach(function(b, idx) {
+    var row = obMakeBadRow(b, selected);
+    if (idx === list.length - 1) row.style.borderBottom = 'none';
+    section.appendChild(row);
+  });
+
+  root.appendChild(section);
 }
 
 function obRenderStackList() {
   var el = $('ob-stack-list'); if (!el) return;
+  var meta = $('ob-stack-meta');
   var selected = new Set(STACK.map(function(s){ return s.id; }));
-  el.innerHTML = S.bad.map(function(b) {
-    var checked = selected.has(b.id);
-    return '<div style="display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line);cursor:pointer" data-ob-id="' + b.id + '">' +
-      '<span style="font-size:22px;margin-right:12px">' + b.e + '</span>' +
-      '<div style="flex:1">' +
-        '<div style="font-size:14px;font-weight:500;color:var(--t1)">' + b.name + '</div>' +
-        '<div style="font-size:12px;color:var(--t2)">' + b.dose + ' · ' + b.time + '</div>' +
-      '</div>' +
-      '<div class="cell-switch ' + (checked ? 'on' : '') + '" id="obs-sw-' + b.id + '" style="flex-shrink:0"></div>' +
-    '</div>';
-  }).join('');
-  el.onclick = function(e) {
-    var row = e.target.closest('[data-ob-id]');
-    if (!row) return;
-    var id = row.dataset.obId;
-    var sw = document.getElementById('obs-sw-'+id);
-    if (!sw) return;
-    sw.classList.toggle('on');
-    var inStack = STACK.findIndex(function(s){ return s.id === id; });
-    if (sw.classList.contains('on')) {
-      if (inStack < 0) {
-        var b = S.bad.find(function(x){ return x.id === id; });
-        if (b) {
-          var slot = b.time.indexOf('вечер') >= 0 ? 'evening' :
-                    (b.time.indexOf('после') >= 0 || b.time.indexOf('трен') >= 0) ? 'after' :
-                    (b.time.indexOf('день') >= 0 || b.time.indexOf('обед') >= 0) ? 'day' : 'morning';
-          STACK.push({id: b.id, slot: slot, dose: b.dose, note: b.time});
-        }
-      }
-    } else {
-      if (inStack >= 0) STACK.splice(inStack, 1);
-    }
-  };
+  var q = ((($('ob-bad-search') || {}).value) || '').trim().toLowerCase();
+  var defaultIds = new Set(obDefaultBadIds());
+  var standard = [];
+  var custom = [];
+  el.innerHTML = '';
+
+  obGetStandardBadList().forEach(function(b) {
+    var hay = [b.name, b.dose, b.note, b.time].join(' ').toLowerCase();
+    if (q && hay.indexOf(q) < 0) return;
+    standard.push(b);
+  });
+
+  S.bad.forEach(function(b) {
+    var hay = [b.name, b.dose, b.note, b.time].join(' ').toLowerCase();
+    if (q && hay.indexOf(q) < 0) return;
+    if (b.custom || !defaultIds.has(b.id)) custom.push(b);
+  });
+
+  if (meta) {
+    meta.textContent = q
+      ? 'Выбрано: ' + STACK.length + ' · найдено: ' + (standard.length + custom.length)
+      : 'Выбрано: ' + STACK.length;
+  }
+
+  obAppendBadSection(el, 'Стандартные БАДы', standard, selected, q ? 'По запросу ничего не найдено в стандартной базе' : 'Стандартная база пока пуста');
+  if (custom.length || q) {
+    obAppendBadSection(el, 'Мои БАДы', custom, selected, q ? 'По запросу ничего не найдено среди ваших БАДов' : 'Вы ещё не добавляли свои БАДы');
+  }
 }
+
 
 
 function obSaveStack() {
@@ -2289,9 +3077,14 @@ function obFinish() {
   // Hide overlay
   var ovl = $('ob-overlay');
   if (ovl) {
-    ovl.style.opacity = '0';
     ovl.style.transition = 'opacity .4s';
-    setTimeout(function(){ ovl.style.display = 'none'; }, 400);
+    ovl.style.opacity = '0';
+    setTimeout(function(){
+      ovl.style.display = 'none';
+      // Reset for next time
+      var track = $('ob-track');
+      if (track) { track.style.transition='none'; track.style.transform='translateX(0)'; }
+    }, 400);
   }
   renderToday();
   updateGreeting();
@@ -2300,13 +3093,25 @@ function obFinish() {
 
 function checkOnboarding() {
   var done = ld('ob_done', false);
+  if (done) return; // fully completed
+  // Reset track to step 0
+  var track = $('ob-track');
+  if (track) track.style.transform = 'translateX(0)';
+  obSetDot(0);
+  // Pre-fill name if exists
   var p = getProfile();
-  if (done || p.name) return; // already onboarded
+  if (p.name) {
+    var nameEl = $('ob-name');
+    if (nameEl) { nameEl.value = p.name; obCheckStep0(); }
+    var dobEl = $('ob-dob');
+    if (dobEl && p.dob) dobEl.value = p.dob;
+  }
   var ovl = $('ob-overlay');
   if (ovl) {
     ovl.style.display = 'flex';
     ovl.style.opacity = '0';
-    setTimeout(function(){ ovl.style.opacity = '1'; ovl.style.transition = 'opacity .3s'; }, 10);
+    ovl.style.transition = 'opacity .3s';
+    setTimeout(function(){ ovl.style.opacity = '1'; }, 20);
   }
 }
 
@@ -2368,6 +3173,10 @@ function registerSW() {
 // ── NOTIFICATIONS ──
 var NOTIF_KEY = 'notif_settings_v1';
 
+function getNotificationApi() {
+  return typeof window !== 'undefined' && 'Notification' in window ? window.Notification : null;
+}
+
 function getNotifSettings() {
   return ld(NOTIF_KEY, {
     enabled: false,
@@ -2379,8 +3188,9 @@ function getNotifSettings() {
 
 function openNotifSettings() {
   var s = getNotifSettings();
-  var granted = Notification && Notification.permission === 'granted';
   var supported = 'Notification' in window;
+  var NotificationApi = getNotificationApi();
+  var granted = !!(NotificationApi && NotificationApi.permission === 'granted');
 
   openSheet('🔔 Уведомления',
     '<div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:14px">' +
@@ -2421,7 +3231,8 @@ function openNotifSettings() {
 function toggleNotif() {
   var sw = document.getElementById('notif-toggle');
   if (!sw) return;
-  var granted = Notification && Notification.permission === 'granted';
+  var NotificationApi = getNotificationApi();
+  var granted = !!(NotificationApi && NotificationApi.permission === 'granted');
   if (!granted && !sw.classList.contains('on')) {
     requestNotifPermission(); return;
   }
@@ -2451,7 +3262,8 @@ function saveNotifSettings() {
   };
   sv(NOTIF_KEY, s);
   closeSheet();
-  if (s.enabled && Notification.permission === 'granted') {
+  var NotificationApi = getNotificationApi();
+  if (s.enabled && NotificationApi && NotificationApi.permission === 'granted') {
     scheduleNotifications();
     toast('Уведомления настроены!');
   } else {
@@ -2461,7 +3273,8 @@ function saveNotifSettings() {
 
 function scheduleNotifications() {
   var s = getNotifSettings();
-  if (!s.enabled || Notification.permission !== 'granted') return;
+  var NotificationApi = getNotificationApi();
+  if (!s.enabled || !NotificationApi || NotificationApi.permission !== 'granted') return;
   // Clear old timers
   if (window._notifTimers) window._notifTimers.forEach(function(t){ clearTimeout(t); });
   window._notifTimers = [];
@@ -2586,7 +3399,8 @@ function initPWA() {
   registerSW();
   // Auto-schedule if already permitted
   var s = getNotifSettings();
-  if (s.enabled && Notification && Notification.permission === 'granted') {
+  var NotificationApi = getNotificationApi();
+  if (s.enabled && NotificationApi && NotificationApi.permission === 'granted') {
     scheduleNotifications();
   }
 }
@@ -2948,51 +3762,626 @@ checkOnboarding();
 initPWA();
 updateDLbl();
 // ai-today-lbl removed
-function openAddBad() {
-  var badOptions = S.bad.map(function(b){return '<option value="'+b.id+'">'+b.e+' '+b.name+'</option>';}).join('');
-  openSheet('Добавить БАД',
+
+function pickEmoji(e) {
+  var inp = $('ae');
+  if (inp) { inp.value = e; inp.style.fontSize = '28px'; inp.style.textAlign = 'center'; }
+  var lbl = $('ae-label');
+  if (lbl) lbl.textContent = BAD_EMOJI_LABELS[e] || e;
+  renderAddBadEmojiList(e);
+  // Highlight selected button
+  var wrap = $('emoji-picker');
+  if (wrap) {
+    wrap.querySelectorAll('button').forEach(function(b) {
+      b.style.borderColor = b.textContent.trim() === e ? 'var(--blue)' : 'transparent';
+      b.style.background  = b.textContent.trim() === e ? 'var(--blue-dim,#2AABEE18)' : 'none';
+    });
+  }
+}
+
+function cycleEmoji(step) {
+  var inp = $('ae');
+  if (!inp) return;
+  var current = (inp.value || '').trim() || '💊';
+  var idx = BAD_EMOJIS.indexOf(current);
+  if (idx < 0) idx = 0;
+  var next = (idx + step + BAD_EMOJIS.length) % BAD_EMOJIS.length;
+  pickEmoji(BAD_EMOJIS[next]);
+}
+
+var BAD_EMOJIS = [
+  '💊','🧴','🧪','⚡','💪','🌿','🍋','🍵','🐟','🦴',
+  '🔮','🌱','🪴','☀️','💎','🔥','🧠','❤️','🛡️','🌙',
+  '🥤','🍄','🫐','🥬','🧂','🧬','🔩','🩸'
+];
+
+var BAD_EMOJI_LABELS = {
+  '💊':'Капсула',
+  '🧴':'Бутылочка',
+  '🧪':'Пробирка',
+  '⚡':'Энергия',
+  '💪':'Сила',
+  '🌿':'Трава',
+  '🍋':'Витамин C',
+  '🍵':'Чай',
+  '🐟':'Омега-3',
+  '🦴':'Кости',
+  '🔮':'Магний',
+  '🌱':'Росток',
+  '🪴':'Растение',
+  '☀️':'Солнце',
+  '💎':'Коллаген',
+  '🔥':'Огонь',
+  '🧠':'Мозг',
+  '❤️':'Сердце',
+  '🛡️':'Защита',
+  '🌙':'Сон',
+  '🥤':'Напиток',
+  '🍄':'Гриб',
+  '🫐':'Ягоды',
+  '🥬':'Зелень',
+  '🧂':'Минералы',
+  '🧬':'Формула',
+  '🔩':'Железо',
+  '🩸':'Кровь'
+};
+
+function buildEmojiOptions(selected) {
+  return BAD_EMOJIS.map(function(emoji) {
+    var picked = emoji === selected ? ' selected' : '';
+    var label = BAD_EMOJI_LABELS[emoji] || emoji;
+    return '<option value="' + emoji + '"' + picked + '>' + label + '</option>';
+  }).join('');
+}
+
+function buildAddBadEmojiListHtml(selected) {
+  return BAD_EMOJIS.map(function(emoji) {
+    var active = emoji === selected;
+    var label = BAD_EMOJI_LABELS[emoji] || emoji;
+    return '<button type="button" onclick="pickEmoji(\'' + emoji + '\')" ' +
+      'style="border:1px solid ' + (active ? 'var(--blue)' : 'var(--line)') + ';background:' + (active ? 'var(--blue-dim,#2AABEE18)' : 'var(--bg3)') + ';color:' + (active ? 'var(--t1)' : 'var(--t2)') + ';border-radius:10px;padding:10px 12px;text-align:left;font-size:13px;cursor:pointer;font-family:inherit">' +
+      label + '</button>';
+  }).join('');
+}
+
+function renderAddBadEmojiList(selected) {
+  var list = $('ae-select-list');
+  if (!list) return;
+  list.innerHTML = buildAddBadEmojiListHtml(selected);
+}
+
+function ensureAddBadEmojiDropdown() {
+  var emojiInput = $('ae');
+  if (!emojiInput) return;
+  emojiInput.readOnly = true;
+  emojiInput.style.cursor = 'default';
+  var existing = $('ae-select-list');
+  var selected = (emojiInput.value || '').trim() || '💊';
+  if (!existing) {
+    var wrap = document.createElement('div');
+    wrap.id = 'ae-select-wrap';
+    wrap.style.marginTop = '8px';
+    wrap.innerHTML =
+      '<div style="font-size:12px;color:var(--t3);margin-bottom:6px">Список эмодзи</div>' +
+      '<div id="ae-label" style="background:var(--bg3);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--t1);margin-bottom:6px">' + (BAD_EMOJI_LABELS[selected] || selected) + '</div>' +
+      '<div id="ae-select-list" style="display:grid;grid-template-columns:1fr 1fr;gap:6px">' + buildAddBadEmojiListHtml(selected) + '</div>';
+    var host = emojiInput.parentElement;
+    if (host && host.parentElement) host.appendChild(wrap);
+    existing = $('ae-select-list');
+  }
+  renderAddBadEmojiList(selected);
+  var picker = $('emoji-picker');
+  if (picker && picker.parentElement) picker.parentElement.style.display = 'none';
+  emojiInput.onclick = null;
+}
+
+function renderEmojiPicker(selected) {
+  var wrap = $('emoji-picker');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  BAD_EMOJIS.forEach(function(emoji) {
+    var btn = document.createElement('button');
+    var active = emoji === selected;
+    btn.type = 'button';
+    btn.textContent = emoji;
+    btn.style.border = '1px solid ' + (active ? 'var(--blue)' : 'transparent');
+    btn.style.background = active ? 'var(--blue-dim,#2AABEE18)' : 'var(--bg3)';
+    btn.style.color = 'var(--t1)';
+    btn.style.borderRadius = '12px';
+    btn.style.height = '42px';
+    btn.style.fontSize = '22px';
+    btn.style.cursor = 'pointer';
+    btn.style.fontFamily = 'inherit';
+    btn.onclick = function() { pickEmoji(emoji); };
+    wrap.appendChild(btn);
+  });
+}
+
+var BAD_FORM_TEST_STATE = { mode: 'add', editId: null, emoji: '💊' };
+
+function getBadFormTestEditItem() {
+  var item = S.bad.find(function(b){ return b.id === 'emoji_test_bad'; });
+  if (!item) {
+    item = {
+      id: 'emoji_test_bad',
+      name: 'Тест БАД (эмодзи)',
+      e: '💊',
+      cat: 'vitamins',
+      dose: '1 капсула',
+      time: 'после еды',
+      syn: [],
+      con: [],
+      note: 'Тестовая запись для проверки формы',
+      custom: true,
+      cycleWeeks: null,
+      breakWeeks: null
+    };
+    S.bad.push(item);
+    sv('bad_v2', S.bad);
+  }
+  return item;
+}
+
+function ensureBadFormTestBlock() {
+  var scroll = $('s-base');
+  if (!scroll) return;
+  var block = $('bad-form-test-block');
+  if (!block) {
+    block = document.createElement('div');
+    block.id = 'bad-form-test-block';
+    block.className = 'card';
+    block.style.margin = '0 12px 8px';
+    var anchor = scroll.querySelector('.slbl');
+    if (anchor) scroll.insertBefore(block, anchor);
+    else scroll.appendChild(block);
+  }
+  renderBadFormTestBlock();
+}
+
+function renderBadFormTestBlock() {
+  var block = $('bad-form-test-block');
+  if (!block) return;
+  var item = S.bad.find(function(b){ return b.id === 'emoji_test_bad'; });
+  var status = item
+    ? '<div style="font-size:13px;color:var(--t2);margin-bottom:10px">Тестовая запись: <span style="color:var(--t1)">' + item.e + ' ' + item.name + '</span></div>'
+    : '<div style="font-size:13px;color:var(--t2);margin-bottom:10px">Тестовая запись ещё не создана</div>';
+  block.innerHTML =
+    '<div class="card-t">Тест формы БАД</div>' +
+    '<div style="font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:10px">Отдельная тестовая форма для проверки добавления, редактирования и выбора эмодзи.</div>' +
+    status +
+    '<div style="display:flex;gap:8px">' +
+      '<button class="btn btn-ghost btn-sm" style="flex:1;font-size:13px" onclick="openBadFormTest(\'add\')">Тест: добавить</button>' +
+      '<button class="btn btn-ghost btn-sm" style="flex:1;font-size:13px" onclick="openBadFormTest(\'edit\')">Тест: редактировать</button>' +
+    '</div>';
+}
+
+function openBadFormTest(mode) {
+  var item = mode === 'edit'
+    ? getBadFormTestEditItem()
+    : { name:'', e:'💊', cat:'vitamins', dose:'', time:'', note:'' };
+  BAD_FORM_TEST_STATE.mode = mode;
+  BAD_FORM_TEST_STATE.editId = mode === 'edit' ? item.id : null;
+  BAD_FORM_TEST_STATE.emoji = item.e || '💊';
+  var title = mode === 'edit' ? 'Тест: редактировать БАД' : 'Тест: добавить БАД';
+  var saveLabel = mode === 'edit' ? 'Сохранить тестовую правку' : 'Добавить тестовый БАД';
+  var emojiOptions = buildEmojiOptions(BAD_FORM_TEST_STATE.emoji);
+  var emojiGrid = BAD_EMOJIS.map(function(emoji) {
+    var active = emoji === BAD_FORM_TEST_STATE.emoji;
+    return '<button type="button" data-test-emoji="' + emoji + '" onclick="setBadTestEmoji(\'' + emoji + '\')" style="height:42px;border-radius:12px;border:1px solid ' + (active ? 'var(--blue)' : 'transparent') + ';background:' + (active ? 'var(--blue-dim,#2AABEE18)' : 'var(--bg3)') + ';color:var(--t1);font-size:22px;cursor:pointer;font-family:inherit">' + emoji + '</button>';
+  }).join('');
+  var html =
+    '<div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:10px">' +
+      '<div style="background:#2b5278;border-radius:8px;padding:10px 12px;font-size:12px;color:#90caf9;line-height:1.5">Тестовая форма. Здесь проверяем только механику эмодзи и режимы добавления/редактирования.</div>' +
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Название</div><input id="tbad-name" class="inp" value="' + (item.name || '') + '" placeholder="Название добавки"></div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+        '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Эмодзи</div><button type="button" id="tbad-emoji" onclick="cycleBadTestEmoji(1)" style="width:100%;height:56px;border:none;border-radius:12px;background:var(--bg3);color:var(--t1);font-size:28px;cursor:pointer">' + BAD_FORM_TEST_STATE.emoji + '</button><input id="tbad-emoji-input" type="hidden" value="' + BAD_FORM_TEST_STATE.emoji + '"></div>' +
+        '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Категория</div><select id="tbad-cat" class="inp"><option value="vitamins"' + (item.cat==='vitamins'?' selected':'') + '>Витамины</option><option value="minerals"' + (item.cat==='minerals'?' selected':'') + '>Минералы</option><option value="sport"' + (item.cat==='sport'?' selected':'') + '>Спорт</option><option value="adapto"' + (item.cat==='adapto'?' selected':'') + '>Адаптогены</option></select></div>' +
+      '</div>' +
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:6px">База эмодзи</div><div id="tbad-emoji-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">' + emojiGrid + '</div></div>' +
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:6px">Выпадающий список эмодзи</div><select id="tbad-emoji-select" class="inp" onchange="setBadTestEmoji(this.value)">' + emojiOptions + '</select></div>' +
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Дозировка</div><input id="tbad-dose" class="inp" value="' + (item.dose || '') + '" placeholder="напр. 2 капсулы"></div>' +
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Время приёма</div><input id="tbad-time" class="inp" value="' + (item.time || '') + '" placeholder="напр. утром"></div>' +
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Заметки</div><textarea id="tbad-note" class="inp" rows="2" placeholder="Особенности...">' + (item.note || '') + '</textarea></div>' +
+      '<button class="btn btn-blue" onclick="saveBadFormTest()">' + saveLabel + '</button>' +
+    '</div>';
+  openSheet(title, html);
+}
+
+function setBadTestEmoji(emoji) {
+  BAD_FORM_TEST_STATE.emoji = emoji;
+  var preview = $('tbad-emoji');
+  if (preview) preview.textContent = emoji;
+  var hidden = $('tbad-emoji-input');
+  if (hidden) hidden.value = emoji;
+  var select = $('tbad-emoji-select');
+  if (select) select.value = emoji;
+  var grid = $('tbad-emoji-grid');
+  if (!grid) return;
+  grid.querySelectorAll('[data-test-emoji]').forEach(function(btn) {
+    var active = btn.getAttribute('data-test-emoji') === emoji;
+    btn.style.borderColor = active ? 'var(--blue)' : 'transparent';
+    btn.style.background = active ? 'var(--blue-dim,#2AABEE18)' : 'var(--bg3)';
+  });
+}
+
+function cycleBadTestEmoji(step) {
+  var current = BAD_FORM_TEST_STATE.emoji || '💊';
+  var idx = BAD_EMOJIS.indexOf(current);
+  if (idx < 0) idx = 0;
+  var next = (idx + step + BAD_EMOJIS.length) % BAD_EMOJIS.length;
+  setBadTestEmoji(BAD_EMOJIS[next]);
+}
+
+function saveBadFormTest() {
+  var name = (($('tbad-name') || {}).value || '').trim();
+  if (!name) { toast('Введите название'); return; }
+  var emoji = (($('tbad-emoji-input') || {}).value || BAD_FORM_TEST_STATE.emoji || '💊').trim();
+  var data = {
+    name: name,
+    e: emoji || '💊',
+    cat: (($('tbad-cat') || {}).value || 'vitamins'),
+    dose: (($('tbad-dose') || {}).value || '—').trim() || '—',
+    time: (($('tbad-time') || {}).value || '—').trim() || '—',
+    note: (($('tbad-note') || {}).value || '').trim(),
+    custom: true,
+    syn: [],
+    con: [],
+    cycleWeeks: null,
+    breakWeeks: null
+  };
+  if (BAD_FORM_TEST_STATE.mode === 'edit' && BAD_FORM_TEST_STATE.editId) {
+    var item = S.bad.find(function(b){ return b.id === BAD_FORM_TEST_STATE.editId; });
+    if (!item) { toast('Тестовая запись не найдена'); return; }
+    item.name = data.name;
+    item.e = data.e;
+    item.cat = data.cat;
+    item.dose = data.dose;
+    item.time = data.time;
+    item.note = data.note;
+    sv('bad_v2', S.bad);
+    closeSheet();
+    renderBase();
+    renderBadFormTestBlock();
+    toast('Тестовая запись обновлена');
+    return;
+  }
+  S.bad.unshift({
+    id: 'test_' + Date.now(),
+    name: data.name,
+    e: data.e,
+    cat: data.cat,
+    dose: data.dose,
+    time: data.time,
+    note: data.note,
+    custom: true,
+    syn: [],
+    con: [],
+    cycleWeeks: null,
+    breakWeeks: null
+  });
+  sv('bad_v2', S.bad);
+  closeSheet();
+  renderBase();
+  renderBadFormTestBlock();
+  toast('Тестовый БАД добавлен');
+}
+
+var EMOJI_LAB_STATE = { mode: 'add', emoji: '💊', editId: 'emoji_lab_bad' };
+
+function openEmojiLab() {
+  EMOJI_LAB_STATE.mode = 'add';
+  go('emoji', null);
+}
+
+function getEmojiLabEditItem() {
+  var item = S.bad.find(function(b){ return b.id === EMOJI_LAB_STATE.editId; });
+  if (!item) {
+    item = {
+      id: EMOJI_LAB_STATE.editId,
+      name: 'Тест БАД экрана',
+      e: '💊',
+      cat: 'vitamins',
+      dose: '1 капсула',
+      time: 'утром',
+      note: 'Тестовая запись для отдельного экрана',
+      custom: true,
+      syn: [],
+      con: [],
+      cycleWeeks: null,
+      breakWeeks: null
+    };
+    S.bad.push(item);
+    sv('bad_v2', S.bad);
+  }
+  return item;
+}
+
+function setEmojiLabMode(mode, btn) {
+  EMOJI_LAB_STATE.mode = mode;
+  var addBtn = $('emoji-lab-add-btn');
+  var editBtn = $('emoji-lab-edit-btn');
+  if (addBtn) addBtn.classList.toggle('btn-blue', mode === 'add');
+  if (addBtn) addBtn.classList.toggle('btn-ghost', mode !== 'add');
+  if (editBtn) editBtn.classList.toggle('btn-blue', mode === 'edit');
+  if (editBtn) editBtn.classList.toggle('btn-ghost', mode !== 'edit');
+  renderEmojiLab();
+}
+
+function renderEmojiLab() {
+  if (EMOJI_LAB_STATE.mode !== 'edit' && EMOJI_LAB_STATE.mode !== 'add') EMOJI_LAB_STATE.mode = 'add';
+  var addBtn = $('emoji-lab-add-btn');
+  var editBtn = $('emoji-lab-edit-btn');
+  if (addBtn) addBtn.className = 'btn ' + (EMOJI_LAB_STATE.mode === 'add' ? 'btn-blue' : 'btn-ghost') + ' btn-sm';
+  if (editBtn) editBtn.className = 'btn ' + (EMOJI_LAB_STATE.mode === 'edit' ? 'btn-blue' : 'btn-ghost') + ' btn-sm';
+  var item = EMOJI_LAB_STATE.mode === 'edit'
+    ? getEmojiLabEditItem()
+    : { name:'', e:'💊', cat:'vitamins', dose:'', time:'', note:'' };
+  EMOJI_LAB_STATE.emoji = item.e || '💊';
+  var form = $('emoji-lab-form');
+  if (!form) return;
+  var title = EMOJI_LAB_STATE.mode === 'edit' ? 'Редактирование тестовой записи' : 'Добавление тестовой записи';
+  var saveLabel = EMOJI_LAB_STATE.mode === 'edit' ? 'Сохранить тестовую запись' : 'Добавить тестовую запись';
+  form.innerHTML =
+    '<div style="font-size:14px;font-weight:600;color:var(--t1);margin-bottom:12px">' + title + '</div>' +
+    '<div style="display:flex;flex-direction:column;gap:10px">' +
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Название</div><input id="emoji-lab-name" class="inp" value="' + (item.name || '') + '" placeholder="Название добавки"></div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+        '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Эмодзи</div><button type="button" id="emoji-lab-preview" style="width:100%;height:56px;border:none;border-radius:12px;background:var(--bg3);color:var(--t1);font-size:28px;cursor:pointer;font-family:inherit">' + EMOJI_LAB_STATE.emoji + '</button></div>' +
+        '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Категория</div><select id="emoji-lab-cat" class="inp"><option value="vitamins"' + (item.cat==='vitamins'?' selected':'') + '>Витамины</option><option value="minerals"' + (item.cat==='minerals'?' selected':'') + '>Минералы</option><option value="sport"' + (item.cat==='sport'?' selected':'') + '>Спорт</option><option value="adapto"' + (item.cat==='adapto'?' selected':'') + '>Адаптогены</option></select></div>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:56px 1fr 56px;gap:8px;align-items:center">' +
+        '<button class="btn btn-ghost" type="button" onclick="cycleEmojiLab(-1)" style="height:48px;padding:0;font-size:22px">←</button>' +
+        '<div id="emoji-lab-label" style="background:var(--bg3);border-radius:12px;padding:12px 14px;text-align:center;font-size:14px;color:var(--t1)">' + (BAD_EMOJI_LABELS[EMOJI_LAB_STATE.emoji] || EMOJI_LAB_STATE.emoji) + '</div>' +
+        '<button class="btn btn-ghost" type="button" onclick="cycleEmojiLab(1)" style="height:48px;padding:0;font-size:22px">→</button>' +
+      '</div>' +
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:6px">Выбор эмодзи</div><div id="emoji-lab-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px"></div></div>' +
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Дозировка</div><input id="emoji-lab-dose" class="inp" value="' + (item.dose || '') + '" placeholder="например 2 капсулы"></div>' +
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Время приёма</div><input id="emoji-lab-time" class="inp" value="' + (item.time || '') + '" placeholder="например утром"></div>' +
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Заметки</div><textarea id="emoji-lab-note" class="inp" rows="2" placeholder="Особенности...">' + (item.note || '') + '</textarea></div>' +
+      '<button class="btn btn-blue" onclick="saveEmojiLab()">' + saveLabel + '</button>' +
+    '</div>';
+  renderEmojiLabGrid();
+}
+
+function renderEmojiLabGrid() {
+  var grid = $('emoji-lab-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  BAD_EMOJIS.forEach(function(emoji) {
+    var btn = document.createElement('button');
+    var active = emoji === EMOJI_LAB_STATE.emoji;
+    btn.type = 'button';
+    btn.textContent = BAD_EMOJI_LABELS[emoji] || emoji;
+    btn.style.border = '1px solid ' + (active ? 'var(--blue)' : 'var(--line)');
+    btn.style.background = active ? 'var(--blue-dim,#2AABEE18)' : 'var(--bg3)';
+    btn.style.color = active ? 'var(--t1)' : 'var(--t2)';
+    btn.style.borderRadius = '10px';
+    btn.style.padding = '10px 12px';
+    btn.style.textAlign = 'left';
+    btn.style.fontSize = '13px';
+    btn.style.cursor = 'pointer';
+    btn.style.fontFamily = 'inherit';
+    btn.onclick = function() { setEmojiLabEmoji(emoji); };
+    grid.appendChild(btn);
+  });
+}
+
+function setEmojiLabEmoji(emoji) {
+  EMOJI_LAB_STATE.emoji = emoji;
+  var preview = $('emoji-lab-preview');
+  if (preview) preview.textContent = emoji;
+  var label = $('emoji-lab-label');
+  if (label) label.textContent = BAD_EMOJI_LABELS[emoji] || emoji;
+  renderEmojiLabGrid();
+}
+
+function cycleEmojiLab(step) {
+  var current = EMOJI_LAB_STATE.emoji || '💊';
+  var idx = BAD_EMOJIS.indexOf(current);
+  if (idx < 0) idx = 0;
+  var next = (idx + step + BAD_EMOJIS.length) % BAD_EMOJIS.length;
+  setEmojiLabEmoji(BAD_EMOJIS[next]);
+}
+
+function saveEmojiLab() {
+  var name = (($('emoji-lab-name') || {}).value || '').trim();
+  if (!name) { toast('Введите название'); return; }
+  var data = {
+    name: name,
+    e: EMOJI_LAB_STATE.emoji || '💊',
+    cat: (($('emoji-lab-cat') || {}).value || 'vitamins'),
+    dose: (($('emoji-lab-dose') || {}).value || '—').trim() || '—',
+    time: (($('emoji-lab-time') || {}).value || '—').trim() || '—',
+    note: (($('emoji-lab-note') || {}).value || '').trim()
+  };
+  if (EMOJI_LAB_STATE.mode === 'edit') {
+    var item = getEmojiLabEditItem();
+    item.name = data.name;
+    item.e = data.e;
+    item.cat = data.cat;
+    item.dose = data.dose;
+    item.time = data.time;
+    item.note = data.note;
+    sv('bad_v2', S.bad);
+    renderBase();
+    toast('Тестовая запись обновлена');
+    return;
+  }
+  S.bad.unshift({
+    id: 'emoji_lab_' + Date.now(),
+    name: data.name,
+    e: data.e,
+    cat: data.cat,
+    dose: data.dose,
+    time: data.time,
+    note: data.note,
+    custom: true,
+    syn: [],
+    con: [],
+    cycleWeeks: null,
+    breakWeeks: null
+  });
+  sv('bad_v2', S.bad);
+  renderBase();
+  toast('Тестовая запись добавлена');
+}
+
+var BAD_FORM_STABLE_LAST_TOGGLE = 0;
+
+function getBadRelationLabelStable(id) {
+  var b = S.bad.find(function(x){ return x.id === id; });
+  return b ? (b.e ? b.e + ' ' : '') + b.name : id;
+}
+
+function restoreBadFormRelationsStable(type, ids) {
+  var listEl = $(type + '-add-list');
+  var hiddenEl = $(type + '-add-hidden');
+  if (!listEl || !hiddenEl) return;
+  listEl.innerHTML = '';
+  hiddenEl.innerHTML = '';
+  (ids || []).forEach(function(id) {
+    addRelation(type, id, getBadRelationLabelStable(id));
+  });
+}
+
+function renderBadFormStable(draft) {
+  var emojis = (typeof BAD_EMOJIS !== 'undefined' && BAD_EMOJIS.length)
+    ? BAD_EMOJIS
+    : ['💊','🧴','🧪','⚡','💪','🌿','🍋','🍵','🐟','🦴','🔮','🌱','🧠','❤️','🛡️','🌙'];
+  var emojiNames = [
+    'Капсула','Бутылочка','Пробирка','Энергия',
+    'Сила','Трава','Витамин C','Чай',
+    'Омега-3','Кости','Минерал','Росток',
+    'Мозг','Сердце','Защита','Сон'
+  ];
+  function getEmojiLabelStable(emoji) {
+    var idx = emojis.indexOf(emoji);
+    if (idx >= 0 && emojiNames[idx]) return emojiNames[idx];
+    if (typeof BAD_EMOJI_LABELS !== 'undefined' && BAD_EMOJI_LABELS && BAD_EMOJI_LABELS[emoji]) return BAD_EMOJI_LABELS[emoji];
+    return emoji;
+  }
+  var badOptions = S.bad.map(function(b){ return '<option value="' + b.id + '">' + b.e + ' ' + b.name + '</option>'; }).join('');
+  var isEdit = draft.mode === 'edit' && draft.editId;
+  var currentEmoji = (draft.e || '💊').trim() || '💊';
+  var title = isEdit ? 'Редактировать БАД' : 'Добавить БАД';
+  var buttonHtml = isEdit
+    ? '<button class="btn btn-blue" onclick="updateBad(\'' + draft.editId + '\')">Сохранить изменения</button>'
+    : '<button class="btn btn-blue" onclick="saveNewBad()">Добавить в базу</button>';
+
+  openSheet(title,
     '<div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:10px">'+
-    '<div style="background:#2b5278;border-radius:8px;padding:10px 12px;font-size:12px;color:#90caf9;line-height:1.5">'+
-      '⚠️ <b style="color:#fff">Важно:</b> Персональная база. Данные справочные, не медицинская рекомендация.'+
-    '</div>'+
-    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Название</div><input id="an" class="inp" placeholder="Название добавки"></div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
-      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Эмодзи</div><input id="ae" class="inp" placeholder="💊" style="font-size:22px;text-align:center"></div>'+
-      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Категория</div>'+
-        '<select id="ac" class="inp"><option value="vitamins">Витамины</option><option value="minerals">Минералы</option><option value="sport">Спорт</option><option value="adapto">Адаптогены</option></select>'+
+      '<div style="background:#2b5278;border-radius:8px;padding:10px 12px;font-size:12px;color:#90caf9;line-height:1.5">'+
+        '⚠️ <b style="color:#fff">Важно:</b> Персональная база. Данные справочные, не медицинская рекомендация.'+
       '</div>'+
-    '</div>'+
-    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Дозировка</div><input id="ad" class="inp" placeholder="напр. 1000–4000 МЕ/день"></div>'+
-    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Время приёма</div><input id="at" class="inp" placeholder="напр. утром с едой"></div>'+
-    '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Заметки</div><textarea id="ano" class="inp" rows="2" placeholder="Особенности..."></textarea></div>'+
-    '<div style="border-top:1px solid var(--line);padding-top:10px">'+
-      '<div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:6px">🔗 Синергии</div>'+
-      '<select id="syn-add-sel" class="inp" style="margin-bottom:6px"><option value="">— Добавить синергию —</option>'+badOptions+'</select>'+
-      '<div id="syn-add-list" style="display:flex;gap:6px;flex-wrap:wrap;min-height:28px"></div>'+
-      '<div id="syn-add-hidden"></div>'+
-    '</div>'+
-    '<div>'+
-      '<div style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:6px">⛔ Конфликты</div>'+
-      '<select id="con-add-sel" class="inp" style="margin-bottom:6px"><option value="">— Добавить конфликт —</option>'+badOptions+'</select>'+
-      '<div id="con-add-list" style="display:flex;gap:6px;flex-wrap:wrap;min-height:28px"></div>'+
-      '<div id="con-add-hidden"></div>'+
-    '</div>'+
-    '<div style="border-top:1px solid var(--line);padding-top:10px">'+
-    '<div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:8px">🔄 Цикл приёма (необязательно)</div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">'+
-      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Приём (недель)</div>'+
-        '<input id="acw" class="inp" type="number" placeholder="напр. 6"></div>'+
-      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Перерыв (недель)</div>'+
-        '<input id="abw" class="inp" type="number" placeholder="напр. 3"></div>'+
-    '</div></div>'+
-    '<button class="btn btn-blue" onclick="saveNewBad()">Добавить в базу</button></div>'
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Название</div><input id="an" class="inp" placeholder="Название добавки"></div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
+        '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Эмодзи</div><input id="ae" class="inp" value="' + currentEmoji + '" readonly style="font-size:28px;text-align:center;cursor:pointer;user-select:none;-webkit-user-select:none"></div>'+
+        '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Категория</div>'+
+          '<select id="ac" class="inp"><option value="vitamins">Витамины</option><option value="minerals">Минералы</option><option value="sport">Спорт</option><option value="adapto">Адаптогены</option></select>'+
+        '</div>'+
+      '</div>'+
+      '<div id="emoji-picker-stable" style="display:none">'+
+        '<div style="font-size:12px;color:var(--t3);margin-bottom:6px">Список эмодзи</div>'+
+        '<div id="emoji-picker-stable-label" style="background:var(--bg3);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--t1);margin-bottom:6px">' + (currentEmoji + ' ' + getEmojiLabelStable(currentEmoji)) + '</div>'+
+        '<div id="emoji-picker-stable-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px"></div>'+
+      '</div>'+
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Дозировка</div><input id="ad" class="inp" placeholder="напр. 1000-4000 МЕ/день"></div>'+
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Время приёма</div><input id="at" class="inp" placeholder="напр. утром с едой"></div>'+
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Заметки</div><textarea id="ano" class="inp" rows="2" placeholder="Особенности..."></textarea></div>'+
+      '<div style="border-top:1px solid var(--line);padding-top:10px">'+
+        '<div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:6px">Синергии</div>'+
+        '<select id="syn-add-sel" class="inp" style="margin-bottom:6px"><option value="">- Добавить синергию -</option>' + badOptions + '</select>'+
+        '<div id="syn-add-list" style="display:flex;gap:6px;flex-wrap:wrap;min-height:28px"></div>'+
+        '<div id="syn-add-hidden"></div>'+
+      '</div>'+
+      '<div>'+
+        '<div style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:6px">Конфликты</div>'+
+        '<select id="con-add-sel" class="inp" style="margin-bottom:6px"><option value="">- Добавить конфликт -</option>' + badOptions + '</select>'+
+        '<div id="con-add-list" style="display:flex;gap:6px;flex-wrap:wrap;min-height:28px"></div>'+
+        '<div id="con-add-hidden"></div>'+
+      '</div>'+
+      '<div style="border-top:1px solid var(--line);padding-top:10px">'+
+        '<div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:8px">Цикл приёма (необязательно)</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">'+
+          '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Приём (недель)</div><input id="acw" class="inp" type="number" placeholder="напр. 8"></div>'+
+          '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Перерыв (недель)</div><input id="abw" class="inp" type="number" placeholder="напр. 4"></div>'+
+        '</div>'+
+      '</div>'+
+      buttonHtml +
+    '</div>'
   );
-  setTimeout(function() {
-    var ss=$('syn-add-sel');
-    if(ss) ss.onchange=function(){addRelation('syn',this.value,this.options[this.selectedIndex].text);this.value='';};
-    var cs=$('con-add-sel');
-    if(cs) cs.onchange=function(){addRelation('con',this.value,this.options[this.selectedIndex].text);this.value='';};
-  },100);
+
+  if ($('an')) $('an').value = draft.name || '';
+  if ($('ac')) $('ac').value = draft.cat || 'vitamins';
+  if ($('ad')) $('ad').value = draft.dose || '';
+  if ($('at')) $('at').value = draft.time || '';
+  if ($('ano')) $('ano').value = draft.note || '';
+  if ($('acw')) $('acw').value = draft.cycleWeeks || '';
+  if ($('abw')) $('abw').value = draft.breakWeeks || '';
+
+  wireAddBadRelations();
+  restoreBadFormRelationsStable('syn', draft.syn || []);
+  restoreBadFormRelationsStable('con', draft.con || []);
+
+  function renderEmojiGrid(selected) {
+    var grid = $('emoji-picker-stable-grid');
+    if (!grid) return;
+    grid.innerHTML = emojis.map(function(emoji, index) {
+      var active = emoji === selected;
+      return '<div data-emoji="' + emoji + '" style="border:1px solid ' + (active ? 'var(--blue)' : 'var(--line)') + ';background:' + (active ? 'var(--blue-dim,#2AABEE18)' : 'var(--bg3)') + ';color:' + (active ? 'var(--t1)' : 'var(--t2)') + ';border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.25;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;display:flex;align-items:center;gap:8px"><span style="font-size:16px;line-height:1">' + emoji + '</span><span>' + (emojiNames[index] || getEmojiLabelStable(emoji)) + '</span></div>';
+    }).join('');
+    Array.prototype.forEach.call(grid.querySelectorAll('[data-emoji]'), function(item) {
+      var emoji = item.getAttribute('data-emoji');
+      var choose = function(ev) {
+        if (ev && ev.preventDefault) ev.preventDefault();
+        if ($('ae')) $('ae').value = emoji;
+        if ($('emoji-picker-stable-label')) $('emoji-picker-stable-label').textContent = emoji + ' ' + getEmojiLabelStable(emoji);
+        renderEmojiGrid(emoji);
+        if ($('emoji-picker-stable')) $('emoji-picker-stable').style.display = 'none';
+      };
+      item.onclick = choose;
+      item.ontouchend = choose;
+    });
+  }
+
+  function toggleEmojiPickerStable(ev) {
+    if (ev && ev.preventDefault) ev.preventDefault();
+    var now = Date.now();
+    if (now - BAD_FORM_STABLE_LAST_TOGGLE < 250) return;
+    BAD_FORM_STABLE_LAST_TOGGLE = now;
+    var picker = $('emoji-picker-stable');
+    if (!picker) return;
+    var willOpen = picker.style.display === 'none' || !picker.style.display;
+    picker.style.display = willOpen ? 'block' : 'none';
+    if (willOpen) {
+      var selected = (($('ae') || {}).value || '💊').trim() || '💊';
+      renderEmojiGrid(selected);
+    }
+  }
+
+  renderEmojiGrid(currentEmoji);
+  if ($('emoji-picker-stable')) $('emoji-picker-stable').style.display = 'none';
+  if ($('ae')) {
+    $('ae').onclick = toggleEmojiPickerStable;
+    $('ae').ontouchend = toggleEmojiPickerStable;
+  }
+}
+
+function openAddBad() {
+  renderBadFormStable({
+    mode: 'add',
+    editId: null,
+    name: '',
+    e: '💊',
+    cat: 'vitamins',
+    dose: '',
+    time: '',
+    note: '',
+    cycleWeeks: '',
+    breakWeeks: '',
+    syn: [],
+    con: []
+  });
 }
 
 function addRelation(type, id, label) {
@@ -3302,11 +4691,13 @@ function renderStackEditorSheet() {
 }
 
 function removeStackItem(idx) {
+  var removed = STACK[idx];
+  if (!removed) return;
   if (!confirm('Убрать "' + (S.bad.find(function(x){return x.id===STACK[idx].id;})||{name:STACK[idx].id}).name + '" из стека?')) return;
   STACK.splice(idx, 1);
   saveStack();
   // Remove from taken
-  S.taken.delete(STACK[idx] && STACK[idx].id);
+  S.taken.delete(removed.id);
   sv('taken_v2', Array.from(S.taken));
   renderToday();
   renderStackEditorSheet(); // refresh sheet
@@ -3419,9 +4810,209 @@ function resetStack() {
 
 function resetOnboarding() {
   sv('ob_done', false);
+  // Reset track position before showing
+  var track = $('ob-track');
+  if (track) { track.style.transition = 'none'; track.style.transform = 'translateX(0)'; }
+  setTimeout(function(){ if (track) track.style.transition = 'transform .3s cubic-bezier(.4,0,.2,1)'; }, 50);
+  obSetDot(0);
   closeSheet();
   checkOnboarding();
 }
+
+function wireAddBadRelations() {
+  var ss = $('syn-add-sel');
+  if (ss) ss.onchange = function(){ addRelation('syn', this.value, this.options[this.selectedIndex].text); this.value=''; };
+  var cs = $('con-add-sel');
+  if (cs) cs.onchange = function(){ addRelation('con', this.value, this.options[this.selectedIndex].text); this.value=''; };
+}
+
+var BAD_FORM_DRAFT_CLEAN = null;
+var BAD_FORM_LAST_PICKER_TOGGLE = 0;
+
+function getBadRelationLabelClean(id) {
+  var b = S.bad.find(function(x){ return x.id === id; });
+  return b ? (b.e + ' ' + b.name) : id;
+}
+
+function restoreBadFormRelationsClean(type, ids) {
+  var listEl = $(type + '-add-list');
+  var hiddenEl = $(type + '-add-hidden');
+  if (!listEl || !hiddenEl) return;
+  listEl.innerHTML = '';
+  hiddenEl.innerHTML = '';
+  (ids || []).forEach(function(id) {
+    addRelation(type, id, getBadRelationLabelClean(id));
+  });
+}
+
+function applyBadFormDraftClean(draft) {
+  if (!draft) return;
+  if ($('an')) $('an').value = draft.name || '';
+  if ($('ae')) $('ae').value = draft.e || '??';
+  if ($('ac')) $('ac').value = draft.cat || 'vitamins';
+  if ($('ad')) $('ad').value = draft.dose || '';
+  if ($('at')) $('at').value = draft.time || '';
+  if ($('ano')) $('ano').value = draft.note || '';
+  if ($('acw')) $('acw').value = draft.cycleWeeks || '';
+  if ($('abw')) $('abw').value = draft.breakWeeks || '';
+  restoreBadFormRelationsClean('syn', draft.syn || []);
+  restoreBadFormRelationsClean('con', draft.con || []);
+}
+
+function buildBadFormEmojiPickerClean(selected) {
+  return BAD_EMOJIS.map(function(emoji) {
+    var active = emoji === selected;
+    return '<div class="emoji-item' + (active ? ' on' : '') + '" data-emoji="' + emoji + '" ' +
+      'style="border:1px solid ' + (active ? 'var(--blue)' : 'var(--line)') + ';background:' + (active ? 'var(--blue-dim,#2AABEE18)' : 'var(--bg3)') + ';color:' + (active ? 'var(--t1)' : 'var(--t2)') + ';border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.25;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation">' +
+      (BAD_EMOJI_LABELS[emoji] || emoji) + ' ' + emoji + '</div>';
+  }).join('');
+}
+
+function renderBadFormEmojiPickerClean(selected) {
+  var grid = $('emoji-picker-grid-clean');
+  if (!grid) return;
+  grid.innerHTML = buildBadFormEmojiPickerClean(selected);
+  Array.prototype.forEach.call(grid.querySelectorAll('.emoji-item'), function(item) {
+    var emoji = item.getAttribute('data-emoji');
+    item.onclick = function() { selectBadFormEmojiClean(emoji); };
+    item.ontouchend = function(ev) { ev.preventDefault(); selectBadFormEmojiClean(emoji); };
+  });
+}
+
+function setBadFormEmojiPickerOpenClean(open) {
+  var picker = $('emoji-picker-clean');
+  if (!picker) return;
+  picker.style.display = open ? 'block' : 'none';
+}
+
+function toggleBadFormEmojiPickerClean(ev) {
+  if (ev && ev.preventDefault) ev.preventDefault();
+  var now = Date.now();
+  if (now - BAD_FORM_LAST_PICKER_TOGGLE < 250) return;
+  BAD_FORM_LAST_PICKER_TOGGLE = now;
+  var picker = $('emoji-picker-clean');
+  if (!picker) return;
+  var willOpen = picker.style.display === 'none' || !picker.style.display;
+  setBadFormEmojiPickerOpenClean(willOpen);
+  if (willOpen) {
+    var current = (($('ae') || {}).value || '??').trim() || '??';
+    renderBadFormEmojiPickerClean(current);
+  }
+}
+
+function selectBadFormEmojiClean(emoji) {
+  var input = $('ae');
+  var label = $('emoji-picker-label-clean');
+  if (input) input.value = emoji;
+  if (label) label.textContent = (BAD_EMOJI_LABELS[emoji] || emoji) + ' ' + emoji;
+  if (BAD_FORM_DRAFT_CLEAN) BAD_FORM_DRAFT_CLEAN.e = emoji;
+  renderBadFormEmojiPickerClean(emoji);
+  setBadFormEmojiPickerOpenClean(false);
+}
+
+function renderBadFormClean(draft) {
+  BAD_FORM_DRAFT_CLEAN = draft;
+  var badOptions = S.bad.map(function(b){ return '<option value="'+b.id+'">'+b.e+' '+b.name+'</option>'; }).join('');
+  var isEdit = draft.mode === 'edit' && draft.editId;
+  var title = isEdit ? '������������� ���' : '�������� ���';
+  var action = isEdit ? '��������� ���������' : '�������� � ����';
+  var buttonHtml = isEdit
+    ? '<button class="btn btn-blue" onclick="updateBad(\'' + draft.editId + '\')">' + action + '</button>'
+    : '<button class="btn btn-blue" onclick="saveNewBad()">' + action + '</button>';
+
+  openSheet(title,
+    '<div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:10px">'+
+      '<div style="background:#2b5278;border-radius:8px;padding:10px 12px;font-size:12px;color:#90caf9;line-height:1.5">'+
+        '?? <b style="color:#fff">�����:</b> ������������ ����. ������ ����������, �� ����������� ������������.'+
+      '</div>'+
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">��������</div><input id="an" class="inp" placeholder="�������� �������"></div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+
+        '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">������</div><input id="ae" class="inp" value="' + (draft.e || '??') + '" readonly style="font-size:28px;text-align:center;cursor:pointer;user-select:none;-webkit-user-select:none"></div>'+
+        '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">���������</div>'+
+          '<select id="ac" class="inp"><option value="vitamins">��������</option><option value="minerals">��������</option><option value="sport">�����</option><option value="adapto">����������</option></select>'+
+        '</div>'+
+      '</div>'+
+      '<div id="emoji-picker-clean" style="display:none">'+
+        '<div style="font-size:12px;color:var(--t3);margin-bottom:6px">������ ������</div>'+
+        '<div id="emoji-picker-label-clean" style="background:var(--bg3);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--t1);margin-bottom:6px">' + ((BAD_EMOJI_LABELS[draft.e || '??'] || (draft.e || '??')) + ' ' + (draft.e || '??')) + '</div>'+
+        '<div id="emoji-picker-grid-clean" style="display:grid;grid-template-columns:1fr 1fr;gap:6px"></div>'+
+      '</div>'+
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">���������</div><input id="ad" class="inp" placeholder="����. 1000-4000 ��/����"></div>'+
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">����� �����</div><input id="at" class="inp" placeholder="����. ����� � ����"></div>'+
+      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">�������</div><textarea id="ano" class="inp" rows="2" placeholder="�����������..."></textarea></div>'+
+      '<div style="border-top:1px solid var(--line);padding-top:10px">'+
+        '<div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:6px">��������</div>'+
+        '<select id="syn-add-sel" class="inp" style="margin-bottom:6px"><option value="">- �������� �������� -</option>'+badOptions+'</select>'+
+        '<div id="syn-add-list" style="display:flex;gap:6px;flex-wrap:wrap;min-height:28px"></div>'+
+        '<div id="syn-add-hidden"></div>'+
+      '</div>'+
+      '<div>'+
+        '<div style="font-size:13px;font-weight:600;color:var(--red);margin-bottom:6px">���������</div>'+
+        '<select id="con-add-sel" class="inp" style="margin-bottom:6px"><option value="">- �������� �������� -</option>'+badOptions+'</select>'+
+        '<div id="con-add-list" style="display:flex;gap:6px;flex-wrap:wrap;min-height:28px"></div>'+
+        '<div id="con-add-hidden"></div>'+
+      '</div>'+
+      '<div style="border-top:1px solid var(--line);padding-top:10px">'+
+        '<div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:8px">���� ����� (�������������)</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">'+
+          '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">���� (������)</div><input id="acw" class="inp" type="number" placeholder="����. 6"></div>'+
+          '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">������� (������)</div><input id="abw" class="inp" type="number" placeholder="����. 3"></div>'+
+        '</div>'+
+      '</div>'+
+      buttonHtml +
+    '</div>'
+  );
+
+  wireAddBadRelations();
+  applyBadFormDraftClean(draft);
+  renderBadFormEmojiPickerClean(draft.e || '??');
+  setBadFormEmojiPickerOpenClean(false);
+  var emojiInput = $('ae');
+  if (emojiInput) {
+    emojiInput.onclick = toggleBadFormEmojiPickerClean;
+    emojiInput.ontouchend = toggleBadFormEmojiPickerClean;
+  }
+}
+
+pickEmoji = function(e) {
+  selectBadFormEmojiClean(e || '??');
+};
+
+openAddBad = function() {
+  renderBadFormClean({
+    mode: 'add',
+    editId: null,
+    name: '',
+    e: '??',
+    cat: 'vitamins',
+    dose: '',
+    time: '',
+    note: '',
+    cycleWeeks: '',
+    breakWeeks: '',
+    syn: [],
+    con: []
+  });
+};
+
+editBad = function(id) {
+  var b = S.bad.find(function(x){ return x.id===id; }); if(!b) return;
+  renderBadFormClean({
+    mode: 'edit',
+    editId: id,
+    name: b.name || '',
+    e: b.e || '??',
+    cat: b.cat || 'vitamins',
+    dose: b.dose || '',
+    time: b.time || '',
+    note: b.note || '',
+    cycleWeeks: b.cycleWeeks || '',
+    breakWeeks: b.breakWeeks || '',
+    syn: (b.syn || []).slice(),
+    con: (b.con || []).slice()
+  });
+};
 </script>
 </body>
 </html>
+
