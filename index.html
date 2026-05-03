@@ -960,6 +960,14 @@ canvas{display:block;width:100%!important}
 
         <!-- PROMPT BLOCK -->
         <div class="card" style="margin-top:8px">
+          <div class="card-t">Зачем нужен этот экран</div>
+          <div style="font-size:13px;color:var(--t2);line-height:1.6">
+            Здесь можно выгрузить ваш стек, базу БАД и параметры профиля для разбора в ИИ, получить структурированный ответ и вернуть полезные связи, синергии и рекомендации обратно в приложение.
+          </div>
+        </div>
+
+        <!-- PROMPT BLOCK -->
+        <div class="card" style="margin-top:8px">
           <div class="card-t">📋 Промт для ИИ</div>
           <div style="font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:12px">
             Скопируйте промт и вставьте в <b style="color:var(--t1)">Claude, ChatGPT, Gemini</b> или любой другой ИИ.
@@ -1421,12 +1429,76 @@ function hdAction() {
 function openSheet(title, html) {
   $('sh-title').textContent = title;
   $('sh-body').innerHTML = html;
+  $('sheet').style.transform = '';
   $('ovl').classList.add('on');
   $('sheet').classList.add('on');
 }
 function closeSheet() {
+  $('sheet').style.transform = '';
   $('ovl').classList.remove('on');
   $('sheet').classList.remove('on');
+}
+
+var SHEET_SWIPE_STATE = null;
+
+function initSheetSwipeClose() {
+  var sheet = $('sheet');
+  var body = $('sh-body');
+  if (!sheet || !body || sheet.dataset.swipeReady === '1') return;
+  sheet.dataset.swipeReady = '1';
+
+  function getPoint(ev) {
+    if (ev.touches && ev.touches[0]) return ev.touches[0];
+    if (ev.changedTouches && ev.changedTouches[0]) return ev.changedTouches[0];
+    return ev;
+  }
+
+  function resetSheetDrag() {
+    SHEET_SWIPE_STATE = null;
+    sheet.style.transition = '';
+    if (sheet.classList.contains('on')) sheet.style.transform = '';
+  }
+
+  sheet.addEventListener('touchstart', function(ev) {
+    if (!sheet.classList.contains('on')) return;
+    var point = getPoint(ev);
+    var target = ev.target;
+    var topZone = !!(target.closest('.sheet-handle') || target.closest('.sheet-title'));
+    var bodyAtTop = body.scrollTop <= 0;
+    if (!topZone && !bodyAtTop) return;
+    SHEET_SWIPE_STATE = {
+      startX: point.clientX,
+      startY: point.clientY,
+      dragging: false,
+      eligible: topZone || bodyAtTop
+    };
+  }, { passive: true });
+
+  sheet.addEventListener('touchmove', function(ev) {
+    if (!SHEET_SWIPE_STATE || !SHEET_SWIPE_STATE.eligible || !sheet.classList.contains('on')) return;
+    var point = getPoint(ev);
+    var dx = point.clientX - SHEET_SWIPE_STATE.startX;
+    var dy = point.clientY - SHEET_SWIPE_STATE.startY;
+    if (dy <= 0 || Math.abs(dx) > Math.abs(dy)) return;
+    if (!SHEET_SWIPE_STATE.dragging && dy < 12) return;
+    SHEET_SWIPE_STATE.dragging = true;
+    sheet.style.transition = 'none';
+    sheet.style.transform = 'translateX(-50%) translateY(' + Math.min(dy, 220) + 'px)';
+    ev.preventDefault();
+  }, { passive: false });
+
+  sheet.addEventListener('touchend', function(ev) {
+    if (!SHEET_SWIPE_STATE || !sheet.classList.contains('on')) return;
+    var point = getPoint(ev);
+    var dy = point.clientY - SHEET_SWIPE_STATE.startY;
+    var shouldClose = SHEET_SWIPE_STATE.dragging && dy > 90;
+    sheet.style.transition = '';
+    sheet.style.transform = '';
+    SHEET_SWIPE_STATE = null;
+    if (shouldClose) closeSheet();
+  }, { passive: true });
+
+  sheet.addEventListener('touchcancel', resetSheetDrag, { passive: true });
 }
 
 // ─────────────────────────────────────────────────
@@ -4115,6 +4187,7 @@ function dailyReset(){var today=fmt(new Date());if(localStorage.getItem('last_d'
 dailyReset();
 updateGreeting();
 renderToday();
+initSheetSwipeClose();
 initEntryExperience();
 initPWA();
 updateDLbl();
