@@ -486,6 +486,8 @@ canvas{display:block;width:100%!important}
         <div style="background:#2b5278;border-radius:10px;padding:10px 12px;font-size:12px;color:#90caf9;line-height:1.5;margin-bottom:12px">
           <b style="color:#fff">Стандартная база.</b> Сначала идут встроенные БАДы, ниже — ваши добавленные позиции.
         </div>
+        <div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Направления</div>
+        <div id="ob-goals" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div>
         <input id="ob-bad-search" class="inp" placeholder="Поиск по БАДам" style="font-size:15px;margin-bottom:12px" oninput="obRenderStackList()">
         <div id="ob-stack-meta" style="font-size:12px;color:var(--t3);margin-bottom:10px"></div>
         <div id="ob-stack-list" style="border-radius:10px;background:var(--bg2);margin-bottom:16px"></div>
@@ -525,7 +527,56 @@ canvas{display:block;width:100%!important}
   </div><!-- /ob-track-wrap -->
 </div><!-- /ob-overlay -->
 
+<div id="boot-overlay" style="display:none;position:fixed;inset:0;z-index:650;max-width:430px;margin:0 auto;background:rgba(9,17,23,.82);backdrop-filter:blur(18px);align-items:center;justify-content:center;padding:24px">
+  <div class="boot-card">
+    <div class="boot-logo">💊</div>
+    <div class="boot-title" id="boot-greet">Добро пожаловать</div>
+    <div class="boot-sub" id="boot-sub">Подготавливаем ваш стек, замеры и персональную базу.</div>
+    <div class="boot-progress"><div class="boot-progress-fill" id="boot-progress-fill"></div></div>
+    <div class="boot-dots">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</div>
+
 <style>
+.boot-card{
+  width:100%;
+  padding:28px 24px 24px;
+  border-radius:28px;
+  background:linear-gradient(180deg,#293d4cd9 0%,#1f2f3bd9 100%);
+  border:1px solid #ffffff12;
+  box-shadow:0 24px 54px #00000038,inset 0 1px 0 #ffffff10;
+  text-align:center;
+}
+.boot-logo{
+  width:76px;height:76px;border-radius:24px;margin:0 auto 18px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:34px;
+  background:linear-gradient(180deg,#5ab7ff 0%,#2d9de6 100%);
+  box-shadow:0 16px 32px #177fc934,inset 0 1px 0 #dff5ff55;
+  animation:bootPulse 1.2s ease-in-out infinite;
+}
+.boot-title{font-size:28px;font-weight:800;letter-spacing:-.03em;color:#f4f9fc}
+.boot-sub{margin-top:10px;font-size:14px;line-height:1.6;color:#adc0cf}
+.boot-progress{
+  margin-top:18px;height:10px;border-radius:999px;overflow:hidden;
+  background:#ffffff10;border:1px solid #ffffff0d;
+}
+.boot-progress-fill{
+  width:0;height:100%;border-radius:999px;
+  background:linear-gradient(90deg,#63bcff 0%,#90e9ff 60%,#65d89f 100%);
+  transition:width 1.1s cubic-bezier(.22,1,.36,1);
+}
+.boot-dots{display:flex;justify-content:center;gap:7px;margin-top:16px}
+.boot-dots span{
+  width:8px;height:8px;border-radius:50%;background:#8fd8ff88;
+  animation:bootBlink 1.2s ease-in-out infinite;
+}
+.boot-dots span:nth-child(2){animation-delay:.15s}
+.boot-dots span:nth-child(3){animation-delay:.3s}
+@keyframes bootPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes bootBlink{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
 .ob-dot{width:8px;height:8px;border-radius:50%;background:var(--bg3);transition:all .3s;flex-shrink:0}
 .ob-dot-active{background:var(--blue);width:24px;border-radius:4px}
 /* Toggle switch for onboarding */
@@ -864,6 +915,7 @@ canvas{display:block;width:100%!important}
           <button class="seg-b" onclick="baseCat('sport',this)">Спорт</button>
           <button class="seg-b" onclick="baseCat('adapto',this)">Адапто</button>
         </div>
+        <div id="base-goals" style="display:flex;gap:8px;flex-wrap:wrap;padding:0 12px 10px"></div>
 
         <!-- Import/Export base -->
         <div style="display:flex;gap:8px;padding:0 12px 8px">
@@ -1023,6 +1075,7 @@ const S = {
   off: 0,
   bad: ld('bad_v2', defaultBad()),
   bcat: 'all',
+  bgoal: 'all',
   synPicks: [],
   cfield: 'weight',
   wcField: 'cal',
@@ -1104,6 +1157,61 @@ function mergeDefaultBadDb(saved) {
 
 S.bad = mergeDefaultBadDb(S.bad);
 sv('bad_v2', S.bad);
+
+const BAD_GOALS = [
+  {id:'all', label:'Все'},
+  {id:'sleep', label:'Сон'},
+  {id:'energy', label:'Энергия'},
+  {id:'stress', label:'Стресс'},
+  {id:'training', label:'Тренировки'},
+  {id:'recovery', label:'Восстановление'},
+  {id:'joints', label:'Суставы'},
+  {id:'gut', label:'ЖКТ'},
+  {id:'focus', label:'Фокус'}
+];
+
+const BAD_GOAL_INDEX = {
+  sleep: ['mg','glycine','ltean','ashwa','bacopa','saffron'],
+  energy: ['d3','b12','folate','coq10','rhodiola','ginseng','eleuthero','cordyceps','iodine','iron'],
+  stress: ['mg','ltean','ashwa','glycine','bacopa','saffron','gotukola'],
+  training: ['creatine','whey','citrul','betaala','electro','taurine','cordyceps','leuzea','tribulus'],
+  recovery: ['omega3','coq10','mg','taurine','glycine','nac','curcumin','electro'],
+  joints: ['collagen','hond','vitc','d3','k2','calcium','boron','curcumin'],
+  gut: ['probiotic','psyllium','glutamine','nac'],
+  focus: ['b12','folate','bacopa','ltean','rhodiola','gotukola','cordyceps']
+};
+
+var obGoal = 'all';
+
+function getBadGoals(id) {
+  return BAD_GOALS
+    .filter(function(goal) {
+      return goal.id !== 'all' && (BAD_GOAL_INDEX[goal.id] || []).indexOf(id) >= 0;
+    })
+    .map(function(goal) { return goal.id; });
+}
+
+function badMatchesGoal(b, goal) {
+  if (!goal || goal === 'all') return true;
+  return getBadGoals(b.id).indexOf(goal) >= 0;
+}
+
+function badGoalText(id, limit) {
+  var labels = getBadGoals(id).map(function(goalId) {
+    var goal = BAD_GOALS.find(function(x){ return x.id === goalId; });
+    return goal ? goal.label : goalId;
+  });
+  if (limit && labels.length > limit) labels = labels.slice(0, limit);
+  return labels.join(' · ');
+}
+
+function renderGoalChips(targetId, activeGoal, handlerName) {
+  var el = $(targetId); if (!el) return;
+  el.innerHTML = BAD_GOALS.map(function(goal) {
+    var on = goal.id === activeGoal ? ' on' : '';
+    return '<button class="chip' + on + '" type="button" onclick="' + handlerName + '(\'' + goal.id + '\')">' + goal.label + '</button>';
+  }).join('');
+}
 
 // Default synergy rules
 const DEFAULT_SYN_RULES = [
@@ -1640,10 +1748,18 @@ function baseCat(cat, btn) {
   renderBase();
 }
 
+function baseGoal(goal) {
+  S.bgoal = goal;
+  renderGoalChips('base-goals', S.bgoal, 'baseGoal');
+  renderBase();
+}
+
 function renderBase() {
+  renderGoalChips('base-goals', S.bgoal, 'baseGoal');
   var q = ($('base-q')||{}).value&&($('base-q')||{}).value.toLowerCase()||'';
   var list = S.bad.filter(function(b) {
     if (S.bcat!=='all' && b.cat!==S.bcat) return false;
+    if (S.bgoal!=='all' && !badMatchesGoal(b, S.bgoal)) return false;
     if (q && !b.name.toLowerCase().includes(q) && !(b.note||'').toLowerCase().includes(q)) return false;
     return true;
   });
@@ -1669,6 +1785,7 @@ function renderBase() {
     var badge = inStack ? '<span style="position:absolute;bottom:0;right:0;width:14px;height:14px;border-radius:50%;background:var(--green);border:2px solid var(--bg);font-size:8px;display:flex;align-items:center;justify-content:center">✓</span>' : '';
     var counters = (mySynergies ? '<span style="color:var(--green);font-size:12px">✦'+mySynergies+'</span> ' : '') +
                    (myConflicts ? '<span style="color:var(--red);font-size:12px">⛔'+myConflicts+'</span>' : '');
+    var goalText = badGoalText(b.id, 2);
     var actions = '<div style="display:flex;align-items:center;gap:6px;margin-left:8px">'+
       '<button type="button" data-bad-action="edit" data-bad-id="'+b.id+'" title="Редактировать" style="width:30px;height:30px;border:none;border-radius:8px;background:var(--bg3);color:var(--t2);font-size:14px;cursor:pointer">✏️</button>'+
       '<button type="button" data-bad-action="delete" data-bad-id="'+b.id+'" title="Удалить" style="width:30px;height:30px;border:none;border-radius:8px;background:var(--bg3);color:var(--red);font-size:14px;cursor:pointer">🗑</button>'+
@@ -1679,7 +1796,7 @@ function renderBase() {
       '<div class="row-body">' +
         '<div class="row-top"><span class="row-name">'+b.name+(b.custom?' ✏️':'')+'</span>' +
         '<span class="row-time">'+counters+'</span></div>' +
-        '<div class="row-sub">'+b.dose+' · '+b.time+'</div>' +
+        '<div class="row-sub">'+b.dose+' · '+b.time+(goalText ? ' · '+goalText : '')+'</div>' +
       '</div>' +
       actions +
     '</div>';
@@ -1985,7 +2102,7 @@ function saveBody() {
   var i=S.body.findIndex(function(b){return b.date===e.date;});
   if(i>=0)S.body[i]=e;else S.body.unshift(e);
   S.body.sort(function(a,b){return b.ts-a.ts;});sv('body_v4',S.body);
-  ['bw','bf','bh','bwa','bch','bbi','bpu','bpl','bab','bpk','bri','bsteps'].forEach(function(id){$(id).value='';});
+  fillBodyFormFromEntry(e, true);
   renderBody();toast('Замеры сохранены!');
 }
 
@@ -1996,8 +2113,34 @@ function d_(c,p,f) {
   return '<span style="font-size:11px;color:'+(good?'var(--green)':'var(--red)')+'">'+( d>0?'+':'')+d.toFixed(1)+'</span>';
 }
 
+var BODY_FORM_FIELDS = [
+  {id:'bw', key:'weight'},
+  {id:'bf', key:'fat'},
+  {id:'bh', key:'height'},
+  {id:'bwa', key:'waist'},
+  {id:'bch', key:'chest'},
+  {id:'bbi', key:'bicep'},
+  {id:'bpu', key:'pushup'},
+  {id:'bpl', key:'pullup'},
+  {id:'bab', key:'abs'},
+  {id:'bpk', key:'plank'},
+  {id:'bri', key:'rings'},
+  {id:'bsteps', key:'steps'}
+];
+
+function fillBodyFormFromEntry(entry, force) {
+  if (!entry) return;
+  if (!force && document.activeElement && BODY_FORM_FIELDS.some(function(field){ return $(field.id) === document.activeElement; })) return;
+  BODY_FORM_FIELDS.forEach(function(field) {
+    var el = $(field.id);
+    if (!el) return;
+    el.value = entry[field.key] == null ? '' : entry[field.key];
+  });
+}
+
 function renderBody() {
   var lat=S.body[0];
+  fillBodyFormFromEntry(lat, false);
   var wb=$('whtr-blk');
   if(lat&&lat.waist&&lat.height){
     var wh=(lat.waist/lat.height).toFixed(3);
@@ -3098,6 +3241,12 @@ function obGetStandardBadList() {
   });
 }
 
+function obGoalFilterSet(goal) {
+  obGoal = goal;
+  renderGoalChips('ob-goals', obGoal, 'obGoalFilterSet');
+  obRenderStackList();
+}
+
 function obGuessStackSlot(timeText) {
   var time = String(timeText || '').toLowerCase();
   if (time.indexOf('вечер') >= 0 || time.indexOf('сном') >= 0) return 'evening';
@@ -3117,9 +3266,10 @@ function obMakeBadRow(b, selected) {
 
   var info = document.createElement('div');
   info.style.cssText = 'flex:1;min-width:0;margin-right:12px';
+  var goalText = badGoalText(b.id, 2);
   info.innerHTML =
     '<div style="font-size:14px;font-weight:500;color:var(--t1)">' + b.name + '</div>' +
-    '<div style="font-size:12px;color:var(--t2);margin-top:2px">' + b.dose + '</div>';
+    '<div style="font-size:12px;color:var(--t2);margin-top:2px">' + b.dose + (goalText ? ' · ' + goalText : '') + '</div>';
 
   var toggle = document.createElement('div');
   toggle.className = 'ob-toggle' + (isOn ? ' on' : '');
@@ -3181,6 +3331,7 @@ function obAppendBadSection(root, title, list, selected, emptyText) {
 function obRenderStackList() {
   var el = $('ob-stack-list'); if (!el) return;
   var meta = $('ob-stack-meta');
+  renderGoalChips('ob-goals', obGoal, 'obGoalFilterSet');
   var selected = new Set(STACK.map(function(s){ return s.id; }));
   var q = ((($('ob-bad-search') || {}).value) || '').trim().toLowerCase();
   var defaultIds = new Set(obDefaultBadIds());
@@ -3191,12 +3342,14 @@ function obRenderStackList() {
   obGetStandardBadList().forEach(function(b) {
     var hay = [b.name, b.dose, b.note, b.time].join(' ').toLowerCase();
     if (q && hay.indexOf(q) < 0) return;
+    if (obGoal !== 'all' && !badMatchesGoal(b, obGoal)) return;
     standard.push(b);
   });
 
   S.bad.forEach(function(b) {
     var hay = [b.name, b.dose, b.note, b.time].join(' ').toLowerCase();
     if (q && hay.indexOf(q) < 0) return;
+    if (obGoal !== 'all' && !badMatchesGoal(b, obGoal)) return;
     if (b.custom || !defaultIds.has(b.id)) custom.push(b);
   });
 
@@ -3284,6 +3437,39 @@ function checkOnboarding() {
     ovl.style.transition = 'opacity .3s';
     setTimeout(function(){ ovl.style.opacity = '1'; }, 20);
   }
+}
+
+function initEntryExperience() {
+  var boot = $('boot-overlay');
+  var next = function() { checkOnboarding(); };
+  if (!boot) { next(); return; }
+
+  var p = getProfile();
+  var h = new Date().getHours();
+  var hello = h < 6 ? 'Доброй ночи' : h < 12 ? 'Доброе утро' : h < 18 ? 'Добрый день' : 'Добрый вечер';
+  var greet = p.name ? (hello + ', ' + p.name) : 'Добро пожаловать в СтекАп';
+  var sub = p.name
+    ? 'Подготавливаем ваш стек, последние замеры и персональную базу.'
+    : 'Подготавливаем ваш стек, базу добавок и стартовый экран.';
+
+  if ($('boot-greet')) $('boot-greet').textContent = greet;
+  if ($('boot-sub')) $('boot-sub').textContent = sub;
+  if ($('boot-progress-fill')) $('boot-progress-fill').style.width = '0';
+
+  boot.style.display = 'flex';
+  boot.style.opacity = '1';
+  setTimeout(function() {
+    if ($('boot-progress-fill')) $('boot-progress-fill').style.width = '100%';
+  }, 40);
+
+  setTimeout(function() {
+    boot.style.transition = 'opacity .35s ease';
+    boot.style.opacity = '0';
+    setTimeout(function() {
+      boot.style.display = 'none';
+      next();
+    }, 360);
+  }, 1180);
 }
 
 
@@ -3929,7 +4115,7 @@ function dailyReset(){var today=fmt(new Date());if(localStorage.getItem('last_d'
 dailyReset();
 updateGreeting();
 renderToday();
-checkOnboarding();
+initEntryExperience();
 initPWA();
 updateDLbl();
 // ai-today-lbl removed
