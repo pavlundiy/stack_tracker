@@ -529,9 +529,11 @@ canvas{display:block;width:100%!important}
 
 <div id="boot-overlay" style="display:none;position:fixed;inset:0;z-index:650;max-width:430px;margin:0 auto;background:rgba(9,17,23,.82);backdrop-filter:blur(18px);align-items:center;justify-content:center;padding:24px">
   <div class="boot-card">
+    <div class="boot-kicker" id="boot-kicker">STACKUP • PERSONAL SYSTEM</div>
     <div class="boot-logo">💊</div>
     <div class="boot-title" id="boot-greet">Добро пожаловать</div>
     <div class="boot-sub" id="boot-sub">Подготавливаем ваш стек, замеры и персональную базу.</div>
+    <div class="boot-status" id="boot-status">Собираем ваш персональный контекст…</div>
     <div class="boot-progress"><div class="boot-progress-fill" id="boot-progress-fill"></div></div>
     <div class="boot-dots">
       <span></span><span></span><span></span>
@@ -542,41 +544,78 @@ canvas{display:block;width:100%!important}
 <style>
 .boot-card{
   width:100%;
-  padding:28px 24px 24px;
-  border-radius:28px;
-  background:linear-gradient(180deg,#293d4cd9 0%,#1f2f3bd9 100%);
-  border:1px solid #ffffff12;
-  box-shadow:0 24px 54px #00000038,inset 0 1px 0 #ffffff10;
+  padding:24px 24px 24px;
+  border-radius:32px;
+  background:
+    radial-gradient(circle at 18% 12%, #8de7ff18 0%, transparent 28%),
+    radial-gradient(circle at 82% 18%, #5ab7ff14 0%, transparent 22%),
+    linear-gradient(180deg,#314757e0 0%,#22323fdf 52%,#1a2731e4 100%);
+  border:1px solid #ffffff14;
+  box-shadow:0 28px 64px #00000042,inset 0 1px 0 #ffffff14;
   text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.boot-card::before{
+  content:'';
+  position:absolute;inset:0 auto auto 0;
+  width:100%;height:1px;
+  background:linear-gradient(90deg,transparent 0%,#dff6ff4f 50%,transparent 100%);
+  pointer-events:none;
+}
+.boot-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:#ffffff0b;
+  border:1px solid #ffffff10;
+  box-shadow:inset 0 1px 0 #ffffff10;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.12em;
+  color:#96dfff;
+  text-transform:uppercase;
 }
 .boot-logo{
-  width:76px;height:76px;border-radius:24px;margin:0 auto 18px;
+  width:82px;height:82px;border-radius:26px;margin:18px auto 18px;
   display:flex;align-items:center;justify-content:center;
-  font-size:34px;
-  background:linear-gradient(180deg,#5ab7ff 0%,#2d9de6 100%);
-  box-shadow:0 16px 32px #177fc934,inset 0 1px 0 #dff5ff55;
-  animation:bootPulse 1.2s ease-in-out infinite;
+  font-size:36px;
+  background:
+    radial-gradient(circle at 30% 26%, #dff5ff66 0%, transparent 24%),
+    linear-gradient(180deg,#74c6ff 0%,#2c9ce4 100%);
+  box-shadow:0 18px 36px #177fc938,inset 0 1px 0 #effbff66;
+  animation:bootPulse 1.65s cubic-bezier(.4,0,.2,1) infinite;
 }
-.boot-title{font-size:28px;font-weight:800;letter-spacing:-.03em;color:#f4f9fc}
-.boot-sub{margin-top:10px;font-size:14px;line-height:1.6;color:#adc0cf}
+.boot-title{font-size:31px;font-weight:800;letter-spacing:-.04em;color:#f4f9fc;line-height:1.02}
+.boot-sub{margin-top:10px;font-size:14px;line-height:1.6;color:#b6c7d4;max-width:290px;margin-left:auto;margin-right:auto}
+.boot-status{
+  margin-top:12px;
+  font-size:12px;
+  color:#93d7fb;
+  letter-spacing:.02em;
+}
 .boot-progress{
   margin-top:18px;height:10px;border-radius:999px;overflow:hidden;
-  background:#ffffff10;border:1px solid #ffffff0d;
+  background:#ffffff10;border:1px solid #ffffff10;
+  box-shadow:inset 0 1px 0 #ffffff0c;
 }
 .boot-progress-fill{
   width:0;height:100%;border-radius:999px;
-  background:linear-gradient(90deg,#63bcff 0%,#90e9ff 60%,#65d89f 100%);
-  transition:width 1.1s cubic-bezier(.22,1,.36,1);
+  background:linear-gradient(90deg,#70c7ff 0%,#9cedff 56%,#6bdba5 100%);
+  box-shadow:0 0 16px #7fe6ff55;
+  transition:width 1.35s cubic-bezier(.22,1,.36,1);
 }
-.boot-dots{display:flex;justify-content:center;gap:7px;margin-top:16px}
+.boot-dots{display:flex;justify-content:center;gap:7px;margin-top:18px}
 .boot-dots span{
   width:8px;height:8px;border-radius:50%;background:#8fd8ff88;
-  animation:bootBlink 1.2s ease-in-out infinite;
+  animation:bootBlink 1.35s ease-in-out infinite;
 }
 .boot-dots span:nth-child(2){animation-delay:.15s}
 .boot-dots span:nth-child(3){animation-delay:.3s}
-@keyframes bootPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
-@keyframes bootBlink{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
+@keyframes bootPulse{0%,100%{transform:scale(1) rotate(0deg)}50%{transform:scale(1.035) rotate(-1.5deg)}}
+@keyframes bootBlink{0%,80%,100%{opacity:.22;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}
 .ob-dot{width:8px;height:8px;border-radius:50%;background:var(--bg3);transition:all .3s;flex-shrink:0}
 .ob-dot-active{background:var(--blue);width:24px;border-radius:4px}
 /* Toggle switch for onboarding */
@@ -3521,27 +3560,38 @@ function initEntryExperience() {
   var hello = h < 6 ? 'Доброй ночи' : h < 12 ? 'Доброе утро' : h < 18 ? 'Добрый день' : 'Добрый вечер';
   var greet = p.name ? (hello + ', ' + p.name) : 'Добро пожаловать в СтекАп';
   var sub = p.name
-    ? 'Подготавливаем ваш стек, последние замеры и персональную базу.'
-    : 'Подготавливаем ваш стек, базу добавок и стартовый экран.';
+    ? 'Подготавливаем ваш стек, последние замеры и персональную базу добавок.'
+    : 'Подготавливаем персональный трекер, базу добавок и стартовый контекст.';
+  var status = p.name
+    ? 'Собираем стек, замеры и связи между добавками…'
+    : 'Настраиваем ваше пространство для старта…';
 
   if ($('boot-greet')) $('boot-greet').textContent = greet;
   if ($('boot-sub')) $('boot-sub').textContent = sub;
+  if ($('boot-status')) $('boot-status').textContent = status;
+  if ($('boot-kicker')) $('boot-kicker').textContent = p.name ? 'STACKUP • PERSONAL SYSTEM' : 'STACKUP • WELCOME';
   if ($('boot-progress-fill')) $('boot-progress-fill').style.width = '0';
 
   boot.style.display = 'flex';
   boot.style.opacity = '1';
+  boot.style.transition = 'opacity .42s ease';
   setTimeout(function() {
     if ($('boot-progress-fill')) $('boot-progress-fill').style.width = '100%';
   }, 40);
 
   setTimeout(function() {
-    boot.style.transition = 'opacity .35s ease';
+    if ($('boot-status')) $('boot-status').textContent = p.name
+      ? 'Всё почти готово. Открываем ваш персональный экран…'
+      : 'Почти готово. Открываем приложение…';
+  }, 760);
+
+  setTimeout(function() {
     boot.style.opacity = '0';
     setTimeout(function() {
       boot.style.display = 'none';
       next();
     }, 360);
-  }, 1180);
+  }, 1520);
 }
 
 
