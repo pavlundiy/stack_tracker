@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="СтекАп">
 <meta name="theme-color" content="#212121">
-<meta name="description" content="Персональный трекер БАД, дневник самочувствия и ИИ-анализ">
+<meta name="description" content="СтекАп помогает собрать персональный стек БАДов, отслеживать самочувствие и разбирать синергии с помощью ИИ.">
 <link rel="manifest" id="pwa-manifest">
 <link rel="apple-touch-icon" id="pwa-icon-link">
 <style>
@@ -226,11 +226,90 @@ html,body{height:100%;background:
 /* ── CHIPS ── */
 .chips{display:flex;gap:8px;flex-wrap:wrap}
 .chip{
-  padding:9px 16px;border-radius:999px;font-size:14px;font-weight:600;background:#ffffff0b;color:var(--t2);
-  border:1px solid #ffffff10;font-family:inherit;cursor:pointer;transition:all .15s;box-shadow:inset 0 1px 0 #ffffff0c
+  position:relative;overflow:hidden;
+  padding:9px 16px;border-radius:999px;font-size:14px;font-weight:600;background:linear-gradient(180deg,#304352c7 0%,#293a47c7 100%);color:var(--t2);
+  border:1px solid #ffffff12;font-family:inherit;cursor:pointer;transition:transform .18s, background .18s, border-color .18s, box-shadow .18s, color .18s;box-shadow:inset 0 1px 0 #ffffff0d
 }
-.chip.on{background:linear-gradient(180deg,#2b4354 0%,#223543 100%);color:#eef8ff;box-shadow:inset 0 1px 0 #ffffff12,0 8px 16px #08121a26}
-.chip:active{opacity:.9;transform:translateY(1px)}
+.chip::after{
+  content:'';
+  position:absolute;inset:1px auto 1px 1px;width:34%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#ffffff1a 0%,transparent 100%);
+  opacity:.55;pointer-events:none
+}
+.chip.on{
+  color:#f7fbff;
+  transform:translateY(-1px);
+  border-color:#6fd0ff40;
+  box-shadow:inset 0 1px 0 #ffffff1c,0 10px 22px #08121a34,0 0 0 1px #7fdbff10
+}
+.chip.on::before{
+  content:'';
+  position:absolute;left:12px;right:12px;bottom:-7px;height:14px;
+  border-radius:999px;
+  background:radial-gradient(closest-side,#79d5ff42 0%,transparent 100%);
+  pointer-events:none;filter:blur(4px)
+}
+.chip:active{opacity:.96;transform:translateY(1px) scale(.99)}
+
+.goal-chip{
+  min-height:40px;
+  padding:10px 18px;
+  font-weight:700;
+  letter-spacing:-.01em;
+}
+.goal-chip.on{
+  color:#fbfeff;
+}
+.goal-chip-main.on{
+  background:linear-gradient(180deg,#40586a 0%,#314757 42%,#263947 100%);
+  border-color:#8ce0ff66;
+  box-shadow:inset 0 1px 0 #ffffff22,0 12px 24px #0e25314f,0 0 0 1px #8ee4ff18;
+}
+.goal-chip-main.on::before{
+  background:radial-gradient(closest-side,#8be6ff52 0%,transparent 100%);
+}
+.goal-chip-extra.on{
+  background:linear-gradient(180deg,#5b5140 0%,#443c2f 42%,#373026 100%);
+  border-color:#ffc76f54;
+  box-shadow:inset 0 1px 0 #ffffff1e,0 12px 24px #2b21144c,0 0 0 1px #ffd89110;
+}
+.goal-chip-extra.on::before{
+  background:radial-gradient(closest-side,#ffca6f4d 0%,transparent 100%);
+}
+
+#c-energy .chip.on,
+#ob-c-energy .chip.on{
+  background:linear-gradient(180deg,#3b5262 0%,#2f4351 42%,#243744 100%);
+  border-color:#7ed7ff52;
+  box-shadow:inset 0 1px 0 #ffffff20,0 10px 22px #0f243148,0 0 0 1px #8ee4ff14
+}
+#c-sleep .chip.on,
+#ob-c-sleep .chip.on{
+  background:linear-gradient(180deg,#46486b 0%,#343756 42%,#292f48 100%);
+  border-color:#a9a2ff4f;
+  box-shadow:inset 0 1px 0 #ffffff1b,0 10px 22px #17192f4a,0 0 0 1px #bcb2ff12
+}
+#c-sleep .chip.on::before,
+#ob-c-sleep .chip.on::before{
+  background:radial-gradient(closest-side,#aea6ff45 0%,transparent 100%)
+}
+#c-mood .chip.on{
+  background:linear-gradient(180deg,#5a4564 0%,#44334e 42%,#37293e 100%);
+  border-color:#ff9ad55a;
+  box-shadow:inset 0 1px 0 #ffffff1c,0 10px 22px #2817254a,0 0 0 1px #ffb4df12
+}
+#c-mood .chip.on::before{
+  background:radial-gradient(closest-side,#ff9fd74a 0%,transparent 100%)
+}
+#c-workout .chip.on{
+  background:linear-gradient(180deg,#5c4a39 0%,#463729 42%,#392d22 100%);
+  border-color:#ffbf6a5c;
+  box-shadow:inset 0 1px 0 #ffffff1a,0 10px 22px #2d1f144d,0 0 0 1px #ffcc8510
+}
+#c-workout .chip.on::before{
+  background:radial-gradient(closest-side,#ffc2664a 0%,transparent 100%)
+}
 
 /* ── INPUTS ── */
 .inp{
@@ -240,7 +319,17 @@ html,body{height:100%;background:
 }
 .inp:focus{background:linear-gradient(180deg,#385062c4 0%,#304653ca 100%);border-color:#5ab7ff55;box-shadow:0 0 0 3px #5ab7ff16,inset 0 1px 0 #ffffff14}
 .inp::placeholder{color:#88a0b2}
-select.inp{-webkit-appearance:none;appearance:none}
+select.inp{
+  -webkit-appearance:none;appearance:none;
+  color-scheme:dark;
+  background-color:var(--bg3);
+  color:var(--t1);
+}
+select.inp option,
+select.inp optgroup{
+  background:#243544;
+  color:#f5fbff;
+}
 textarea.inp{resize:none}
 
 /* ── BUTTONS ── */
@@ -470,7 +559,7 @@ canvas{display:block;width:100%!important}
         <div style="text-align:center;margin-bottom:28px">
           <div style="font-size:56px;margin-bottom:12px">💊</div>
           <div style="font-size:24px;font-weight:700;color:var(--t1);margin-bottom:8px">Добро пожаловать<br>в СтекАп</div>
-          <div style="font-size:14px;color:var(--t2);line-height:1.6">Персональный трекер БАД, дневник самочувствия и ИИ-анализ</div>
+          <div style="font-size:14px;color:var(--t2);line-height:1.6">Соберите персональный стек БАДов под свои цели, самочувствие и ритм жизни.</div>
         </div>
         <div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Как вас зовут?</div>
         <input id="ob-name" class="inp" placeholder="Введите имя" style="font-size:16px;margin-bottom:16px" oninput="obCheckStep0()">
@@ -482,7 +571,7 @@ canvas{display:block;width:100%!important}
       <!-- STEP 1: Choose stack -->
       <div style="width:33.333%;flex-shrink:0;overflow-y:auto;padding:24px 24px 0" id="ob-step-1-inner">
         <div style="font-size:22px;font-weight:700;color:var(--t1);margin-bottom:6px">Выберите свои БАДы</div>
-        <div style="font-size:14px;color:var(--t2);line-height:1.5;margin-bottom:12px">Используйте стандартный список и включайте тумблером то, что уже принимаете. Это сразу станет вашим стеком.</div>
+        <div style="font-size:14px;color:var(--t2);line-height:1.5;margin-bottom:12px">Используйте стандартный список и включайте тумблером то, что уже принимаете. Так вы быстро соберёте свой персональный стек.</div>
         <div style="background:#2b5278;border-radius:10px;padding:10px 12px;font-size:12px;color:#90caf9;line-height:1.5;margin-bottom:12px">
           <b style="color:#fff">Стандартная база.</b> Сначала идут встроенные БАДы, ниже — ваши добавленные позиции.
         </div>
@@ -532,8 +621,8 @@ canvas{display:block;width:100%!important}
     <div class="boot-kicker" id="boot-kicker">STACKUP • PERSONAL SYSTEM</div>
     <div class="boot-logo">💊</div>
     <div class="boot-title" id="boot-greet">Добро пожаловать</div>
-    <div class="boot-sub" id="boot-sub">Подготавливаем ваш стек, замеры и персональную базу.</div>
-    <div class="boot-status" id="boot-status">Собираем ваш персональный контекст…</div>
+    <div class="boot-sub" id="boot-sub">Собираем персональный стек, замеры и базу добавок под ваши цели.</div>
+    <div class="boot-status" id="boot-status">Настраиваем вашу систему приёма и наблюдений…</div>
     <div class="boot-progress"><div class="boot-progress-fill" id="boot-progress-fill"></div></div>
     <div class="boot-dots">
       <span></span><span></span><span></span>
@@ -658,7 +747,7 @@ canvas{display:block;width:100%!important}
       <div class="hd-title" id="hd-title">СтекАп</div>
       <div class="hd-sub" id="hd-sub">мой стек</div>
     </div>
-    <button class="hd-btn" onclick="openProfile()" title="Профиль">👤</button>
+    <button class="hd-btn" onclick="openProfileScreen()" title="Профиль">👤</button>
     <button class="hd-btn" id="hd-btn2" onclick="hdAction()">⋮</button>
   </div>
 
@@ -737,33 +826,33 @@ canvas{display:block;width:100%!important}
           <div style="margin-bottom:12px">
             <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:8px">ЭНЕРГИЯ</div>
             <div class="chips" id="c-energy">
-              <button class="chip" onclick="pickChip('energy',1,this)">😴 Низкая</button>
-              <button class="chip" onclick="pickChip('energy',2,this)">⚡ Норм</button>
-              <button class="chip" onclick="pickChip('energy',3,this)">🚀 Высокая</button>
+              <button type="button" class="chip" onclick="pickChip('energy',1,this,event)">😴 Низкая</button>
+              <button type="button" class="chip" onclick="pickChip('energy',2,this,event)">⚡ Норм</button>
+              <button type="button" class="chip" onclick="pickChip('energy',3,this,event)">🚀 Высокая</button>
             </div>
           </div>
           <div style="margin-bottom:12px">
             <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:8px">СОН</div>
             <div class="chips" id="c-sleep">
-              <button class="chip" onclick="pickChip('sleep',1,this)">😫 Плохой</button>
-              <button class="chip" onclick="pickChip('sleep',2,this)">😐 Средний</button>
-              <button class="chip" onclick="pickChip('sleep',3,this)">😴 Хороший</button>
+              <button type="button" class="chip" onclick="pickChip('sleep',1,this,event)">😫 Плохой</button>
+              <button type="button" class="chip" onclick="pickChip('sleep',2,this,event)">😐 Средний</button>
+              <button type="button" class="chip" onclick="pickChip('sleep',3,this,event)">😴 Хороший</button>
             </div>
           </div>
           <div style="margin-bottom:12px">
             <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:8px">НАСТРОЙ</div>
             <div class="chips" id="c-mood">
-              <button class="chip" onclick="pickChip('mood',1,this)">😞 Плохо</button>
-              <button class="chip" onclick="pickChip('mood',2,this)">😊 Норм</button>
-              <button class="chip" onclick="pickChip('mood',3,this)">😄 Отлично</button>
+              <button type="button" class="chip" onclick="pickChip('mood',1,this,event)">😞 Плохо</button>
+              <button type="button" class="chip" onclick="pickChip('mood',2,this,event)">😊 Норм</button>
+              <button type="button" class="chip" onclick="pickChip('mood',3,this,event)">😄 Отлично</button>
             </div>
           </div>
           <div style="margin-bottom:12px">
             <div style="font-size:12px;color:var(--t3);font-weight:600;margin-bottom:8px">ТРЕНИРОВКА</div>
             <div class="chips" id="c-workout">
-              <button class="chip" onclick="pickChip('workout',0,this)">— Нет</button>
-              <button class="chip" onclick="pickChip('workout',1,this)">💪 Была</button>
-              <button class="chip" onclick="pickChip('workout',2,this)">🔥 Огонь</button>
+              <button type="button" class="chip" onclick="pickChip('workout',0,this,event)">— Нет</button>
+              <button type="button" class="chip" onclick="pickChip('workout',1,this,event)">💪 Была</button>
+              <button type="button" class="chip" onclick="pickChip('workout',2,this,event)">🔥 Огонь</button>
             </div>
           </div>
 
@@ -868,7 +957,7 @@ canvas{display:block;width:100%!important}
             <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Подтягивания</div><input class="inp" id="bpl" type="number" placeholder="8"></div>
             <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Пресс (повт)</div><input class="inp" id="bab" type="number" placeholder="40"></div>
             <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Планка (сек)</div><input class="inp" id="bpk" type="number" placeholder="60"></div>
-            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Кольца ТРХ</div><input class="inp" id="bri" type="number" placeholder="15"></div>
+            <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Кольца TRX</div><input class="inp" id="bri" type="number" placeholder="15"></div>
           <div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Шаги за день 👟</div><input class="inp" id="bsteps" type="number" placeholder="8000"></div>
           </div>
           <button class="btn btn-blue" onclick="saveBody()">Сохранить замеры</button>
@@ -1001,7 +1090,7 @@ canvas{display:block;width:100%!important}
         <div class="card" style="margin-top:8px">
           <div class="card-t">Зачем нужен этот экран</div>
           <div style="font-size:13px;color:var(--t2);line-height:1.6">
-            Здесь можно выгрузить ваш стек, базу БАД и параметры профиля для разбора в ИИ, получить структурированный ответ и вернуть полезные связи, синергии и рекомендации обратно в приложение.
+            Этот экран помогает получить более осмысленный разбор вашего стека. Вы выгружаете базу БАД, цели и профиль в ИИ, а затем возвращаете в приложение структурированный ответ с синергиями, временем приёма и пояснениями. Это рекомендательный инструмент, а не назначение врача.
           </div>
         </div>
 
@@ -1009,8 +1098,8 @@ canvas{display:block;width:100%!important}
         <div class="card" style="margin-top:8px">
           <div class="card-t">📋 Промт для ИИ</div>
           <div style="font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:12px">
-            Скопируйте промт и вставьте в <b style="color:var(--t1)">Claude, ChatGPT, Gemini</b> или любой другой ИИ.
-            Затем вставьте ответ ниже — он сохранится в дневнике разборов.
+            Скопируйте промт и вставьте в <b style="color:var(--t1)">Claude, ChatGPT, Gemini</b> или другой ИИ.
+            Попросите вернуть ответ строго в JSON, затем вставьте его ниже и проверьте изменения перед импортом.
           </div>
           <div style="background:var(--bg3);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--t3);max-height:80px;overflow:hidden;margin-bottom:10px;line-height:1.5" id="ai-prompt-preview">Нажмите кнопку для генерации промта...</div>
           <button class="btn btn-blue" onclick="copyPrompt()" id="ai-copy-btn">📋 Скопировать промт</button>
@@ -1019,23 +1108,34 @@ canvas{display:block;width:100%!important}
         <div class="card">
           <div class="card-t">🧬 База БАД → ИИ</div>
           <div style="font-size:13px;color:var(--t2);line-height:1.5;margin-bottom:12px">
-            Выгрузите базу БАД, синергии, конфликты, цикл приёма и параметры профиля в JSON для ИИ. Затем импортируйте обратно только структурированный JSON-ответ ИИ с предпросмотром изменений.
+            Выгрузите базу БАД, синергии, конфликты, цикл приёма и параметры профиля в JSON. После ответа ИИ вы сможете импортировать только структурированные изменения и решить, что действительно сохранить в своей базе.
           </div>
           <div style="display:flex;gap:8px;margin-bottom:10px">
             <button class="btn btn-ghost" style="flex:1" onclick="exportBadAiPackage()">↓ Экспорт для ИИ</button>
             <button class="btn btn-blue" style="flex:1" onclick="copyBadAiPrompt()">📋 Промт JSON</button>
           </div>
           <div style="font-size:12px;color:var(--t3);margin-bottom:6px">Ответ ИИ в JSON</div>
-          <textarea id="ai-bad-json-input" class="inp" rows="8" placeholder='Вставьте сюда JSON-ответ ИИ по схеме импорта БАД...' style="margin-bottom:10px;resize:none"></textarea>
+          <textarea id="ai-bad-json-input" class="inp" rows="8" placeholder='Вставьте сюда JSON-ответ ИИ по схеме импорта БАД...' style="margin-bottom:8px;resize:none" oninput="validateAiBadJsonInput()"></textarea>
+          <div id="ai-bad-json-status" style="font-size:12px;color:var(--t3);margin-bottom:10px">JSON ещё не проверен</div>
           <button class="btn btn-ghost" type="button" style="width:100%;margin-bottom:10px" onclick="pasteAiBadJsonFromClipboard()">📥 Вставить из буфера</button>
           <div style="display:flex;gap:8px">
             <button class="btn btn-ghost" type="button" style="flex:1" onclick="triggerAiBadJsonFilePicker()">↑ Импорт JSON</button>
             <input id="ai-bad-json-file" type="file" accept=".json,application/json" onchange="loadAiBadJsonFile(event)" style="display:none">
             <button class="btn btn-blue" style="flex:1" onclick="previewAiBadImport()">Предпросмотр</button>
           </div>
+          <button class="btn btn-ghost" type="button" style="width:100%;margin-top:8px" onclick="showAiBadJsonExample()">📄 Пример JSON-ответа</button>
           <div style="margin-top:10px">
             <div style="font-size:12px;color:var(--t3);margin-bottom:6px">Если кнопка не сработала, выберите файл напрямую</div>
-            <input id="ai-bad-json-file-direct" type="file" accept=".json,application/json" onchange="loadAiBadJsonFile(event)" class="inp" style="padding:10px 12px;height:auto">
+            <label for="ai-bad-json-file-direct" style="display:block;cursor:pointer;background:linear-gradient(180deg,#2f4352d9 0%,#283945d9 100%);border:1px solid #ffffff12;border-radius:16px;padding:12px 14px;box-shadow:inset 0 1px 0 #ffffff10">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+                <div style="min-width:0">
+                  <div style="font-size:14px;font-weight:700;color:var(--t1);margin-bottom:3px">📎 Выбрать JSON-файл</div>
+                  <div id="ai-bad-json-file-name" style="font-size:12px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Файл не выбран</div>
+                </div>
+                <div style="flex-shrink:0;padding:8px 12px;border-radius:999px;background:#ffffff0b;border:1px solid #ffffff12;color:#8fd8ff;font-size:13px;font-weight:700">Открыть</div>
+              </div>
+              <input id="ai-bad-json-file-direct" type="file" accept=".json,application/json" onchange="loadAiBadJsonFile(event)" style="display:none">
+            </label>
           </div>
         </div>
 
@@ -1086,10 +1186,6 @@ canvas{display:block;width:100%!important}
     <button class="nt" onclick="go('body',this)" id="nt-body">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
       <span>Тело</span>
-    </button>
-    <button class="nt" onclick="openProfileScreen(this)" id="nt-profile">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-      <span>Профиль</span>
     </button>
     <button class="nt" onclick="go('ai',this)" id="nt-ai">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z"/></svg>
@@ -1229,6 +1325,10 @@ const BAD_GOAL_INDEX = {
 };
 
 var obGoal = 'all';
+var GOAL_TEST_STORAGE_KEY = 'goal_test_v1';
+var GOAL_TEST_SELECTION_KEY = 'goal_test_selection_v1';
+var GOAL_TEST_CONFIRM_KEY = 'goal_test_confirm_v1';
+var GOAL_TEST_PLANS_KEY = 'goal_test_plans_v1';
 
 function getBadGoals(id) {
   return BAD_GOALS
@@ -1420,7 +1520,6 @@ function hdAction() {
     today: [
       {ico:'✏️', lbl:'Редактировать стек',    fn:'openStackEditor()'},
       {ico:'🔄', lbl:'Сбросить отметки дня',  fn:'resetTaken()'},
-      {ico:'👤', lbl:'Профиль',               fn:'openProfile()'},
       {ico:'🔁', lbl:'Показать знакомство',   fn:'resetOnboarding()'},
       {ico:'🔔', lbl:'Уведомления',           fn:'openNotifSettings()'},
       {ico:'📲', lbl:'Установить на экран',   fn:'installPWA()'},
@@ -1629,6 +1728,8 @@ function showBad(id) {
   var b = S.bad.find(function(x){return x.id===id;}); if(!b) return;
   var myIds = STACK.map(function(s){return s.id;});
   var rules = getSynRules();
+  var goalIds = getBadGoals(id);
+  var checks = getGoalCandidateChecks(b, {}, null);
 
   // Conflicts with MY current stack
   var conflicts = [];
@@ -1666,6 +1767,17 @@ function showBad(id) {
   html += '<span class="tag tg">⏰ '+b.time+'</span>';
   if (b.custom) html += '<span class="tag ta">✏️ Моя добавка</span>';
   html += '</div>';
+  if (goalIds.length) {
+    html += '<div style="margin-bottom:12px"><div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Направления</div><div style="display:flex;gap:6px;flex-wrap:wrap">' + getGoalBadgeChips(goalIds, 'main') + '</div></div>';
+  }
+  if (checks.length) {
+    html += '<div style="background:rgba(255,184,77,.08);border:1px solid rgba(255,184,77,.12);border-radius:10px;padding:12px;margin-bottom:12px">';
+    html += '<div style="font-size:12px;font-weight:700;color:#ffcf85;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Что обычно проверяют</div>';
+    checks.forEach(function(check) {
+      html += '<div style="font-size:13px;color:#f3d9ab;margin-bottom:4px">• '+check+'</div>';
+    });
+    html += '</div>';
+  }
 
   // ⛔ Conflicts with MY stack
   if (conflicts.length) {
@@ -1821,6 +1933,8 @@ function editBad(id) {
     cat: b.cat || 'vitamins',
     dose: b.dose || '',
     time: b.time || '',
+    timeSlot: b.timeSlot || '',
+    mealTiming: b.mealTiming || '',
     note: b.note || '',
     cycleWeeks: b.cycleWeeks || '',
     breakWeeks: b.breakWeeks || '',
@@ -1833,11 +1947,14 @@ function updateBad(id) {
   var b = S.bad.find(function(x){return x.id===id;}); if(!b) return;
   var synIds = getBadFormRelationIds('syn');
   var conIds = getBadFormRelationIds('con');
+  var timing = syncBadTimingPreview();
   b.name = ($('an')||{}).value||""||b.name;
   b.e    = ($('ae')||{}).value||""||b.e;
   b.cat  = ($('ac')||{}).value||b.cat;
   b.dose = ($('ad')||{}).value||""||b.dose;
-  b.time = ($('at')||{}).value||""||b.time;
+  b.timeSlot = timing.timeSlot;
+  b.mealTiming = timing.mealTiming;
+  b.time = timing.time;
   b.note = ($('ano')||{}).value||""||b.note;
   b.syn  = synIds;
   b.con  = conIds;
@@ -2008,13 +2125,20 @@ function exportBase() {
 }
 
 function normalizeImportedBad(rawBad) {
+  var timing = normalizeBadTimingValue(
+    rawBad.timeSlot || rawBad.time_slot || null,
+    rawBad.mealTiming || rawBad.meal_timing || null,
+    rawBad.time || ''
+  );
   return {
     id: rawBad.id || ('c_' + Date.now()),
     name: rawBad.name || 'Без названия',
     e: rawBad.e || '💊',
     cat: rawBad.cat || 'vitamins',
     dose: rawBad.dose || '—',
-    time: rawBad.time || '—',
+    time: timing.time,
+    timeSlot: timing.timeSlot,
+    mealTiming: timing.mealTiming,
     syn: Array.isArray(rawBad.syn) ? rawBad.syn.filter(Boolean) : [],
     con: Array.isArray(rawBad.con) ? rawBad.con.filter(Boolean) : [],
     note: rawBad.note || '',
@@ -2022,6 +2146,102 @@ function normalizeImportedBad(rawBad) {
     cycleWeeks: rawBad.cycleWeeks || null,
     breakWeeks: rawBad.breakWeeks || null
   };
+}
+
+var BAD_TIME_SLOT_OPTIONS = [
+  { value: '', label: 'Не выбрано' },
+  { value: 'morning', label: 'Утро' },
+  { value: 'day', label: 'День' },
+  { value: 'evening', label: 'Вечер' }
+];
+
+var BAD_MEAL_TIMING_OPTIONS = [
+  { value: '', label: 'Не выбрано' },
+  { value: 'before_food', label: 'До еды' },
+  { value: 'with_food', label: 'Во время еды' },
+  { value: 'after_food', label: 'После еды' }
+];
+
+function getBadTimeSlotLabel(value) {
+  var item = BAD_TIME_SLOT_OPTIONS.find(function(option){ return option.value === value; });
+  return item ? item.label : '';
+}
+
+function getBadMealTimingLabel(value) {
+  var item = BAD_MEAL_TIMING_OPTIONS.find(function(option){ return option.value === value; });
+  return item ? item.label : '';
+}
+
+function buildBadTimingLabel(timeSlot, mealTiming, fallbackText) {
+  var slotLabel = getBadTimeSlotLabel(timeSlot);
+  var mealLabel = getBadMealTimingLabel(mealTiming);
+  if (slotLabel && mealLabel) return slotLabel.toLowerCase() + ', ' + mealLabel.toLowerCase();
+  if (slotLabel) return slotLabel.toLowerCase();
+  if (mealLabel) return mealLabel.toLowerCase();
+  var fallback = String(fallbackText || '').trim();
+  return fallback || '—';
+}
+
+function inferBadTimingFromText(text) {
+  var raw = String(text || '').toLowerCase();
+  var timeSlot = '';
+  var mealTiming = '';
+  if (/(утр|завтрак|morning)/.test(raw)) timeSlot = 'morning';
+  else if (/(днем|днём|обед|day|afternoon)/.test(raw)) timeSlot = 'day';
+  else if (/(веч|ужин|night|evening)/.test(raw)) timeSlot = 'evening';
+
+  if (/(до еды|натощак|before)/.test(raw)) mealTiming = 'before_food';
+  else if (/(во время|с едой|with food|with meal)/.test(raw)) mealTiming = 'with_food';
+  else if (/(после еды|after)/.test(raw)) mealTiming = 'after_food';
+
+  return { timeSlot: timeSlot, mealTiming: mealTiming };
+}
+
+function normalizeBadTimingValue(timeSlot, mealTiming, fallbackText) {
+  var slot = String(timeSlot || '').trim();
+  var meal = String(mealTiming || '').trim();
+  if (!getBadTimeSlotLabel(slot) && slot) slot = '';
+  if (!getBadMealTimingLabel(meal) && meal) meal = '';
+  if (!slot && !meal) {
+    var inferred = inferBadTimingFromText(fallbackText);
+    slot = inferred.timeSlot;
+    meal = inferred.mealTiming;
+  }
+  return {
+    timeSlot: slot || '',
+    mealTiming: meal || '',
+    time: buildBadTimingLabel(slot, meal, fallbackText)
+  };
+}
+
+function syncBadTimingPreview() {
+  var timing = normalizeBadTimingValue(
+    (($('ats') || {}).value || ''),
+    (($('atm') || {}).value || ''),
+    (($('at') || {}).dataset ? $('at').dataset.raw || '' : '')
+  );
+  var input = $('at');
+  if (input) {
+    input.value = timing.time === '—' ? '' : timing.time;
+    input.dataset.raw = timing.time === '—' ? '' : timing.time;
+  }
+  var preview = $('at-preview');
+  if (preview) {
+    preview.textContent = timing.time === '—' ? 'Выберите время приема' : timing.time;
+  }
+  return timing;
+}
+
+function setDiaryChipState(name, value) {
+  S.m[name] = value;
+  var group = $('c-' + name);
+  if (!group || !group.querySelectorAll) return;
+  var chips = group.querySelectorAll('.chip');
+  Array.prototype.forEach.call(chips, function(chip) {
+    chip.classList.remove('on');
+  });
+  var index = name === 'workout' ? value : (value - 1);
+  if (index >= 0 && chips[index]) chips[index].classList.add('on');
 }
 
 function importBase(e) {
@@ -2046,6 +2266,8 @@ function importBase(e) {
             exists.cat = bad.cat;
             exists.dose = bad.dose;
             exists.time = bad.time;
+            exists.timeSlot = bad.timeSlot || '';
+            exists.mealTiming = bad.mealTiming || '';
             exists.syn = bad.syn;
             exists.con = bad.con;
             exists.note = bad.note;
@@ -2110,10 +2332,10 @@ function saveSynRule() {
 }
 
 // ─── DIARY ────────────────────────────────────────
-function pickChip(name, val, btn) {
-  S.m[name]=val;
-  btn.closest('.chips').querySelectorAll('.chip').forEach(function(c){c.classList.remove('on');});
-  btn.classList.add('on');
+function pickChip(name, val, btn, ev) {
+  if (ev && ev.preventDefault) ev.preventDefault();
+  if (ev && ev.stopPropagation) ev.stopPropagation();
+  setDiaryChipState(name, val);
 }
 
 function dayShift(d) {
@@ -2133,17 +2355,13 @@ function prefillD() {
   var d=new Date();d.setDate(d.getDate()+S.off);
   var key=fmt(d),ex=S.diary.find(function(e){return e.date===key;});
   ['energy','sleep','mood','workout'].forEach(function(m){
-    S.m[m]=0;
-    var g=$('c-'+m); if(g) g.querySelectorAll('.chip').forEach(function(c){c.classList.remove('on');});
+    setDiaryChipState(m, 0);
   });
   $('d-note').value='';
   if(ex){
     ['energy','sleep','mood','workout'].forEach(function(m){
       if(ex[m]===undefined&&ex[m]!==0) return;
-      S.m[m]=ex[m];
-      var btns=($('c-'+m)||{}).querySelectorAll?$('c-'+m).querySelectorAll('.chip'):[];
-      var idx=m==='workout'?ex[m]:ex[m]-1;
-      if(btns[idx]) btns[idx].classList.add('on');
+      setDiaryChipState(m, ex[m]);
     });
     $('d-note').value=ex.note||'';
   }
@@ -2441,6 +2659,8 @@ function getBadAiResponseTemplate() {
       {
         id: 'zinc',
         dose: '15 мг',
+        timeSlot: 'morning',
+        mealTiming: 'with_food',
         time: 'утром с едой',
         note: 'Уточнение логики приема. Разнести с железом минимум на 4 часа.',
         cycleWeeks: null,
@@ -2456,6 +2676,8 @@ function getBadAiResponseTemplate() {
         emoji: '🌿',
         category: 'adapto',
         dose: '500 мг',
+        timeSlot: 'evening',
+        mealTiming: 'with_food',
         time: 'вечером с едой',
         note: 'Пример новой добавки.',
         cycleWeeks: 8,
@@ -2538,6 +2760,8 @@ function buildBadAiPackage() {
         category: b.cat || 'vitamins',
         dose: b.dose || '',
         time: b.time || '',
+        timeSlot: b.timeSlot || '',
+        mealTiming: b.mealTiming || '',
         note: b.note || '',
         cycleWeeks: b.cycleWeeks || null,
         breakWeeks: b.breakWeeks || null,
@@ -2600,11 +2824,96 @@ function copyBadAiPrompt() {
   else copy();
 }
 
+function escapeHtml(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function getBadAiExampleResponse() {
+  return {
+    format: 'stackup_bad_ai_response_v1',
+    analysis: {
+      summary: 'База выглядит в целом согласованной. Для вечернего блока стоит аккуратнее развести стимулирующие позиции и уточнить время приема магния.',
+      warnings: [
+        'Стимулирующие адаптогены не ставить на вечер.',
+        'Позиции под энергию лучше сверять с анализами и самочувствием.'
+      ],
+      bodyNotes: [
+        'Если цель связана с энергией и восстановлением, полезно учитывать сон и текущие замеры.'
+      ],
+      synergyNotes: [
+        'D3 логично держать рядом с K2 и Омега-3.',
+        'Железо лучше разносить с кальцием и цинком.'
+      ]
+    },
+    bad_updates: [
+      {
+        id: 'd3',
+        timeSlot: 'morning',
+        mealTiming: 'with_food',
+        time: 'утро с едой',
+        note: 'Жирорастворимый. Логично принимать утром с едой вместе с Омега-3.',
+        synergyRefs: ['k2','omega3']
+      },
+      {
+        id: 'mg',
+        timeSlot: 'evening',
+        mealTiming: 'after_food',
+        time: 'вечером после еды',
+        note: 'Сместить ближе к вечеру для расслабления и сна.'
+      }
+    ],
+    new_bad: [],
+    synergy_updates: [
+      { ref1: 'd3', ref2: 'omega3', txt: 'Омега-3 улучшает логику приема жирорастворимого витамина D3.' }
+    ],
+    conflict_updates: [
+      { ref1: 'iron', ref2: 'calcium', txt: 'Железо и кальций лучше разносить минимум на 2-4 часа.' }
+    ]
+  };
+}
+
+function setAiBadJsonStatus(text, tone) {
+  var el = $('ai-bad-json-status');
+  if (!el) return;
+  var color = tone === 'ok' ? '#8be28f' : tone === 'warn' ? '#ffcf85' : tone === 'error' ? '#ff9b94' : 'var(--t3)';
+  el.style.color = color;
+  el.textContent = text || 'JSON ещё не проверен';
+}
+
+function validateAiBadJsonInput() {
+  var raw = extractJsonPayload((($('ai-bad-json-input') || {}).value || ''));
+  if (!raw) {
+    setAiBadJsonStatus('JSON ещё не добавлен', 'idle');
+    return null;
+  }
+  try {
+    var parsed = JSON.parse(raw);
+    var payload = enrichAiBadTiming(normalizeAiBadPayload(parsed), parsed);
+    var issues = collectAiBadImportIssues(payload);
+    if (issues.length) {
+      setAiBadJsonStatus('JSON прочитан, но есть замечания: ' + issues.length, 'warn');
+    } else {
+      setAiBadJsonStatus('JSON распознан. Можно открыть предпросмотр.', 'ok');
+    }
+    return { parsed: parsed, payload: payload, issues: issues };
+  } catch (err) {
+    setAiBadJsonStatus('Ошибка JSON: ' + err.message, 'error');
+    return null;
+  }
+}
+
 function loadAiBadJsonFile(e) {
   var f = e.target.files[0]; if (!f) return;
   var r = new FileReader();
   r.onload = function(ev) {
     if ($('ai-bad-json-input')) $('ai-bad-json-input').value = ev.target.result || '';
+    if ($('ai-bad-json-file-name')) $('ai-bad-json-file-name').textContent = f.name || 'JSON загружен';
+    validateAiBadJsonInput();
     toast('JSON ответа загружен');
     e.target.value = '';
   };
@@ -2638,10 +2947,36 @@ function pasteAiBadJsonFromClipboard() {
     }
     ta.value = raw;
     ta.focus();
+    validateAiBadJsonInput();
     toast('JSON вставлен из буфера');
   }).catch(function() {
     fail('Нет доступа к буферу. Вставьте JSON вручную');
   });
+}
+
+function showAiBadJsonExample() {
+  var sample = JSON.stringify(getBadAiExampleResponse(), null, 2);
+  var html = '<div style="padding:0 16px 16px">' +
+    '<div style="background:#2b5278;border-radius:10px;padding:12px 14px;font-size:12px;color:#c9e7ff;line-height:1.55;margin-bottom:12px"><b style="color:#fff">Пример.</b> Это образец корректного ответа ИИ. Возвращать лучше только JSON без markdown и лишнего текста.</div>' +
+    '<div style="background:var(--bg3);border-radius:12px;padding:12px 14px;font-size:12px;line-height:1.55;color:var(--t2);white-space:pre-wrap;word-break:break-word;max-height:52vh;overflow:auto">' + escapeHtml(sample) + '</div>' +
+    '<div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-blue" style="flex:1" onclick="copyAiBadJsonExample()">Скопировать пример</button><button class="btn btn-ghost" style="flex:1" onclick="closeSheet()">Закрыть</button></div>' +
+  '</div>';
+  openSheet('Пример JSON-ответа', html);
+}
+
+function copyAiBadJsonExample() {
+  var text = JSON.stringify(getBadAiExampleResponse(), null, 2);
+  var copy = function() {
+    var t = document.createElement('textarea');
+    t.value = text;
+    document.body.appendChild(t);
+    t.select();
+    document.execCommand('copy');
+    t.remove();
+    toast('Пример JSON скопирован');
+  };
+  if (navigator.clipboard) navigator.clipboard.writeText(text).then(function(){toast('Пример JSON скопирован');}).catch(copy);
+  else copy();
 }
 
 function extractJsonPayload(text) {
@@ -2709,6 +3044,8 @@ function normalizeAiBadPayload(obj) {
           emoji: item.emoji != null ? String(item.emoji) : (item.e != null ? String(item.e) : null),
           cat: item.category != null ? String(item.category) : (item.cat != null ? String(item.cat) : null),
           dose: item.dose != null ? String(item.dose) : null,
+          timeSlot: item.timeSlot != null ? String(item.timeSlot) : (item.time_slot != null ? String(item.time_slot) : null),
+          mealTiming: item.mealTiming != null ? String(item.mealTiming) : (item.meal_timing != null ? String(item.meal_timing) : null),
           time: item.time != null ? String(item.time) : null,
           note: item.note != null ? String(item.note) : null,
           cycleWeeks: toNullableInt(item.cycleWeeks != null ? item.cycleWeeks : item.cycle_weeks),
@@ -2745,6 +3082,37 @@ function normalizeAiBadPayload(obj) {
         };
       })
   };
+}
+
+function enrichAiBadTiming(payload, rawObj) {
+  var rawUpdates = Array.isArray(rawObj.bad_updates) ? rawObj.bad_updates : [];
+  var rawNewBad = Array.isArray(rawObj.new_bad) ? rawObj.new_bad : [];
+
+  payload.badUpdates.forEach(function(item, idx) {
+    var source = rawUpdates[idx] || {};
+    var timing = normalizeBadTimingValue(
+      item.timeSlot != null ? item.timeSlot : (source.timeSlot != null ? source.timeSlot : source.time_slot),
+      item.mealTiming != null ? item.mealTiming : (source.mealTiming != null ? source.mealTiming : source.meal_timing),
+      item.time != null ? item.time : source.time
+    );
+    item.timeSlot = timing.timeSlot;
+    item.mealTiming = timing.mealTiming;
+    item.time = timing.time;
+  });
+
+  payload.newBad.forEach(function(item, idx) {
+    var source = rawNewBad[idx] || {};
+    var timing = normalizeBadTimingValue(
+      source.timeSlot != null ? source.timeSlot : source.time_slot,
+      source.mealTiming != null ? source.mealTiming : source.meal_timing,
+      item.time != null ? item.time : source.time
+    );
+    item.timeSlot = timing.timeSlot;
+    item.mealTiming = timing.mealTiming;
+    item.time = timing.time;
+  });
+
+  return payload;
 }
 
 function resolveAiBadRef(ref, newMap) {
@@ -2786,17 +3154,10 @@ function collectAiBadImportIssues(payload) {
 }
 
 function previewAiBadImport() {
-  var raw = extractJsonPayload((($('ai-bad-json-input') || {}).value || ''));
-  if (!raw) { toast('Вставьте JSON ответа ИИ'); return; }
-  var parsed;
-  try {
-    parsed = JSON.parse(raw);
-  } catch (err) {
-    toast('JSON не распознан: ' + err.message);
-    return;
-  }
-
-  var payload = normalizeAiBadPayload(parsed);
+  var checked = validateAiBadJsonInput();
+  if (!checked) { toast('Вставьте корректный JSON ответа ИИ'); return; }
+  var parsed = checked.parsed;
+  var payload = checked.payload;
   payload.issues = collectAiBadImportIssues(payload);
   AI_BAD_IMPORT_PREVIEW = payload;
 
@@ -2891,13 +3252,16 @@ function applyAiBadImport() {
   payload.newBad.forEach(function(item, idx) {
     var newId = 'ai_' + item.key + '_' + (Date.now() + idx);
     newMap[item.key] = newId;
+    var timing = normalizeBadTimingValue(item.timeSlot, item.mealTiming, item.time);
     var bad = {
       id: newId,
       name: item.name,
       e: item.emoji || '💊',
       cat: item.cat || 'vitamins',
       dose: item.dose || '—',
-      time: item.time || '—',
+      time: timing.time,
+      timeSlot: timing.timeSlot,
+      mealTiming: timing.mealTiming,
       syn: [],
       con: [],
       note: item.note || '',
@@ -2912,11 +3276,16 @@ function applyAiBadImport() {
   payload.badUpdates.forEach(function(item) {
     var bad = S.bad.find(function(x){ return x.id === item.id; });
     if (!bad) return;
+    var timing = normalizeBadTimingValue(item.timeSlot, item.mealTiming, item.time);
     if (item.name) bad.name = item.name;
     if (item.emoji) bad.e = item.emoji;
     if (item.cat) bad.cat = item.cat;
     if (item.dose) bad.dose = item.dose;
-    if (item.time) bad.time = item.time;
+    if (item.time != null || item.timeSlot != null || item.mealTiming != null) {
+      bad.time = timing.time;
+      bad.timeSlot = timing.timeSlot;
+      bad.mealTiming = timing.mealTiming;
+    }
     if (item.note != null) bad.note = item.note;
     if (item.cycleWeeks !== null) bad.cycleWeeks = item.cycleWeeks;
     if (item.breakWeeks !== null) bad.breakWeeks = item.breakWeeks;
@@ -3023,7 +3392,7 @@ function buildPrompt() {
       lat.pullup ? 'Подтягивания: '+lat.pullup+' повт':'',
       lat.abs    ? 'Пресс: '+lat.abs+' повт'          : '',
       lat.plank  ? 'Планка: '+lat.plank+' с'           : '',
-      lat.rings  ? 'Кольца ТРХ: '+lat.rings+' повт'   : '',
+      lat.rings  ? 'Кольца TRX: '+lat.rings+' повт'   : '',
       lat.steps  ? 'Шаги: '+lat.steps+' шаг'          : '',
     ].filter(Boolean).join(', ') || 'нет данных';
   }
@@ -3263,6 +3632,604 @@ function importAll(e){
 
 // ─── PROFILE ──────────────────────────────────────
 function getProfile(){var p=ld('profile_v1',{name:'',dob:'',sex:''})||{};return {name:p.name||'',dob:p.dob||'',sex:p.sex||''};}
+function getGoalTestPrefs(){
+  var raw = ld(GOAL_TEST_STORAGE_KEY, null) || {};
+  var extra = Array.isArray(raw.extraGoals) ? raw.extraGoals.filter(Boolean) : [];
+  return {
+    goal: raw.goal || 'sleep',
+    extraGoals: extra.filter(function(goal){ return goal !== (raw.goal || 'sleep'); }).slice(0, 3),
+    indicators: raw.indicators || '',
+    contra: raw.contra || '',
+    notes: raw.notes || ''
+  };
+}
+function saveGoalTestPrefs(prefs){
+  var mainGoal = prefs.goal || 'sleep';
+  var extraGoals = Array.isArray(prefs.extraGoals) ? prefs.extraGoals.filter(Boolean) : [];
+  sv(GOAL_TEST_STORAGE_KEY, {
+    goal: mainGoal,
+    extraGoals: extraGoals.filter(function(goal){ return goal !== mainGoal; }).slice(0, 3),
+    indicators: prefs.indicators || '',
+    contra: prefs.contra || '',
+    notes: prefs.notes || ''
+  });
+}
+function collectGoalTestFormPrefs(basePrefs){
+  var prefs = Object.assign({}, basePrefs || getGoalTestPrefs());
+  if ($('goal-test-indicators')) prefs.indicators = (($('goal-test-indicators') || {}).value || '').trim();
+  if ($('goal-test-contra')) prefs.contra = (($('goal-test-contra') || {}).value || '').trim();
+  if ($('goal-test-notes')) prefs.notes = (($('goal-test-notes') || {}).value || '').trim();
+  return prefs;
+}
+function getGoalTestSelection(){
+  return (ld(GOAL_TEST_SELECTION_KEY, []) || []).filter(Boolean);
+}
+function saveGoalTestSelection(ids){
+  var clean = [];
+  (Array.isArray(ids) ? ids : []).forEach(function(id){
+    if (id && clean.indexOf(id) < 0) clean.push(id);
+  });
+  sv(GOAL_TEST_SELECTION_KEY, clean);
+}
+function getGoalConfirmState(){
+  var raw = ld(GOAL_TEST_CONFIRM_KEY, null) || {};
+  var ids = [];
+  var active = [];
+  (Array.isArray(raw.ids) ? raw.ids : []).forEach(function(id){
+    if (id && ids.indexOf(id) < 0) ids.push(id);
+  });
+  (Array.isArray(raw.active) ? raw.active : []).forEach(function(id){
+    if (id && active.indexOf(id) < 0 && ids.indexOf(id) >= 0) active.push(id);
+  });
+  return { ids: ids, active: active };
+}
+function saveGoalConfirmState(ids, activeIds){
+  var cleanIds = [];
+  var cleanActive = [];
+  (Array.isArray(ids) ? ids : []).forEach(function(id){
+    if (id && cleanIds.indexOf(id) < 0) cleanIds.push(id);
+  });
+  (Array.isArray(activeIds) ? activeIds : []).forEach(function(id){
+    if (id && cleanActive.indexOf(id) < 0 && cleanIds.indexOf(id) >= 0) cleanActive.push(id);
+  });
+  sv(GOAL_TEST_CONFIRM_KEY, { ids: cleanIds, active: cleanActive });
+}
+function getGoalRecommendationPlans(){
+  var raw = ld(GOAL_TEST_PLANS_KEY, []) || [];
+  return (Array.isArray(raw) ? raw : []).filter(function(plan){
+    return plan && plan.id && Array.isArray(plan.items) && plan.items.length;
+  });
+}
+function saveGoalRecommendationPlans(plans){
+  sv(GOAL_TEST_PLANS_KEY, (Array.isArray(plans) ? plans : []).slice(0, 12));
+}
+function sanitizeGoalTestSelection(ids, result){
+  var allowed = new Set((result && result.recommended || []).map(function(item){ return item.bad.id; }).filter(function(id){
+    return !STACK.find(function(stackItem){ return stackItem.id === id; });
+  }));
+  return (Array.isArray(ids) ? ids : []).filter(function(id, index, arr){
+    return id && allowed.has(id) && arr.indexOf(id) === index;
+  });
+}
+function getDiaryAverages(){
+  var recent = S.diary.slice(0, 14);
+  function avg(field){
+    var vals = recent.filter(function(x){ return typeof x[field] === 'number' && x[field] > 0; }).map(function(x){ return x[field]; });
+    if (!vals.length) return null;
+    return vals.reduce(function(a,b){ return a+b; }, 0) / vals.length;
+  }
+  return {
+    energy: avg('energy'),
+    sleep: avg('sleep'),
+    mood: avg('mood'),
+    workout: avg('workout')
+  };
+}
+function getGoalGoalLabel(goalId){
+  var goal = BAD_GOALS.find(function(x){ return x.id === goalId; });
+  return goal ? goal.label : goalId;
+}
+function getContraRules(){
+  return [
+    {
+      key: 'thyroid',
+      patterns: [/щитовид/i,/тирео/i,/гипертире/i,/гипотире/i],
+      ids: ['iodine','ashwa'],
+      text: 'Есть упоминание щитовидной железы: йод и ашваганду лучше проверять отдельно по анализам и рекомендациям врача.'
+    },
+    {
+      key: 'pressure',
+      patterns: [/давлен/i,/гипертон/i,/hypertension/i],
+      ids: ['ginseng','rhodiola','eleuthero','leuzea','tribulus'],
+      text: 'Есть упоминание давления: бодрящие адаптогены лучше рассматривать осторожно и не без личной проверки переносимости.'
+    },
+    {
+      key: 'blood',
+      patterns: [/антикоаг/i,/кровотеч/i,/warfarin/i,/аспирин/i],
+      ids: ['omega3','curcumin','k2'],
+      text: 'Есть лекарства/риски, связанные с кровью: Омега-3, куркумин и K2 лучше отдельно сверять с врачом и схемой терапии.'
+    },
+    {
+      key: 'kidney',
+      patterns: [/почек/i,/почки/i,/renal/i],
+      ids: ['creatine','magnesium','potassium'],
+      text: 'Есть упоминание почек: креатин и минералы стоит сверять отдельно, а не добавлять автоматически.'
+    },
+    {
+      key: 'sleep',
+      patterns: [/бессон/i,/тревог/i,/паник/i],
+      ids: ['ginseng','rhodiola','eleuthero','leuzea','tribulus'],
+      text: 'Есть упоминание сна/тревоги: стимулирующие позиции лучше не ставить по умолчанию, особенно на вечер.'
+    },
+    {
+      key: 'pregnancy',
+      patterns: [/беремен/i,/лактац/i,/грудное/i],
+      ids: ['ashwa','rhodiola','ginseng','eleuthero','tribulus','leuzea','saffron'],
+      text: 'Есть упоминание беременности или лактации: адаптогены и некоторые активные добавки нельзя рекомендовать без врача.'
+    }
+  ];
+}
+function getGoalCandidateReasons(goalId, bad, body, diary, prefs){
+  var reasons = [];
+  if (badMatchesGoal(bad, goalId)) reasons.push('подходит под цель «' + getGoalGoalLabel(goalId) + '»');
+  if ((goalId === 'sleep' || goalId === 'stress') && diary.sleep != null && diary.sleep < 2.4 && ['mg','glycine','ltean','ashwa','bacopa','saffron'].indexOf(bad.id) >= 0) {
+    reasons.push('может быть уместен на фоне низких оценок сна');
+  }
+  if (goalId === 'energy' && diary.energy != null && diary.energy < 2.4 && ['d3','b12','folate','coq10','rhodiola','ginseng','cordyceps','iodine','iron'].indexOf(bad.id) >= 0) {
+    reasons.push('может поддержать энергию по вашим недавним отметкам');
+  }
+  if ((goalId === 'training' || goalId === 'recovery') && (body.pushup != null || body.pullup != null || body.steps != null) && ['creatine','whey','electro','omega3','mg','collagen','curcumin'].indexOf(bad.id) >= 0) {
+    reasons.push('логично смотрится рядом с тренировочной нагрузкой и восстановлением');
+  }
+  if (goalId === 'joints' && (body.weight != null || body.waist != null) && ['collagen','hond','curcumin','d3','k2','calcium','boron'].indexOf(bad.id) >= 0) {
+    reasons.push('часто рассматривают для опоры на суставы и связки');
+  }
+  if (goalId === 'gut' && prefs.indicators && /жкт|вздут|стул|киш|желуд/i.test(prefs.indicators) && ['probiotic','psyllium','glutamine'].indexOf(bad.id) >= 0) {
+    reasons.push('совпадает с упоминанием ЖКТ в известных показателях');
+  }
+  if (goalId === 'focus' && prefs.notes && /концент|фокус|вниман/i.test(prefs.notes) && ['b12','folate','bacopa','ltean','rhodiola','gotukola'].indexOf(bad.id) >= 0) {
+    reasons.push('может быть полезен под фокус и концентрацию');
+  }
+  if (!reasons.length) reasons.push('может быть кандидатом для обсуждения при этой цели');
+  return reasons;
+}
+function getGoalCandidateChecks(bad, prefs, resultItem){
+  var checks = [];
+  var conNames = (bad.con || []).map(function(id){ return getBadLabel(id); }).filter(Boolean);
+  var timeLower = String(bad.time || '').toLowerCase();
+  var noteLower = String(bad.note || '').toLowerCase();
+  var indicatorsLower = String((prefs && prefs.indicators) || '').toLowerCase();
+
+  if (conNames.length) checks.push('Разнести с: ' + conNames.join(', '));
+  if (/жирн|с едой/.test(timeLower)) checks.push('Проверьте прием вместе с едой');
+  if (/натощак|между едой/.test(timeLower)) checks.push('Проверьте переносимость натощак');
+  if (/утром|до 16:00|до трен/.test(timeLower)) checks.push('Не ставить на поздний вечер');
+  if (['iron','iodine','d3','b12','folate','ferrum'].indexOf(bad.id) >= 0 || /анализ|дефицит/.test(noteLower)) {
+    checks.push(indicatorsLower ? 'Сверьте с вашими анализами и текущими показателями' : 'Желательно сверить с анализами перед регулярным приемом');
+  }
+  if (resultItem && resultItem.blocked) checks.unshift('Есть ограничение по вашему контексту: не добавлять автоматически');
+  return checks.filter(function(txt, index, arr){ return txt && arr.indexOf(txt) === index; }).slice(0, 3);
+}
+function getGoalBadgeChips(goalIds, kind){
+  return (goalIds || []).map(function(goalId){
+    return '<span class="tag ' + (kind === 'extra' ? 'ta' : 'tb') + '">' + getGoalGoalLabel(goalId) + '</span>';
+  }).join('');
+}
+function buildGoalRecommendationResult(prefs){
+  var body = getLatestBodyForAi() || {};
+  var diary = getDiaryAverages();
+  var contraText = [prefs.contra || '', prefs.indicators || '', prefs.notes || ''].join(' ').toLowerCase();
+  var blockedIds = new Set();
+  var cautions = [];
+  getContraRules().forEach(function(rule){
+    if (rule.patterns.some(function(rx){ return rx.test(contraText); })) {
+      rule.ids.forEach(function(id){ blockedIds.add(id); });
+      cautions.push(rule.text);
+    }
+  });
+
+  var mainGoal = prefs.goal || 'sleep';
+  var extraGoals = Array.isArray(prefs.extraGoals) ? prefs.extraGoals.filter(Boolean).filter(function(goal){ return goal !== mainGoal; }) : [];
+  var ids = [];
+  [mainGoal].concat(extraGoals).forEach(function(goalId){
+    (BAD_GOAL_INDEX[goalId] || []).forEach(function(id){
+      if (ids.indexOf(id) < 0) ids.push(id);
+    });
+  });
+
+  var candidates = ids
+    .map(function(id, idx){
+      var bad = S.bad.find(function(x){ return x.id === id; });
+      if (!bad) return null;
+      var matchedGoals = [mainGoal].concat(extraGoals).filter(function(goalId){ return badMatchesGoal(bad, goalId); });
+      var reasons = [];
+      matchedGoals.forEach(function(goalId){
+        getGoalCandidateReasons(goalId, bad, body, diary, prefs).forEach(function(reason){
+          if (reasons.indexOf(reason) < 0) reasons.push(reason);
+        });
+      });
+      var score = 120 - idx * 3 + reasons.length * 8 + matchedGoals.length * 10;
+      if (blockedIds.has(id)) score -= 80;
+      if (mainGoal === 'training' && ['creatine','whey','electro'].indexOf(id) >= 0) score += 8;
+      if (mainGoal === 'sleep' && ['mg','glycine','ltean'].indexOf(id) >= 0) score += 8;
+      return {
+        bad: bad,
+        reasons: reasons,
+        matchedGoals: matchedGoals,
+        blocked: blockedIds.has(id),
+        score: score
+      };
+    })
+    .filter(Boolean)
+    .sort(function(a,b){ return b.score - a.score; });
+
+  return {
+    body: body,
+    diary: diary,
+    cautions: Array.from(new Set(cautions)),
+    checks: (function(){
+      var list = [];
+      if (cautions.length) list = list.concat(cautions);
+      if (mainGoal === 'energy') list.push('Энергетические позиции лучше сверять с анализами и не добавлять автоматически без контекста.');
+      if (mainGoal === 'sleep' || mainGoal === 'stress') list.push('Стимулирующие позиции не ставьте на вечер, даже если они выглядят уместно под цель.');
+      if (candidates.some(function(x){ return /с едой|жирной едой|натощак|между едой/i.test(String(x.bad.time || '')); })) list.push('После выбора проверьте время приема: с едой, натощак или разнесение по времени.');
+      return list.filter(function(txt, index, arr){ return txt && arr.indexOf(txt) === index; }).slice(0, 4);
+    })(),
+    recommended: candidates.filter(function(x){ return !x.blocked; }).slice(0, 6),
+    cautionOnly: candidates.filter(function(x){ return x.blocked; }).slice(0, 6)
+  };
+}
+function renderGoalTestMainGoalChips(activeGoal){
+  return BAD_GOALS
+    .filter(function(goal){ return goal.id !== 'all'; })
+    .map(function(goal){
+      var on = goal.id === activeGoal ? ' on' : '';
+      return '<button type="button" class="chip goal-chip goal-chip-main' + on + '" onclick="setGoalTestGoal(\'' + goal.id + '\')">' + goal.label + '</button>';
+    }).join('');
+}
+function renderGoalTestExtraGoalChips(mainGoal, extraGoals){
+  var picked = Array.isArray(extraGoals) ? extraGoals : [];
+  return BAD_GOALS
+    .filter(function(goal){ return goal.id !== 'all' && goal.id !== mainGoal; })
+    .map(function(goal){
+      var on = picked.indexOf(goal.id) >= 0 ? ' on' : '';
+      return '<button type="button" class="chip goal-chip goal-chip-extra' + on + '" onclick="toggleGoalTestExtraGoal(\'' + goal.id + '\')">' + goal.label + '</button>';
+    }).join('');
+}
+function setGoalTestGoal(goalId){
+  var prefs = collectGoalTestFormPrefs(getGoalTestPrefs());
+  prefs.goal = goalId;
+  prefs.extraGoals = (prefs.extraGoals || []).filter(function(goal){ return goal !== goalId; }).slice(0, 3);
+  saveGoalTestPrefs(prefs);
+  openGoalRecommendationTest();
+}
+function toggleGoalTestExtraGoal(goalId){
+  var prefs = collectGoalTestFormPrefs(getGoalTestPrefs());
+  var extraGoals = Array.isArray(prefs.extraGoals) ? prefs.extraGoals.slice() : [];
+  var idx = extraGoals.indexOf(goalId);
+  if (idx >= 0) {
+    extraGoals.splice(idx, 1);
+  } else {
+    if (extraGoals.length >= 3) {
+      toast('Дополнительных целей может быть не больше трёх');
+      return;
+    }
+    extraGoals.push(goalId);
+  }
+  prefs.extraGoals = extraGoals;
+  saveGoalTestPrefs(prefs);
+  openGoalRecommendationTest();
+}
+function toggleGoalRecommendationPick(id){
+  var prefs = collectGoalTestFormPrefs(getGoalTestPrefs());
+  saveGoalTestPrefs(prefs);
+  var result = buildGoalRecommendationResult(prefs);
+  var picks = sanitizeGoalTestSelection(getGoalTestSelection(), result);
+  if (!result.recommended.some(function(item){ return item.bad.id === id; })) {
+    toast('Эта позиция сейчас вне рекомендаций');
+    return;
+  }
+  if (STACK.find(function(item){ return item.id === id; })) {
+    toast('Эта добавка уже есть в основном стеке');
+    return;
+  }
+  var idx = picks.indexOf(id);
+  if (idx >= 0) picks.splice(idx, 1);
+  else picks.push(id);
+  saveGoalTestSelection(picks);
+  openGoalRecommendationTest();
+}
+function buildGoalStackDraft(ids){
+  return (Array.isArray(ids) ? ids : []).map(function(id){
+    var bad = S.bad.find(function(x){ return x.id === id; });
+    if (!bad || STACK.find(function(item){ return item.id === id; })) return null;
+    var timing = normalizeBadTimingValue({
+      timeSlot: bad.timeSlot || '',
+      mealTiming: bad.mealTiming || '',
+      time: bad.time || ''
+    });
+    var slot = timing.timeSlot || obGuessStackSlot(bad.time || '');
+    var note = (bad.time || buildBadTimingLabel(slot, timing.mealTiming) || bad.note || '').trim();
+    return {
+      id: bad.id,
+      name: bad.name,
+      emoji: bad.e || '💊',
+      dose: (bad.dose || 'по базе').trim(),
+      slot: slot || 'morning',
+      slotLabel: SLOTS[slot || 'morning'] || '☀️ Утро',
+      note: note || 'по базе',
+      goals: getBadGoals(bad.id)
+    };
+  }).filter(Boolean);
+}
+function buildGoalPlanDraft(ids, prefs, result){
+  var draft = buildGoalStackDraft(ids);
+  return draft.map(function(item){
+    var rec = ((result && result.recommended) || []).find(function(entry){ return entry.bad.id === item.id; }) || null;
+    var bad = S.bad.find(function(x){ return x.id === item.id; }) || null;
+    return Object.assign({}, item, {
+      reasons: rec ? rec.reasons.slice(0, 3) : [],
+      checks: bad ? getGoalCandidateChecks(bad, prefs || {}, rec).slice(0, 3) : []
+    });
+  });
+}
+function getGoalPlanTitle(plan){
+  var main = getGoalGoalLabel(plan.goal || 'sleep');
+  return 'План: ' + main;
+}
+function saveGoalRecommendationPlanFromIds(ids){
+  var prefs = collectGoalTestFormPrefs(getGoalTestPrefs());
+  saveGoalTestPrefs(prefs);
+  var result = buildGoalRecommendationResult(prefs);
+  var cleanIds = sanitizeGoalTestSelection(ids, result);
+  var items = buildGoalPlanDraft(cleanIds, prefs, result);
+  if (!items.length) {
+    toast('Сначала отметьте позиции для сохранения плана');
+    return;
+  }
+  var plans = getGoalRecommendationPlans();
+  var plan = {
+    id: 'plan_' + Date.now(),
+    createdAt: new Date().toISOString(),
+    goal: prefs.goal || 'sleep',
+    extraGoals: Array.isArray(prefs.extraGoals) ? prefs.extraGoals.slice(0, 3) : [],
+    indicators: prefs.indicators || '',
+    contra: prefs.contra || '',
+    notes: prefs.notes || '',
+    items: items
+  };
+  plans.unshift(plan);
+  saveGoalRecommendationPlans(plans);
+  toast('План сохранён: ' + items.length + ' поз.');
+  openGoalRecommendationTest();
+}
+function deleteGoalRecommendationPlan(planId){
+  var plans = getGoalRecommendationPlans().filter(function(plan){ return plan.id !== planId; });
+  saveGoalRecommendationPlans(plans);
+  toast('План удалён');
+  openGoalRecommendationTest();
+}
+function applyGoalRecommendationPlan(planId){
+  var plan = getGoalRecommendationPlans().find(function(entry){ return entry.id === planId; });
+  if (!plan) { toast('План не найден'); return; }
+  var added = 0;
+  (plan.items || []).forEach(function(item){
+    if (STACK.find(function(stackItem){ return stackItem.id === item.id; })) return;
+    STACK.push({
+      id: item.id,
+      slot: item.slot || 'morning',
+      dose: item.dose || 'по базе',
+      note: item.note || 'по базе'
+    });
+    added++;
+  });
+  if (!added) { toast('Все позиции из плана уже есть в стеке'); return; }
+  saveStack();
+  renderToday();
+  closeSheet();
+  toast('Из плана добавлено в стек: ' + added);
+}
+function renderGoalPlanCards(){
+  var plans = getGoalRecommendationPlans();
+  if (!plans.length) return '';
+  return plans.map(function(plan){
+    var date = new Date(plan.createdAt || Date.now()).toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit'});
+    var extra = Array.isArray(plan.extraGoals) ? plan.extraGoals.slice(0,3) : [];
+    var extraText = extra.length ? (' · доп: ' + extra.map(getGoalGoalLabel).join(', ')) : '';
+    return '<div style="background:var(--bg3);border-radius:12px;padding:12px 14px;margin-bottom:8px">' +
+      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px"><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700;color:var(--t1)">' + getGoalPlanTitle(plan) + '</div><div style="font-size:12px;color:var(--t2);margin-top:4px">' + date + ' · ' + plan.items.length + ' поз.' + extraText + '</div></div></div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">' + (plan.items || []).slice(0,4).map(function(item){ return '<span class="tag tb">' + item.emoji + ' ' + item.name + '</span>'; }).join('') + '</div>' +
+      '<div style="display:flex;gap:8px"><button class="btn btn-blue btn-sm" style="flex:1" onclick="applyGoalRecommendationPlan(\'' + plan.id + '\')">В стек</button><button class="btn btn-ghost btn-sm" style="flex:1" onclick="deleteGoalRecommendationPlan(\'' + plan.id + '\')">Удалить</button></div>' +
+    '</div>';
+  }).join('');
+}
+function toggleGoalRecommendationConfirmPick(id){
+  var state = getGoalConfirmState();
+  if (!state.ids.length || state.ids.indexOf(id) < 0) return;
+  var active = state.active.slice();
+  var idx = active.indexOf(id);
+  if (idx >= 0) active.splice(idx, 1);
+  else active.push(id);
+  saveGoalConfirmState(state.ids, active);
+  saveGoalTestSelection(active);
+  openGoalRecommendationConfirm(true);
+}
+function openGoalRecommendationConfirm(preserveState){
+  var prefs = collectGoalTestFormPrefs(getGoalTestPrefs());
+  saveGoalTestPrefs(prefs);
+  var result = buildGoalRecommendationResult(prefs);
+  var picks = sanitizeGoalTestSelection(getGoalTestSelection(), result);
+  saveGoalTestSelection(picks);
+  var existingConfirmState = getGoalConfirmState();
+  var confirmSourceIds = preserveState && existingConfirmState.ids.length
+    ? existingConfirmState.ids.slice()
+    : picks.slice();
+  var confirmIdsSafe = sanitizeGoalTestSelection(confirmSourceIds, result);
+  if (!confirmIdsSafe.length) {
+    toast('Сначала отметьте позиции для добавления');
+    return;
+  }
+  var draft = buildGoalStackDraft(confirmIdsSafe);
+  if (!draft.length) {
+    toast('Новых позиций для добавления сейчас нет');
+    openGoalRecommendationTest();
+    return;
+  }
+  var confirmIds = draft.map(function(item){ return item.id; });
+  var confirmState = preserveState ? existingConfirmState : { ids: [], active: [] };
+  var activeIds = preserveState
+    ? confirmState.active.filter(function(id){ return confirmIds.indexOf(id) >= 0; })
+    : confirmIds.slice();
+  if (!preserveState && !activeIds.length) activeIds = confirmIds.slice();
+  saveGoalConfirmState(confirmIds, activeIds);
+  var html = '<div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:12px">';
+  html += '<div style="background:#2b5278;border-radius:10px;padding:12px 14px;font-size:12px;color:#c9e7ff;line-height:1.55"><b style="color:#fff">Подтверждение.</b> Эти позиции уже есть в вашей базе БАД. После подтверждения они попадут только в <b style="color:#fff">основной стек</b> и не изменят справочник автоматически.</div>';
+  html += '<div style="background:var(--bg3);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--t2);line-height:1.55">В подборе: <b style="color:var(--t1)">' + draft.length + '</b> · Добавится в стек: <b style="color:var(--t1)">' + activeIds.length + '</b>. Здесь можно быстро переключить каждую позицию, не возвращаясь назад.</div>';
+  html += draft.map(function(item){
+    var active = activeIds.indexOf(item.id) >= 0;
+    var stateLabel = active ? 'Добавить' : 'Не добавлять';
+    var stateStyle = active ? 'background:var(--blue);color:#fff;border-color:var(--blue)' : 'background:var(--bg2);color:var(--t3);border-color:var(--line)';
+    return '<div style="background:var(--bg3);border-radius:12px;padding:12px 14px">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px"><div style="font-size:15px;font-weight:700;color:' + (active ? 'var(--t1)' : 'var(--t2)') + '">' + item.emoji + ' ' + item.name + '</div><button class="btn btn-ghost btn-sm" style="padding:8px 12px;' + stateStyle + '" onclick="toggleGoalRecommendationConfirmPick(\'' + item.id + '\')">' + stateLabel + '</button></div>' +
+      '<div style="font-size:13px;color:var(--t2);margin-bottom:6px">' + item.dose + ' · ' + item.slotLabel + '</div>' +
+      '<div style="font-size:12px;color:var(--t3);line-height:1.55">' + item.note + '</div>' +
+      (active ? '' : '<div style="font-size:12px;color:var(--orange);margin-top:8px;line-height:1.45">Эта позиция останется только в рекомендациях и не будет добавлена в основной стек.</div>') +
+      (item.goals.length ? '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">' + getGoalBadgeChips(item.goals, 'extra') + '</div>' : '') +
+    '</div>';
+  }).join('');
+  if (!activeIds.length) {
+    html += '<div class="alert alert-o"><span class="alert-ico">⚠️</span><span class="alert-txt">Сейчас все позиции выключены. Включите хотя бы одну, если хотите добавить что-то в основной стек.</span></div>';
+  }
+  html += '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-blue" style="flex:1;opacity:' + (activeIds.length ? '1' : '.45') + ';pointer-events:' + (activeIds.length ? 'auto' : 'none') + '" onclick="applyGoalRecommendationSelection()">Подтвердить добавление</button><button class="btn btn-ghost" style="flex:1;opacity:' + (activeIds.length ? '1' : '.45') + ';pointer-events:' + (activeIds.length ? 'auto' : 'none') + '" onclick="saveGoalRecommendationPlanFromIds(getGoalConfirmState().active)">Сохранить как план</button><button class="btn btn-ghost" style="flex:1 1 100%" onclick="openGoalRecommendationTest()">Назад</button></div>';
+  html += '</div>';
+  openSheet('Подтвердить подбор', html);
+}
+function applyGoalRecommendationSelection(){
+  var prefs = getGoalTestPrefs();
+  var result = buildGoalRecommendationResult(prefs);
+  var confirmState = getGoalConfirmState();
+  var picks = sanitizeGoalTestSelection((confirmState.active && confirmState.active.length ? confirmState.active : getGoalTestSelection()), result);
+  var draft = buildGoalStackDraft(picks);
+  if (!draft.length) {
+    toast('Нечего добавлять: всё уже в стеке или выбор пуст');
+    openGoalRecommendationTest();
+    return;
+  }
+  draft.forEach(function(item){
+    STACK.push({
+      id: item.id,
+      slot: item.slot,
+      dose: item.dose,
+      note: item.note
+    });
+  });
+  saveStack();
+  renderToday();
+  saveGoalTestSelection([]);
+  saveGoalConfirmState([], []);
+  closeSheet();
+  toast('В основной стек добавлено: ' + draft.length);
+}
+function renderGoalRecommendationCard(item, selectedIds, mainGoal){
+  var bad = item.bad;
+  var selected = selectedIds.indexOf(bad.id) >= 0;
+  var alreadyInStack = !!STACK.find(function(stackItem){ return stackItem.id === bad.id; });
+  var checks = getGoalCandidateChecks(bad, getGoalTestPrefs(), item);
+  var pickLabel = alreadyInStack ? 'Уже в стеке' : (selected ? 'Убрать из подбора' : 'Выбрать');
+  var pickStyle = alreadyInStack ? 'background:var(--bg2);color:var(--t3);border-color:var(--line);pointer-events:none' : (selected ? 'background:var(--blue);color:#fff;border-color:var(--blue)' : '');
+  return '<div style="background:var(--bg3);border-radius:14px;padding:13px 14px 14px;margin-bottom:8px;border:1px solid rgba(255,255,255,.05)">' +
+    '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px"><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700;color:var(--t1);line-height:1.25">' + bad.e + ' ' + bad.name + '</div><div style="font-size:13px;color:var(--t2);margin-top:6px">' + (bad.dose || '—') + ' · ' + (bad.time || '—') + '</div></div><div style="display:flex;gap:8px;flex-shrink:0"><button class="btn btn-ghost btn-sm" style="width:132px;min-width:132px;padding:8px 12px;text-align:center;line-height:1.15;' + pickStyle + '" onclick="toggleGoalRecommendationPick(\'' + bad.id + '\')">' + pickLabel + '</button><button class="btn btn-ghost btn-sm" style="width:84px;min-width:84px;padding:8px 12px;text-align:center" onclick="showBad(\'' + bad.id + '\')">Открыть</button></div></div>' +
+    '<div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:6px">Под цель</div>' +
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">' + getGoalBadgeChips(item.matchedGoals || [mainGoal], 'main') + '</div>' +
+    '<div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:6px">Почему может подойти</div>' +
+    '<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">' + item.reasons.map(function(reason){ return '<div style="font-size:13px;color:var(--t2);line-height:1.45;background:rgba(42,171,238,.08);border:1px solid rgba(42,171,238,.12);border-radius:10px;padding:8px 10px">' + reason + '</div>'; }).join('') + '</div>' +
+    (checks.length ? '<div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:6px">Что проверить</div><div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px">' + checks.map(function(check){ return '<div style="font-size:12px;color:#ffd89a;line-height:1.45;background:rgba(255,184,77,.08);border:1px solid rgba(255,184,77,.12);border-radius:10px;padding:8px 10px">• ' + check + '</div>'; }).join('') + '</div>' : '') +
+    '<div style="font-size:11px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:5px">Справочно</div>' +
+    '<div style="font-size:12px;color:var(--t3);line-height:1.55">' + (bad.note || 'Без дополнительных заметок') + '</div>' +
+  '</div>';
+}
+function openGoalRecommendationTest(){
+  var prefs = getGoalTestPrefs();
+  var p = getProfile();
+  var body = getLatestBodyForAi() || {};
+  var diary = getDiaryAverages();
+  var profileBits = [
+    p.sex ? ('Пол: ' + (p.sex === 'male' ? 'мужской' : p.sex === 'female' ? 'женский' : p.sex)) : '',
+    p.dob ? ('Возраст: ' + getAge(p.dob)) : '',
+    body.weight != null ? ('Вес: ' + body.weight + ' кг') : '',
+    body.fat != null ? ('Жир: ' + body.fat + '%') : '',
+    body.waist != null ? ('Талия: ' + body.waist + ' см') : ''
+  ].filter(Boolean);
+  var diaryBits = [
+    diary.energy != null ? ('Энергия: ' + diary.energy.toFixed(1)) : '',
+    diary.sleep != null ? ('Сон: ' + diary.sleep.toFixed(1)) : '',
+    diary.mood != null ? ('Настрой: ' + diary.mood.toFixed(1)) : ''
+  ].filter(Boolean);
+  var mainGoal = prefs.goal || 'sleep';
+  var extraGoals = Array.isArray(prefs.extraGoals) ? prefs.extraGoals : [];
+  var result = buildGoalRecommendationResult(prefs);
+  var selectedIds = sanitizeGoalTestSelection(getGoalTestSelection(), result);
+  saveGoalTestSelection(selectedIds);
+  var html = '<div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:12px">';
+  html += '<div style="background:#2b5278;border-radius:10px;padding:12px 14px;font-size:12px;color:#c9e7ff;line-height:1.55"><b style="color:#fff">Тестовый блок.</b> Это не назначение и не консультация врача. Экран показывает, какие БАДы из вашей базы <b style="color:#fff">могут рассматриваться</b> под цель пользователя с учётом данных профиля, замеров и известных ограничений.</div>';
+  html += '<div style="background:var(--bg3);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--t2);line-height:1.55">';
+  html += '<div style="font-size:12px;color:var(--t3);text-transform:uppercase;font-weight:600;margin-bottom:6px">Как выбирать цели</div>';
+  html += '<div>Сначала выберите <b style="color:var(--t1)">главную цель</b>. Затем можно добавить до <b style="color:var(--t1)">трёх дополнительных</b>. Подбор будет строиться в первую очередь по главной цели.</div>';
+  html += '</div>';
+  html += '<div><div style="font-size:12px;color:var(--t3);margin-bottom:8px;font-weight:600;text-transform:uppercase">Главная цель</div><div class="chips">' + renderGoalTestMainGoalChips(mainGoal) + '</div></div>';
+  html += '<div><div style="font-size:12px;color:var(--t3);margin-bottom:8px;font-weight:600;text-transform:uppercase">Дополнительные цели</div><div class="chips">' + renderGoalTestExtraGoalChips(mainGoal, extraGoals) + '</div></div>';
+  if (extraGoals.length) {
+    html += '<div style="display:flex;gap:6px;flex-wrap:wrap">' + getGoalBadgeChips(extraGoals, 'extra') + '</div>';
+  }
+  html += '<div style="background:var(--bg3);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--t2);line-height:1.55">';
+  html += '<div style="font-size:12px;color:var(--t3);text-transform:uppercase;font-weight:600;margin-bottom:6px">Контекст профиля</div>';
+  html += '<div>' + (profileBits.length ? profileBits.join(' · ') : 'Пока мало данных профиля и тела') + '</div>';
+  if (diaryBits.length) html += '<div style="margin-top:6px;color:var(--t3)">Недавний дневник: ' + diaryBits.join(' · ') + '</div>';
+  html += '</div>';
+  html += '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Известные показатели / анализы</div><textarea id="goal-test-indicators" class="inp" rows="3" placeholder="Напр. ферритин низкий, витамин D низкий, мало сна, проблемы с ЖКТ">' + prefs.indicators + '</textarea></div>';
+  html += '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Противопоказания / лекарства / ограничения</div><textarea id="goal-test-contra" class="inp" rows="3" placeholder="Напр. антикоагулянты, щитовидка, тревожность, беременность, давление">' + prefs.contra + '</textarea></div>';
+  html += '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">Доп. контекст цели</div><textarea id="goal-test-notes" class="inp" rows="2" placeholder="Напр. хочу лучше спать, восстановиться после силовых, улучшить концентрацию">' + prefs.notes + '</textarea></div>';
+  html += '<div style="display:flex;gap:8px"><button class="btn btn-blue" style="flex:1" onclick="saveGoalRecommendationTest()">Обновить подбор</button><button class="btn btn-ghost" style="flex:1" onclick="closeSheet()">Закрыть</button></div>';
+  if (result.checks && result.checks.length) {
+    html += '<div style="background:rgba(255,184,77,.08);border:1px solid rgba(255,184,77,.12);border-radius:12px;padding:12px 14px;font-size:13px;color:#f3d9ab;line-height:1.55">';
+    html += '<div style="font-size:12px;color:#ffcf85;text-transform:uppercase;font-weight:700;letter-spacing:.05em;margin-bottom:6px">Что проверить перед добавлением</div>';
+    html += result.checks.map(function(check){ return '<div style="margin-bottom:6px">• ' + check + '</div>'; }).join('');
+    html += '</div>';
+  }
+  var savedPlansHtml = renderGoalPlanCards();
+  if (savedPlansHtml) {
+    html += '<div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Сохранённые планы</div>';
+    html += savedPlansHtml;
+  }
+  html += '<div style="font-size:12px;color:var(--t3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:4px">Рекомендательные кандидаты</div>';
+  html += '<div style="background:var(--bg3);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--t2);line-height:1.55">Ничего не попадёт в основной стек автоматически. Отметьте подходящие позиции и затем подтвердите подбор. <b style="color:var(--t1)">Выбрано: ' + selectedIds.length + '</b>' + (selectedIds.length ? ' · <span style="color:var(--blue)">готово к подтверждению</span>' : '') + '</div>';
+  if (selectedIds.length) {
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-blue" style="flex:1" onclick="openGoalRecommendationConfirm()">Подтвердить ' + selectedIds.length + ' ' + (selectedIds.length === 1 ? 'позицию' : selectedIds.length < 5 ? 'позиции' : 'позиций') + '</button><button class="btn btn-ghost" style="flex:1" onclick="saveGoalRecommendationPlanFromIds(getGoalTestSelection())">Сохранить как план</button><button class="btn btn-ghost" style="flex:1 1 100%" onclick="saveGoalTestSelection([]);openGoalRecommendationTest()">Очистить выбор</button></div>';
+  }
+  if (!result.recommended.length) {
+    html += '<div class="alert alert-o"><span class="alert-ico">⚠️</span><span class="alert-txt">Пока не получилось собрать кандидатов. Попробуйте другую цель или добавьте больше контекста.</span></div>';
+  } else {
+    html += result.recommended.map(function(item){
+      return renderGoalRecommendationCard(item, selectedIds, mainGoal);
+    }).join('');
+  }
+  if (result.cautions.length || result.cautionOnly.length) {
+    html += '<div style="font-size:12px;color:var(--orange);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:6px">Что не стоит добавлять автоматически</div>';
+    html += result.cautions.map(function(text){
+      return '<div class="alert alert-o" style="margin:4px 0"><span class="alert-ico">⚠️</span><span class="alert-txt">' + text + '</span></div>';
+    }).join('');
+    html += result.cautionOnly.map(function(item){
+      return '<div style="background:rgba(255,152,0,.12);border:1px solid rgba(255,152,0,.18);border-radius:12px;padding:12px 14px;margin-top:8px"><div style="font-size:14px;font-weight:700;color:#ffd59a">' + item.bad.e + ' ' + item.bad.name + '</div><div style="font-size:12px;color:#ffd59a;margin-top:4px">Нужна отдельная проверка перед рекомендацией.</div></div>';
+    }).join('');
+  }
+  html += '</div>';
+  openSheet('🧪 Тест: подбор по цели', html);
+}
+function saveGoalRecommendationTest(){
+  var prefs = collectGoalTestFormPrefs(getGoalTestPrefs());
+  saveGoalTestPrefs(prefs);
+  openGoalRecommendationTest();
+}
 function saveProfile(){
   var name=($('prof-name')||{}).value||""||'';
   var dob=($('prof-dob')||{}).value||'';
@@ -3560,11 +4527,11 @@ function initEntryExperience() {
   var hello = h < 6 ? 'Доброй ночи' : h < 12 ? 'Доброе утро' : h < 18 ? 'Добрый день' : 'Добрый вечер';
   var greet = p.name ? (hello + ', ' + p.name) : 'Добро пожаловать в СтекАп';
   var sub = p.name
-    ? 'Подготавливаем ваш стек, последние замеры и персональную базу добавок.'
-    : 'Подготавливаем персональный трекер, базу добавок и стартовый контекст.';
+    ? 'Подготавливаем ваш персональный стек, последние замеры и базу добавок под ваши цели.'
+    : 'Подготавливаем ваш персональный стек, базу добавок и стартовый контекст.';
   var status = p.name
     ? 'Собираем стек, замеры и связи между добавками…'
-    : 'Настраиваем ваше пространство для старта…';
+    : 'Настраиваем систему приёма, наблюдений и первых рекомендаций…';
 
   if ($('boot-greet')) $('boot-greet').textContent = greet;
   if ($('boot-sub')) $('boot-sub').textContent = sub;
@@ -3582,7 +4549,7 @@ function initEntryExperience() {
   setTimeout(function() {
     if ($('boot-status')) $('boot-status').textContent = p.name
       ? 'Всё почти готово. Открываем ваш персональный экран…'
-      : 'Почти готово. Открываем приложение…';
+      : 'Почти готово. Открываем ваш персональный трекер…';
   }, 760);
 
   setTimeout(function() {
@@ -3620,7 +4587,7 @@ function injectManifest() {
   var manifest = {
     name: 'СтекАп',
     short_name: 'СтекАп',
-    description: 'Персональный трекер БАД и дневник самочувствия',
+    description: 'Персональный стек БАДов, дневник самочувствия и ИИ-разбор в одной системе',
     start_url: './',
     display: 'standalone',
     background_color: '#212121',
@@ -4187,8 +5154,9 @@ function openProfileScreen(btn) {
       '<div style="flex:1">' +
         '<div style="font-size:18px;font-weight:700;color:var(--t1)">' + (p.name || 'Не указано') + '</div>' +
         (age ? '<div style="font-size:13px;color:var(--t2)">' + age + ' лет · ' + bdStr + '</div>' : '<div style="font-size:13px;color:var(--t3)">Дата рождения не указана</div>') +
+        '<div style="font-size:12px;color:var(--t3);margin-top:4px">Ваш стек, цели, самочувствие и ИИ-разбор в одной системе.</div>' +
       '</div>' +
-      '<button onclick="openProfile()" style="background:var(--bg3);border:none;border-radius:8px;padding:8px 12px;color:var(--blue);cursor:pointer;font-size:13px">✏️ Изменить</button>' +
+      '<button onclick="openProfileScreen()" style="background:var(--bg3);border:none;border-radius:8px;padding:8px 12px;color:var(--blue);cursor:pointer;font-size:13px">✏️ Изменить</button>' +
     '</div>' +
 
     // Sections
@@ -4200,6 +5168,10 @@ function openProfileScreen(btn) {
       '<div class="cell" onclick="openAddSynRule();closeSheet()">' +
         '<div class="cell-ico" style="background:#2AABEE20;font-size:16px">🔗</div>' +
         '<div class="cell-lbl">Добавить правило синергии</div><span class="cell-arr">›</span>' +
+      '</div>' +
+      '<div class="cell" onclick="openGoalRecommendationTest()">' +
+        '<div class="cell-ico" style="background:#8b5cf620;font-size:16px">🧪</div>' +
+        '<div style="flex:1;min-width:0"><div class="cell-lbl">Тест: подбор по цели</div><div style="font-size:12px;color:var(--t3);margin-top:2px">Главная цель + до 3 дополнительных</div></div><span class="cell-arr">›</span>' +
       '</div>' +
       '<div class="cell" onclick="openNotifSettings()">' +
         '<div class="cell-ico" style="background:#4CAF5020;font-size:16px">🔔</div>' +
@@ -4224,6 +5196,10 @@ function openProfileScreen(btn) {
     '</div>' +
 
     '<div style="padding:12px 16px 0;display:flex;gap:8px">' +
+      '<button class="btn btn-ghost" onclick="openGoalRecommendationTest()" style="flex:1;font-size:13px">🧪 Открыть подбор по цели</button>' +
+    '</div>' +
+
+    '<div style="padding:8px 16px 0;display:flex;gap:8px">' +
       '<button class="btn btn-ghost" onclick="resetOnboarding();closeSheet()" style="flex:1;font-size:13px;color:var(--t3)">🔁 Знакомство заново</button>' +
     '</div>' +
 
@@ -4438,10 +5414,17 @@ function renderBadFormStable(draft) {
   }).join('');
   var isEdit = draft.mode === 'edit' && draft.editId;
   var currentEmoji = (draft.e || '\uD83D\uDC8A').trim() || '\uD83D\uDC8A';
+  var timing = normalizeBadTimingValue(draft.timeSlot || '', draft.mealTiming || '', draft.time || '');
   var title = isEdit ? '\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0411\u0410\u0414' : '\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0411\u0410\u0414';
   var buttonHtml = isEdit
     ? '<button class="btn btn-blue" onclick="updateBad(\'' + draft.editId + '\')">\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0438\u0437\u043C\u0435\u043D\u0435\u043D\u0438\u044F</button>'
     : '<button class="btn btn-blue" onclick="saveNewBad()">\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0432 \u0431\u0430\u0437\u0443</button>';
+  var timeSlotOptionsHtml = BAD_TIME_SLOT_OPTIONS.map(function(option) {
+    return '<option value="' + option.value + '">' + option.label + '</option>';
+  }).join('');
+  var mealTimingOptionsHtml = BAD_MEAL_TIMING_OPTIONS.map(function(option) {
+    return '<option value="' + option.value + '">' + option.label + '</option>';
+  }).join('');
 
   openSheet(title,
     '<div style="padding:0 16px 16px;display:flex;flex-direction:column;gap:10px">'+
@@ -4461,7 +5444,15 @@ function renderBadFormStable(draft) {
         '<div id="emoji-picker-stable-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:6px"></div>'+
       '</div>'+
       '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">\u0414\u043E\u0437\u0438\u0440\u043E\u0432\u043A\u0430</div><input id="ad" class="inp" placeholder="\u043D\u0430\u043F\u0440. 1000\u20134000 \u041C\u0415/\u0434\u0435\u043D\u044C"></div>'+
-      '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">\u0412\u0440\u0435\u043C\u044F \u043F\u0440\u0438\u0451\u043C\u0430</div><input id="at" class="inp" placeholder="\u043D\u0430\u043F\u0440. \u0443\u0442\u0440\u043E\u043C \u0441 \u0435\u0434\u043E\u0439"></div>'+
+      '<div>'+
+        '<div style="font-size:12px;color:var(--t3);margin-bottom:4px">\u0412\u0440\u0435\u043C\u044F \u043F\u0440\u0438\u0451\u043C\u0430</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">'+
+          '<select id="ats" class="inp" onchange="syncBadTimingPreview()">' + timeSlotOptionsHtml + '</select>'+
+          '<select id="atm" class="inp" onchange="syncBadTimingPreview()">' + mealTimingOptionsHtml + '</select>'+
+        '</div>'+
+        '<div id="at-preview" style="font-size:12px;color:var(--t2);margin-bottom:6px">' + (timing.time === '—' ? '\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0440\u0435\u043C\u044F \u043F\u0440\u0438\u0435\u043C\u0430' : timing.time) + '</div>'+
+        '<input id="at" class="inp" readonly placeholder="\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0440\u0435\u043C\u044F \u0438 \u0441\u0432\u044F\u0437\u044C \u0441 \u0435\u0434\u043E\u0439">'+
+      '</div>'+
       '<div><div style="font-size:12px;color:var(--t3);margin-bottom:4px">\u0417\u0430\u043C\u0435\u0442\u043A\u0438</div><textarea id="ano" class="inp" rows="2" placeholder="\u041E\u0441\u043E\u0431\u0435\u043D\u043D\u043E\u0441\u0442\u0438..."></textarea></div>'+
       '<div style="border-top:1px solid var(--line);padding-top:10px">'+
         '<div style="font-size:13px;font-weight:600;color:var(--t1);margin-bottom:6px">\uD83D\uDD17 \u0421\u0438\u043D\u0435\u0440\u0433\u0438\u0438</div>'+
@@ -4489,10 +5480,16 @@ function renderBadFormStable(draft) {
   if ($('an')) $('an').value = draft.name || '';
   if ($('ac')) $('ac').value = draft.cat || 'vitamins';
   if ($('ad')) $('ad').value = draft.dose || '';
-  if ($('at')) $('at').value = draft.time || '';
+  if ($('ats')) $('ats').value = timing.timeSlot || '';
+  if ($('atm')) $('atm').value = timing.mealTiming || '';
+  if ($('at')) {
+    $('at').value = timing.time === '—' ? '' : timing.time;
+    $('at').dataset.raw = draft.time || '';
+  }
   if ($('ano')) $('ano').value = draft.note || '';
   if ($('acw')) $('acw').value = draft.cycleWeeks || '';
   if ($('abw')) $('abw').value = draft.breakWeeks || '';
+  syncBadTimingPreview();
 
   wireAddBadRelations();
   restoreBadFormRelationsStable('syn', draft.syn || []);
@@ -4551,6 +5548,8 @@ function openAddBad() {
     cat: 'vitamins',
     dose: '',
     time: '',
+    timeSlot: '',
+    mealTiming: '',
     note: '',
     cycleWeeks: '',
     breakWeeks: '',
@@ -4576,12 +5575,13 @@ function addRelation(type, id, label) {
 function saveNewBad() {
   var name=($('an')||{}).value||"";
   if(!name){toast('\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u0435');return;}
+  var timing = syncBadTimingPreview();
   var newId='c_'+Date.now();
   var synEls=($('syn-add-hidden')||{}).querySelectorAll?$('syn-add-hidden').querySelectorAll('[data-id]'):[];
   var synIds=[].map.call(synEls,function(el){return el.value;});
   var conEls=($('con-add-hidden')||{}).querySelectorAll?$('con-add-hidden').querySelectorAll('[data-id]'):[];
   var conIds=[].map.call(conEls,function(el){return el.value;});
-  var b={id:newId,name:name,e:($('ae')||{}).value||""||'\uD83D\uDC8A',cat:($('ac')||{}).value||'vitamins',dose:($('ad')||{}).value||""||'\u2014',time:($('at')||{}).value||""||'\u2014',syn:synIds,con:conIds,note:($('ano')||{}).value||""||'',custom:true,cycleWeeks:parseInt(($('acw')||{}).value||'')||null,breakWeeks:parseInt(($('abw')||{}).value||'')||null};
+  var b={id:newId,name:name,e:($('ae')||{}).value||""||'\uD83D\uDC8A',cat:($('ac')||{}).value||'vitamins',dose:($('ad')||{}).value||""||'\u2014',time:timing.time,timeSlot:timing.timeSlot,mealTiming:timing.mealTiming,syn:synIds,con:conIds,note:($('ano')||{}).value||""||'',custom:true,cycleWeeks:parseInt(($('acw')||{}).value||'')||null,breakWeeks:parseInt(($('abw')||{}).value||'')||null};
   S.bad.push(b);sv('bad_v2',S.bad);
   var customRules=ld('syn_db_v1',[]);
   synIds.forEach(function(sid){
@@ -4986,4 +5986,5 @@ function wireAddBadRelations() {
 </script>
 </body>
 </html>
+
 
