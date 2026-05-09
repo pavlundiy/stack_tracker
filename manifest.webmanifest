@@ -3,7 +3,7 @@
   "short_name": "StackUp",
   "description": "Supplement stack tracker with diary and AI analysis",
   "lang": "ru",
-  "id": "./index.html",
+  "id": "./",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
