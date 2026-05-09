@@ -1,17 +1,16 @@
-const CACHE_VERSION = "stackup-pwa-v2-20260509";
+const CACHE_VERSION = "stackup-pwa-v4-20260509";
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 
 const APP_SHELL = [
   "./",
+  "./index.html",
   "./manifest.webmanifest",
   "./icons/apple-touch-icon.png",
   "./icons/stackup-icon-192.png",
   "./icons/stackup-icon-512.png",
   "./icons/stackup-icon-192.svg",
-  "./icons/stackup-icon-512.svg",
-  "./stack_tracker%209%20refreshed.html",
-  "./stack_tracker%209.html"
+  "./icons/stackup-icon-512.svg"
 ];
 
 self.addEventListener("install", (event) => {
@@ -50,11 +49,7 @@ self.addEventListener("fetch", (event) => {
         .catch(async () => {
           const cachedPage = await caches.match(req);
           if (cachedPage) return cachedPage;
-          return (
-            (await caches.match("./stack_tracker%209%20refreshed.html")) ||
-            (await caches.match("./stack_tracker%209.html")) ||
-            Response.error()
-          );
+          return (await caches.match("./index.html")) || Response.error();
         })
     );
     return;
