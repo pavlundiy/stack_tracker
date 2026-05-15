@@ -1,20 +1,32 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#244659"/>
-      <stop offset="100%" stop-color="#0f1f2b"/>
+    <linearGradient id="bg" x1="58" y1="26" x2="454" y2="490" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F8FFFC"/>
+      <stop offset=".46" stop-color="#DFF4EF"/>
+      <stop offset="1" stop-color="#BFE8E1"/>
     </linearGradient>
-    <linearGradient id="pill" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#66d6ff"/>
-      <stop offset="100%" stop-color="#2AABEE"/>
+    <linearGradient id="pillA" x1="122" y1="330" x2="378" y2="150" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFD35B"/>
+      <stop offset=".48" stop-color="#FFB43B"/>
+      <stop offset="1" stop-color="#FF7C9A"/>
     </linearGradient>
+    <linearGradient id="pillB" x1="170" y1="346" x2="400" y2="186" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#24B8A9"/>
+      <stop offset="1" stop-color="#55DCCF"/>
+    </linearGradient>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="42" stdDeviation="32" flood-color="#1A6B62" flood-opacity=".24"/>
+    </filter>
   </defs>
-  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
-  <rect x="116" y="116" width="280" height="280" rx="76" fill="#102733" stroke="#8ee7ff33"/>
-  <g transform="translate(116 116)">
-    <rect x="58" y="96" width="160" height="86" rx="43" fill="#f7ba3f" transform="rotate(-35 140 140)"/>
-    <rect x="122" y="96" width="102" height="86" rx="43" fill="#ff4f86" transform="rotate(-35 140 140)"/>
-    <circle cx="190" cy="118" r="11" fill="#fff" opacity=".72"/>
+  <rect width="512" height="512" rx="122" fill="url(#bg)"/>
+  <path d="M88 198c24-83 88-128 176-128 83 0 144 40 178 115 40 88 16 178-61 239-67 53-163 53-235 8-83-53-109-144-58-234Z" fill="#FFFFFF" opacity=".58"/>
+  <path d="M357 86c40 16 64 48 72 93" fill="none" stroke="#FFFFFF" stroke-width="22" stroke-linecap="round" opacity=".65"/>
+  <g filter="url(#soft)">
+    <rect x="114" y="200" width="284" height="122" rx="61" fill="url(#pillA)" transform="rotate(-35 256 261)"/>
+    <rect x="232" y="200" width="166" height="122" rx="61" fill="url(#pillB)" transform="rotate(-35 256 261)"/>
+    <circle cx="331" cy="184" r="17" fill="#FFFFFF" opacity=".78"/>
   </g>
-  <rect x="150" y="404" width="212" height="28" rx="14" fill="url(#pill)" opacity=".85"/>
+  <rect x="118" y="371" width="276" height="38" rx="19" fill="#24B8A9" opacity=".72"/>
+  <circle cx="150" cy="126" r="19" fill="#FFB43B"/>
+  <circle cx="386" cy="352" r="22" fill="#8F6CFF" opacity=".82"/>
 </svg>

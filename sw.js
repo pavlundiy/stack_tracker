@@ -1,4 +1,4 @@
-const CACHE_VERSION = "stackup-pwa-v4-20260509";
+const CACHE_VERSION = "stackup-pwa-v5-20260515";
 const STATIC_CACHE = `static-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 
